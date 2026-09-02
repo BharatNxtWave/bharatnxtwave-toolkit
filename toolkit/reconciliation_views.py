@@ -5,12 +5,11 @@ from django.shortcuts import (
     redirect,
     render,
 )
+from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
 from toolkit.intelligence.final_import import (
-    apply_batch,
     preview_batch,
-    rollback_batch,
 )
 from accounts.portal_access import is_admin_user
 
@@ -133,18 +132,48 @@ def reconciliation_finalize(
                         )
 
 
-                    result = apply_batch(
-                        batch.pk,
-                        user=request.user,
-                        reconcile=True,
+                    # Queued rather than applied here: applying snapshots
+                    # the whole database and would hold this request - and
+                    # a gunicorn worker - for the length of the import.
+                    # toolkit/management/commands/run_import_worker applies
+                    # it with reconcile=True.
+                    queue_metadata = (
+                        dict(batch.metadata)
+                        if isinstance(batch.metadata, dict)
+                        else {}
                     )
+
+                    queue_metadata["queued_by_id"] = request.user.pk
+                    queue_metadata["queued_reconcile"] = True
+                    queue_metadata["queued_at"] = (
+                        timezone.now().isoformat()
+                    )
+                    queue_metadata.pop("import_failure", None)
+
+                    queued = (
+                        ImportBatch.objects
+                        .filter(
+                            pk=batch.pk,
+                            status__in=("PREVIEWED", "VALIDATED"),
+                        )
+                        .update(
+                            status="QUEUED",
+                            metadata=queue_metadata,
+                        )
+                    )
+
+                    if not queued:
+                        raise RuntimeError(
+                            "This source is no longer ready to import. "
+                            "Reload the review screen."
+                        )
 
                 messages.success(
                     request,
                     (
-                        "Final Import completed. "
-                        f"{result.get('changes_created', 0)} "
-                        "audited change(s) created."
+                        "Final Import queued. The import worker is "
+                        "applying it now - this page shows its progress. "
+                        "A large source can take a few minutes."
                     ),
                 )
 
@@ -159,17 +188,40 @@ def reconciliation_finalize(
 
             try:
 
-                result = rollback_batch(
-                    batch.pk,
-                    user=request.user,
+                # Queued for the same reason as the import: a rollback
+                # snapshots the database and reverses every change, which
+                # is far too long to hold a request open.
+                queue_metadata = (
+                    dict(batch.metadata)
+                    if isinstance(batch.metadata, dict)
+                    else {}
                 )
+
+                queue_metadata["queued_by_id"] = request.user.pk
+                queue_metadata["queued_operation"] = "rollback"
+                queue_metadata["queued_at"] = timezone.now().isoformat()
+                queue_metadata.pop("import_failure", None)
+
+                queued = (
+                    ImportBatch.objects
+                    .filter(pk=batch.pk, status="IMPORTED")
+                    .update(
+                        status="QUEUED",
+                        metadata=queue_metadata,
+                    )
+                )
+
+                if not queued:
+                    raise RuntimeError(
+                        "Only an imported source can be rolled back. "
+                        "Reload this page."
+                    )
 
                 messages.success(
                     request,
                     (
-                        "Rollback completed. "
-                        f"{result.get('reversed_changes', 0)} "
-                        "change(s) reversed."
+                        "Rollback queued. The import worker is reversing "
+                        "the changes now - this page shows its progress."
                     ),
                 )
 

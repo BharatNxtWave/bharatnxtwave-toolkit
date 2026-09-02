@@ -1,0 +1,17 @@
+# BharatNXT Wave - activity history retention.
+#
+# ActivityLog, SearchEvent and LoginSession grow with every action and
+# nothing removes rows. At thirty BDEs that is roughly half a million rows a
+# year, which slows the admin activity screens and inflates the pre-import
+# pg_dump.
+#
+#   sudo cp deployment/retention-cron.example /etc/cron.d/bharatnxt-retention
+#   sudo chmod 644 /etc/cron.d/bharatnxt-retention
+#
+# Run it once by hand with --dry-run first to see what would go.
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# 03:30 daily. Routine activity is kept 365 days, security events 730.
+30 3 * * * bharatnxt set -a; . /etc/bharatnxt-toolkit.env; set +a; cd /opt/bharatnxt-toolkit && .venv/bin/python manage.py prune_activity_history >> /opt/bharatnxt-toolkit/logs/retention.log 2>&1

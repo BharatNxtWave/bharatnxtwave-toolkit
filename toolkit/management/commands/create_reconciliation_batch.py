@@ -211,7 +211,9 @@ class Command(BaseCommand):
                     "rb"
                 ) as handle:
 
-                    stage_result = stage_analysis(
+                    # Called for its side effect: it stages the analysis
+                    # onto the batch. The return value is not used here.
+                    stage_analysis(
                         batch,
                         analysis,
                         handle,

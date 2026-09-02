@@ -2345,9 +2345,6 @@ from .models import (
     ImportBatch as _StandardImportBatch,
     ImportRow as _StandardImportRow,
 )
-from .intelligence.final_import import (
-    apply_batch as _standard_apply_batch,
-)
 
 
 def _standard_approve_ready_rows(
@@ -2539,11 +2536,39 @@ def import_finalize(
                 )
             )
 
-            result = _standard_apply_batch(
-                locked_batch.pk,
-                user=request.user,
-                reconcile=False,
+            # Applying takes a full database snapshot and rewrites the
+            # catalogue. Doing that inline held a gunicorn worker for the
+            # whole import and hit the 120s request timeout as the database
+            # grew. Queue it; toolkit/management/commands/run_import_worker
+            # applies it.
+            queue_metadata = (
+                dict(locked_batch.metadata)
+                if isinstance(locked_batch.metadata, dict)
+                else {}
             )
+
+            queue_metadata["queued_by_id"] = request.user.pk
+            queue_metadata["queued_reconcile"] = False
+            queue_metadata["queued_at"] = timezone.now().isoformat()
+            queue_metadata.pop("import_failure", None)
+
+            queued = (
+                _StandardImportBatch.objects
+                .filter(
+                    pk=locked_batch.pk,
+                    status__in=("PREVIEWED", "VALIDATED"),
+                )
+                .update(
+                    status="QUEUED",
+                    metadata=queue_metadata,
+                )
+            )
+
+            if not queued:
+                raise RuntimeError(
+                    "This source is no longer ready to import. "
+                    "Reload the review screen."
+                )
 
     except Exception as exc:
 
@@ -2560,22 +2585,6 @@ def import_finalize(
             batch_id=batch.pk,
         )
 
-    created_services = int(
-        result.get(
-            "created_services",
-            0,
-        )
-        or 0
-    )
-
-    changes_created = int(
-        result.get(
-            "changes_created",
-            0,
-        )
-        or 0
-    )
-
     skipped_count = (
         batch.rows
         .filter(
@@ -2584,10 +2593,17 @@ def import_finalize(
         .count()
     )
 
+    importable = (
+        batch.rows
+        .exclude(
+            candidate_action="SKIP"
+        )
+        .exists()
+    )
+
     if (
         skipped_count > 0
-        and created_services == 0
-        and changes_created == 0
+        and not importable
         and approved == 0
     ):
 
@@ -2607,17 +2623,13 @@ def import_finalize(
         _standard_import_messages.success(
             request,
             (
-                "Toolkit import completed. "
-                f"{created_services} new Service"
-                f"{'s' if created_services != 1 else ''} "
-                "created and "
-                f"{changes_created} audited change"
-                f"{'s' if changes_created != 1 else ''} "
-                "recorded. "
+                "Import queued. "
                 f"{approved} ready item"
                 f"{'s' if approved != 1 else ''} "
                 f"{'were' if approved != 1 else 'was'} "
-                "approved during import."
+                "approved and the source is now waiting for the import "
+                "worker. This page shows its progress - a large source "
+                "can take a few minutes."
             ),
         )
 

@@ -1026,6 +1026,10 @@ class ImportBatch(models.Model):
     STATUS_CHOICES = [
         ("PREVIEWED", "Previewed"),
         ("VALIDATED", "Validated"),
+        # Approved by an admin and waiting for the import worker to pick it
+        # up. Applying an import snapshots the whole database and rewrites
+        # the catalogue, which is far too long to hold an HTTP request open.
+        ("QUEUED", "Queued for import"),
         ("IMPORTING", "Importing"),
         ("IMPORTED", "Imported"),
         ("ROLLED_BACK", "Rolled Back"),

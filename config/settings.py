@@ -519,7 +519,35 @@ LOGIN_LOCKOUT_SECONDS = int(
     )
 )
 
-if IS_PRODUCTION:
+# The cache carries two things that must be shared by every worker and,
+# once there is more than one instance, by every instance:
+#
+#   - login lockout counters (a per-process cache multiplies the limit)
+#   - cached search answers (see toolkit/search_cache.py)
+#
+# Redis is required past a couple of hundred concurrent users: the database
+# cache turns every cache read into a database round trip, which is exactly
+# the load the search cache exists to remove.
+REDIS_URL = os.environ.get(
+    "REDIS_URL",
+    "",
+).strip()
+
+if REDIS_URL:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": REDIS_URL,
+            "OPTIONS": {
+                "socket_connect_timeout": 2,
+                "socket_timeout": 2,
+            },
+        }
+    }
+
+elif IS_PRODUCTION:
+    # No Redis configured. Correct, and fine for a single small instance,
+    # but it puts the cache on the database - see DEPLOY_RENDER.md.
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.db.DatabaseCache",

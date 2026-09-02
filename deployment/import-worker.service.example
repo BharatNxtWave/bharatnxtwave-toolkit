@@ -1,0 +1,49 @@
+# BharatNXT Wave - background import worker (self-hosted).
+#
+# Applying an import or a rollback takes a full pg_dump and rewrites the
+# catalogue. That used to run inside the HTTP request, which blocked a
+# gunicorn worker for the whole operation and hit the 120s request timeout
+# as the database grew. The web app now queues the work; this unit applies it.
+#
+# Without this unit running, imports queue up and are never applied. The app
+# still works - queued sources simply sit in the Admin Centre showing
+# "Queued for import" until the worker starts.
+#
+#   sudo cp deployment/import-worker.service.example \
+#           /etc/systemd/system/bharatnxt-import-worker.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now bharatnxt-import-worker
+#   sudo journalctl -u bharatnxt-import-worker -f
+
+[Unit]
+Description=BharatNXT Wave Import Worker
+After=network.target postgresql.service
+# The web service owns database migrations; start after it.
+After=bharatnxt-toolkit.service
+
+[Service]
+Type=simple
+
+User=bharatnxt
+Group=www-data
+
+WorkingDirectory=/opt/bharatnxt-toolkit
+
+EnvironmentFile=/etc/bharatnxt-toolkit.env
+
+ExecStart=/opt/bharatnxt-toolkit/.venv/bin/python manage.py run_import_worker
+
+# The worker finishes the batch in flight before exiting, so give it room.
+# An import killed halfway is rolled back by its transaction, but the batch
+# then needs a human to re-queue it.
+KillSignal=SIGTERM
+TimeoutStopSec=900
+
+Restart=on-failure
+RestartSec=10
+
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

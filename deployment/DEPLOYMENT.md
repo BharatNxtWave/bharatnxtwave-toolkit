@@ -242,6 +242,60 @@ sudo systemctl status bharatnxt-toolkit
 
 ---
 
+## 7b. Background import worker — required
+
+Applying an import or a rollback takes a full `pg_dump` and rewrites the
+catalogue. That work no longer happens inside the HTTP request: the web app
+queues it and a separate worker applies it.
+
+**Without the worker running, imports are never applied.** Nothing breaks -
+queued sources sit in the Admin Centre showing "Queued for import" - but no
+data moves.
+
+```bash
+sudo cp deployment/import-worker.service.example         /etc/systemd/system/bharatnxt-import-worker.service
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now bharatnxt-import-worker
+sudo journalctl -u bharatnxt-import-worker -f
+```
+
+A healthy log looks like:
+
+```
+Import worker started.
+Importing batch #12 (schemes-march.xlsx)...
+Batch #12 imported in 34.2s (478 rows, 12 services created).
+```
+
+More than one copy is safe - batches are claimed with a single conditional
+UPDATE, so exactly one worker wins each. A worker killed mid-import leaves the
+batch recoverable: the import is transactional, so nothing is half-applied,
+and the next worker start marks it FAILED with a reason so it can be queued
+again.
+
+---
+
+## 7c. Activity history retention
+
+`ActivityLog`, `SearchEvent` and `LoginSession` gain a row on every action and
+nothing removes them - roughly half a million rows a year at thirty BDEs. That
+slows the activity screens and inflates the pre-import `pg_dump`.
+
+```bash
+# See what would go, before scheduling anything
+sudo -u bharatnxt -E .venv/bin/python manage.py prune_activity_history --dry-run
+
+sudo cp deployment/retention-cron.example /etc/cron.d/bharatnxt-retention
+sudo chmod 644 /etc/cron.d/bharatnxt-retention
+```
+
+Routine activity is kept 365 days; failed sign-ins, blocked sign-ins and
+permission denials are kept 730, because those are the rows an investigation
+actually needs.
+
+---
+
 ## 8. Backups
 
 The app holds imported scheme data that is expensive to reconstruct. Set up
@@ -328,6 +382,7 @@ going live for an internal team, but you should know they are missing:
 - **`toolkit/views.py` and `toolkit/models.py` are very large** and will
   slow future changes. A refactor is deferred, not forgotten.
 - **Pre-import snapshots are never pruned.** `confidential_source/audit/` grows
-  by one full database dump per applied import. Watch the disk.
+  by one full database dump per applied import. Watch the disk. (Activity
+  history *is* pruned - see section 7c.)
 - **The login lockout has no admin unlock screen.** Clearing an early lockout
   means clearing the cache table by hand.

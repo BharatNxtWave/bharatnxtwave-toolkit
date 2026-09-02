@@ -105,6 +105,11 @@ echo "==> Data root ready: ${BHARATNXT_DATA_ROOT}"
 # Database
 # --------------------------------------------------------------------------
 
+# The web service owns the schema. Other services built from this image
+# (the import worker) get their own command and skip this: two processes
+# running `migrate` at the same moment on a deploy can conflict.
+if [ "$#" -eq 0 ]; then
+
 echo "==> Applying migrations"
 ${RUN_AS} python manage.py migrate --noinput
 
@@ -112,6 +117,45 @@ ${RUN_AS} python manage.py migrate --noinput
 # worker would count failures separately. Safe to re-run.
 echo "==> Ensuring cache table"
 ${RUN_AS} python manage.py createcachetable
+
+# --- first administrator ------------------------------------------------
+# A free Render instance has no Shell, so `createsuperuser` cannot be run
+# by hand there. Set these three variables to have the first admin created
+# on boot; it is skipped once any superuser exists, so leaving them set
+# does nothing on later deploys.
+#
+# Remove them from the environment once you have signed in - they are a
+# password sitting in the service configuration.
+if [ -n "${BHARATNXT_BOOTSTRAP_ADMIN_USERNAME:-}" ]    && [ -n "${BHARATNXT_BOOTSTRAP_ADMIN_PASSWORD:-}" ]; then
+
+    echo "==> Ensuring a bootstrap administrator exists"
+    ${RUN_AS} python manage.py bootstrap_admin
+
+fi
+
+# --- import worker, in-process ------------------------------------------
+# Free instances cannot run a separate worker service, so queued imports
+# would never be applied. This runs one inside the web container instead.
+#
+# Do NOT use this on a paid plan: it competes with gunicorn for the same
+# CPU, and it dies with the web service. Use the worker service instead.
+if [ "${BHARATNXT_RUN_WORKER_INLINE:-false}" = "true" ]; then
+
+    echo "==> Starting an in-process import worker (free-tier mode)"
+    ${RUN_AS} python manage.py run_import_worker &
+
+fi
+
+fi
+
+# A command passed to the container (Render's dockerCommand) replaces the
+# default web server - that is how the import worker runs from this same
+# image. Without this branch it would silently start gunicorn instead and no
+# queued import would ever be applied.
+if [ "$#" -gt 0 ]; then
+    echo "==> Starting: $* (as ${APP_USER})"
+    exec ${RUN_AS} "$@"
+fi
 
 # --------------------------------------------------------------------------
 # Hand over to gunicorn

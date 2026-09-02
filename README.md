@@ -60,13 +60,23 @@ normally. In production it is forced on — see the deployment guide.
 
 ---
 
+## Operational commands
+
+| Command | What it does |
+|---|---|
+| `manage.py run_import_worker` | Applies queued imports and rollbacks. Required in production; `--once` for a single pass. |
+| `manage.py prune_activity_history` | Deletes activity history past its retention window. `--dry-run` first. |
+| `deployment/loadtest.py` | Measures how many concurrent users the deployment actually handles. |
+
+---
+
 ## Running the tests
 
 ```bash
 python manage.py test
 ```
 
-86 tests across `accounts`, `dashboard` and `toolkit`. They cover login,
+115 tests across `accounts`, `dashboard` and `toolkit`. They cover login,
 session/CSRF handling and brute-force lockout, admin access control, import
 safety and finalisation, the pre-import backup on both database engines, and
 the scheme-flyer upload/restore lifecycle.
@@ -98,9 +108,16 @@ at the final `OK` line.
 - **Login failures are counted in the cache** by `accounts/login_throttle.py`.
   Production must use a cache shared across gunicorn workers, or the limit is
   effectively multiplied by the worker count.
-- **Applying an import first snapshots the whole database** via
-  `toolkit.intelligence.final_import.backup_database`. It needs `pg_dump` on
-  `PATH` under PostgreSQL.
+- **Imports and rollbacks run in a background worker**, not in the request.
+  Applying takes a full `pg_dump` and rewrites the catalogue, which used to
+  block a gunicorn worker and hit the 120s request timeout. The view queues
+  the batch; `manage.py run_import_worker` applies it. **Nothing is imported
+  while no worker is running** - queued sources just wait.
+- **Search results are cached** by `toolkit/search_cache.py`, keyed on a
+  catalogue version. Anything that changes what a search can return must bump
+  that version; model signals in `toolkit/apps.py` handle ordinary saves, but
+  bulk writes (`bulk_create`, `update`, the import) must call
+  `bump_catalog_version()` themselves.
 - **Client IP resolution has two modes** (`BHARATNXT_PROXY_MODE`), because it
   feeds the IP allow-list: `xrealip` behind your own nginx, `forwarded` behind
   a managed platform. Read the docstrings in `accounts/network_security.py`
