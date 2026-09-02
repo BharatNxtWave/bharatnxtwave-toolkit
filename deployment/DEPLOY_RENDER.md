@@ -59,6 +59,7 @@ schemes, throwaway flyers, throwaway users.
 | **First load takes ~1 minute** | Free instances sleep after ~15 minutes idle. The next request wakes them. Warn the team, or it gets reported as a bug. |
 | **Uploads disappear after a deploy** | Expected. See above. |
 | **The database expires** | Render deletes free databases after their trial window, and everything in them. |
+| **There is no Shell** | Free instances have no SSH, no one-off jobs and no scaling. `render.free.yaml` works around it: the first admin is created from `BHARATNXT_BOOTSTRAP_ADMIN_*`, and the import worker runs inside the web container. |
 
 There is no way to keep a free instance awake from inside the app: while it
 sleeps, no code of yours is running, so nothing can ping anything. An external
@@ -132,9 +133,14 @@ Render Dashboard → **New** → **Blueprint** → select this repository.
 
 Render reads [`render.yaml`](../render.yaml) and creates:
 
-- **`bharatnxt-toolkit`** — the web service (Docker, Singapore, `starter`)
-- **`bharatnxt-db`** — PostgreSQL 16 (Singapore, `basic-256mb`, not exposed
-  outside Render)
+- **`bharatnxt-toolkit`** — the web service (Docker, Singapore, `standard`,
+  2 instances × 8 gunicorn workers)
+- **`bharatnxt-import-worker`** — applies queued imports and rollbacks.
+  **Without it, imports queue up and are never applied.**
+- **`bharatnxt-cache`** — Redis. Holds cached search answers and login
+  lockout counters, both of which must be shared across instances.
+- **`bharatnxt-db`** — PostgreSQL 16 (Singapore, `basic-1gb` — sized for the
+  connection count, not the data volume)
 - **`bharatnxt-data`** — a 10 GB persistent disk mounted at `/var/data`
 
 > Plan names and sizes in `render.yaml` reflect Render's tiers at the time of
@@ -224,14 +230,27 @@ Render marks the deploy failed rather than serving a broken app:
 
 ## 5. Create the first administrator
 
-Render Dashboard → the service → **Shell**:
+**On a paid plan**, Render Dashboard → the service → **Shell**:
 
 ```bash
 python manage.py createsuperuser
 ```
 
-Then sign in and set that user's role to `SUPER_ADMIN` under
-**Admin Centre → Employees**, so role-based screens behave correctly.
+**On the free tier there is no Shell.** Set these two variables instead; the
+admin is created on the next boot, and the command does nothing once any
+superuser exists:
+
+```
+BHARATNXT_BOOTSTRAP_ADMIN_USERNAME=admin
+BHARATNXT_BOOTSTRAP_ADMIN_PASSWORD=<a long random password>
+```
+
+> Delete both once you have signed in. They are a full-access password
+> sitting in a settings page, and anyone who can read the service
+> configuration can read them.
+
+Either way, confirm the account's role is `SUPER_ADMIN` under
+**Admin Centre → Employees**.
 
 ---
 
@@ -293,6 +312,64 @@ import pipeline is working.
 
 If you instead see `pg_dump was not found on PATH`, the image built without
 the PGDG step — check the build log.
+
+---
+
+## 7b. Check the import worker is running
+
+Applying an import is queued, not done in the request. Open the
+**bharatnxt-import-worker** logs; a healthy worker prints:
+
+```
+Import worker started.
+```
+
+and, when you apply the test import from section 7:
+
+```
+Importing batch #1 (test.xlsx)...
+Batch #1 imported in 12.4s (40 rows, 8 services created).
+```
+
+If the source stays on "Queued for import" forever, the worker is not running.
+
+> On the **free tier** there is no separate worker service, and no Shell to
+> run one by hand. `render.free.yaml` sets
+> `BHARATNXT_RUN_WORKER_INLINE=true`, which starts a worker inside the web
+> container. Look for `Starting an in-process import worker` in the boot log.
+>
+> Do not carry that variable over to a paid plan - there the worker competes
+> with gunicorn for CPU. Use the worker service instead.
+
+---
+
+## 7c. Schedule activity retention
+
+`ActivityLog`, `SearchEvent` and `LoginSession` grow with every action and
+nothing removes them. Add a Render **Cron Job** on the same image:
+
+```
+Schedule : 30 3 * * *
+Command  : python manage.py prune_activity_history
+```
+
+Give it the same `DATABASE_URL`, `BHARATNXT_ENVIRONMENT` and
+`BHARATNXT_SECRET_KEY` as the worker. Run it once with `--dry-run` first.
+
+---
+
+## 7d. Prove the capacity
+
+Do not take an estimate for it — measure. [`loadtest.py`](loadtest.py) drives
+realistic BDE sessions and reports where latency turns:
+
+```bash
+python deployment/loadtest.py --url https://<your-app>.onrender.com     --ramp 25,50,100,200 --duration 60
+```
+
+Read its docstring first: it needs test accounts created, and it must run
+from inside the office allow-list. p95 is the number that matters — the level
+where it turns sharply upward is the real capacity of the deployment.
 
 ---
 

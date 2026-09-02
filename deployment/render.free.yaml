@@ -10,6 +10,12 @@
 #  Use this to let the team click around the real application. Put throwaway
 #  data in it. When it becomes the system people actually rely on, move to
 #  ../render.yaml (see "Upgrading" below).
+#
+#  A free instance also has NO SHELL, no scaling and no separate worker
+#  service, so two things are handled inside the web container instead:
+#  the first administrator is created from environment variables, and the
+#  import worker runs in-process. Neither is how a paid deployment should
+#  work - see ../render.yaml.
 # ===========================================================================
 #
 # To use this file:
@@ -116,7 +122,26 @@ services:
       - key: BHARATNXT_LOG_LEVEL
         value: INFO
 
-      # A free instance has far less memory than a paid one. Three gunicorn
-      # workers will not fit comfortably.
+      # A free instance is 512 MB / 0.1 CPU. Memory is not the binding
+      # constraint (about 75 MB per worker) - the tenth of a CPU is. More
+      # workers would just queue on the same sliver of CPU.
       - key: WEB_CONCURRENCY
         value: "2"
+
+      # No separate worker service is possible on free, so run one inside
+      # the web container. Without it, queued imports are never applied.
+      # Delete this when moving to a paid plan with a real worker service.
+      - key: BHARATNXT_RUN_WORKER_INLINE
+        value: "true"
+
+      # There is no Shell on a free instance, so `createsuperuser` cannot be
+      # run by hand. These create the first administrator on boot; the
+      # command does nothing once any superuser exists.
+      #
+      # DELETE BOTH once you have signed in - they are a full-access
+      # password sitting in the service configuration.
+      - key: BHARATNXT_BOOTSTRAP_ADMIN_USERNAME
+        sync: false
+
+      - key: BHARATNXT_BOOTSTRAP_ADMIN_PASSWORD
+        sync: false

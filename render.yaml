@@ -23,18 +23,97 @@ databases:
     user: bharatnxt_app
     # Must match the web service region, or every query crosses the internet.
     region: singapore
-    plan: basic-256mb
+    # Sized for the connection count, not the data: every gunicorn worker
+    # holds its own persistent connection (CONN_MAX_AGE=60). numInstances x
+    # WEB_CONCURRENCY + the import worker must fit the plan's limit.
+    plan: basic-1gb
     postgresMajorVersion: "16"
     ipAllowList: []          # Reachable only from inside Render.
 
 services:
+  # Shared cache. Required once there is more than one instance: it holds the
+  # cached search answers (toolkit/search_cache.py) and the login lockout
+  # counters, both of which must be seen by every worker on every instance.
+  # Without it the app falls back to the database cache, which puts the load
+  # back on the database that the search cache exists to remove.
+  #
+  # Render renamed this service type; if the dashboard rejects `redis`, use
+  # the current Key Value type and keep the same name.
+  - type: redis
+    name: bharatnxt-cache
+    region: singapore
+    plan: starter
+    maxmemoryPolicy: allkeys-lru   # It is a cache; evicting is correct.
+    ipAllowList: []
+
+  # Applies queued imports and rollbacks. Both take a full pg_dump and rewrite
+  # the catalogue, which used to run inside the HTTP request - blocking a
+  # gunicorn worker and hitting the 120s request timeout as the database grew.
+  #
+  # Safe to run more than one: batches are claimed with a single conditional
+  # UPDATE. Safe to run none: imports simply wait in the queue.
+  - type: worker
+    name: bharatnxt-import-worker
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: singapore
+    plan: starter
+    dockerCommand: python manage.py run_import_worker
+
+    # The worker serves no HTTP, so it needs no hosts, CSRF origins or
+    # office allow-list. It does need the same database, the same disk (it
+    # writes pre-import snapshots there) and the same cache.
+    #
+    # The secret key is pulled from the web service rather than generated
+    # again, so both halves of the app agree on one value.
+    envVars:
+      - key: BHARATNXT_ENVIRONMENT
+        value: production
+
+      - key: BHARATNXT_SECRET_KEY
+        fromService:
+          type: web
+          name: bharatnxt-toolkit
+          envVarKey: BHARATNXT_SECRET_KEY
+
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bharatnxt-db
+          property: connectionString
+
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: bharatnxt-cache
+          property: connectionString
+
+      - key: BHARATNXT_DATA_ROOT
+        value: /var/data
+
+      - key: BHARATNXT_LOG_LEVEL
+        value: INFO
+
+    # Pre-import snapshots are written here, so the worker needs the disk
+    # too. Render mounts a disk to one service, so this is a separate disk
+    # from the web service's - snapshots written here are not visible from
+    # the web instances. They are an audit artefact, not something the app
+    # reads back, so that is acceptable.
+    disk:
+      name: bharatnxt-worker-data
+      mountPath: /var/data
+      sizeGB: 10
+
   - type: web
     name: bharatnxt-toolkit
     runtime: docker
     dockerfilePath: ./Dockerfile
     region: singapore
     # A persistent disk requires a paid instance type; free will not work.
-    plan: starter
+    # `standard` is sized for the worker count below - each gunicorn worker
+    # holds about 75 MB steady state (measured), so 8 workers needs roughly
+    # 600 MB plus headroom.
+    plan: standard
+    numInstances: 2
     healthCheckPath: /healthz/
 
     disk:
@@ -108,7 +187,19 @@ services:
       - key: BHARATNXT_LOG_LEVEL
         value: INFO
 
-      # gunicorn workers. Raise only with the instance size - each worker
-      # holds its own database connections.
+      # gunicorn uses sync workers: each one serves a single request at a
+      # time, so this is the concurrency ceiling per instance. 8 workers x 2
+      # instances = 16 requests in flight.
+      #
+      # Raise only alongside the instance size (about 75 MB per worker) and
+      # the database plan (one persistent connection per worker).
       - key: WEB_CONCURRENCY
-        value: "3"
+        value: "8"
+
+      # Shared cache. Without it the app uses the database cache, which does
+      # not scale past a single small instance.
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: bharatnxt-cache
+          property: connectionString

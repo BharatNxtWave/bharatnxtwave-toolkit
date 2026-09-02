@@ -17,3 +17,6 @@ et_xmlfile==2.0.0
 
 # Serves static files from the app process (managed platforms)
 whitenoise==6.12.0
+
+# Shared cache client (django.core.cache.backends.redis.RedisCache)
+redis==8.1.0

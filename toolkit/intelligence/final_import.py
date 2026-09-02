@@ -28,6 +28,7 @@ from django.db import models, transaction
 from django.utils import timezone
 from django.utils.text import slugify
 
+from toolkit.search_cache import bump_catalog_version
 from toolkit.intelligence.delta import (
     classify_candidate,
     normalize_text,
@@ -2068,12 +2069,32 @@ def preview_batch(
 # FINAL APPLY
 # ============================================================
 
+#: Statuses a batch may be in when apply_batch is called directly. This is
+#: what stops the same batch being imported twice: apply_batch leaves it as
+#: IMPORTED, which is not in this set.
+APPLYABLE_STATUSES = frozenset({"PREVIEWED", "VALIDATED"})
+
+
 def apply_batch(
     batch_id,
     *,
     user=None,
     reconcile=False,
+    expected_statuses=None,
 ):
+    """Apply an import batch.
+
+    `expected_statuses` overrides the status guard for the import worker,
+    which has already claimed the batch by moving it QUEUED -> IMPORTING in
+    a single atomic UPDATE. That claim is what guarantees one execution, so
+    the worker passes {"IMPORTING"}. Nothing else should override it.
+    """
+
+    allowed = (
+        APPLYABLE_STATUSES
+        if expected_statuses is None
+        else frozenset(expected_statuses)
+    )
 
     batch = (
         ImportBatch.objects
@@ -2082,10 +2103,7 @@ def apply_batch(
         )
     )
 
-    if batch.status not in {
-        "PREVIEWED",
-        "VALIDATED",
-    }:
+    if batch.status not in allowed:
         raise FinalImportError(
             f"Batch #{batch.pk} has status "
             f"{batch.status}; cannot import."
@@ -2582,6 +2600,11 @@ def apply_batch(
         .count()
     )
 
+    # The import writes through bulk paths that do not fire model signals,
+    # so retire the cached search answers by hand. Without this a BDE keeps
+    # getting pre-import results until the cache TTL lapses.
+    bump_catalog_version()
+
     return {
         "batch_id":
             batch.pk,
@@ -2614,7 +2637,14 @@ def rollback_batch(
     batch_id,
     *,
     user=None,
+    expected_statuses=None,
 ):
+    """Reverse an applied import.
+
+    `expected_statuses` is for the import worker, which has already claimed
+    the batch by moving it QUEUED -> IMPORTING atomically. Nothing else
+    should override the guard.
+    """
 
     batch = (
         ImportBatch.objects
@@ -2623,7 +2653,13 @@ def rollback_batch(
         )
     )
 
-    if batch.status != "IMPORTED":
+    allowed_rollback = (
+        {"IMPORTED"}
+        if expected_statuses is None
+        else set(expected_statuses)
+    )
+
+    if batch.status not in allowed_rollback:
 
         raise FinalImportError(
             f"Batch #{batch.pk} is "
@@ -2756,6 +2792,9 @@ def rollback_batch(
                 update_fields
             )
         )
+
+    # A rollback changes what search can return just as much as an import.
+    bump_catalog_version()
 
     return {
         "batch_id":

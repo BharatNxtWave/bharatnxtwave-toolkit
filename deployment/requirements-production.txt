@@ -22,3 +22,6 @@ gunicorn==23.0.0
 
 # PostgreSQL driver
 psycopg[binary]==3.3.5
+
+# Shared cache client (django.core.cache.backends.redis.RedisCache)
+redis==8.1.0

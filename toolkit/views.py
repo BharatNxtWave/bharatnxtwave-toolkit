@@ -1006,6 +1006,38 @@ def _search_money_amounts(value):
     return amounts
 
 
+def cached_catalog_match_ids(query):
+    """`natural_language_match_ids` over the whole catalogue, cached.
+
+    Only safe for the full BDE catalogue: the cache key is the query text
+    alone, so a caller passing an already-filtered queryset would read
+    somebody else's answer. `matcher.py` does exactly that and therefore
+    calls the uncached function directly.
+
+    A single search costs 86 queries and a four-word one 186, and the result
+    depends only on the query and the catalogue - never on the user - so the
+    same popular searches are otherwise recomputed for every BDE.
+    """
+
+    from .search_cache import get_cached_ids, set_cached_ids
+
+    cached = get_cached_ids("nlmatch", query)
+
+    # None means "not cached". An empty set is a real answer and is served
+    # from the cache like any other.
+    if cached is not None:
+        return set(cached)
+
+    matched = natural_language_match_ids(
+        all_bde_services(),
+        query,
+    )
+
+    set_cached_ids("nlmatch", query, matched)
+
+    return matched
+
+
 def natural_language_rank_map(
     base_services,
     query,
@@ -1277,6 +1309,32 @@ def natural_language_rank_map(
             service.pk
         ] = score
 
+
+    return scores
+
+
+def cached_catalog_rank_map(query):
+    """`natural_language_rank_map` over the whole catalogue, cached.
+
+    Same constraint as cached_catalog_match_ids: the key is the query text
+    alone, so this is only valid for the full BDE catalogue. Ranking repeats
+    the same per-variant scans the matching pass does, which is the bulk of
+    what remains in a warm search request.
+    """
+
+    from .search_cache import get_cached_value, set_cached_value
+
+    cached = get_cached_value("nlrank", query)
+
+    if cached is not None:
+        return cached
+
+    scores = natural_language_rank_map(
+        all_bde_services(),
+        query,
+    )
+
+    set_cached_value("nlrank", query, scores)
 
     return scores
 
@@ -1635,8 +1693,7 @@ def toolkit_home(request):
                 )
             )
             | Q(
-                pk__in=natural_language_match_ids(
-                    base_services,
+                pk__in=cached_catalog_match_ids(
                     query
                 )
             )
@@ -1789,8 +1846,7 @@ def toolkit_home(request):
     if query:
 
         relevance_scores = (
-            natural_language_rank_map(
-                base_services,
+            cached_catalog_rank_map(
                 query,
             )
         )
@@ -2813,8 +2869,7 @@ def service_library(request):
                 )
             )
             | Q(
-                pk__in=natural_language_match_ids(
-                    base_services,
+                pk__in=cached_catalog_match_ids(
                     query
                 )
             )
@@ -2900,8 +2955,7 @@ def service_library(request):
     if query:
 
         relevance_scores = (
-            natural_language_rank_map(
-                base_services,
+            cached_catalog_rank_map(
                 query,
             )
         )
