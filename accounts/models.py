@@ -108,6 +108,8 @@ class ActivityLog(models.Model):
 
     ACTION_CHOICES = [
         ("LOGIN", "Login"),
+        ("LOGIN_FAILED", "Sign-in Failed"),
+        ("LOGIN_BLOCKED", "Sign-in Blocked"),
         ("LOGOUT", "Logout"),
         ("EMPLOYEE_CREATE", "Employee Created"),
         ("EMPLOYEE_EDIT", "Employee Updated"),

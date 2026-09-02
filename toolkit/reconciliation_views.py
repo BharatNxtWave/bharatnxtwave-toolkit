@@ -8,56 +8,26 @@ from django.shortcuts import (
 from django.views.decorators.http import require_http_methods
 
 from toolkit.intelligence.final_import import (
-    FinalImportError,
     apply_batch,
     preview_batch,
     rollback_batch,
 )
+from accounts.portal_access import is_admin_user
+
 from toolkit.models import ImportBatch
 
 
-ADMIN_ROLES = {
-    "ADMIN",
-    "DATA_ADMIN",
-    "SECURITY_ADMIN",
-    "IT_ADMIN",
-    "SUPER_ADMIN",
-}
-
 
 def _allowed(user):
+    """Delegate to the single definition of "admin" in portal_access.
 
-    if not getattr(
-        user,
-        "is_authenticated",
-        False,
-    ):
-        return False
+    This used to accept `is_staff` as well, which portal_access.is_admin_user
+    does not. That divergence was only harmless because this view sits under
+    the /admin-center/ prefix, where the middleware rejects such a user first;
+    moving the route would have turned it into a privilege escalation.
+    """
 
-    if getattr(
-        user,
-        "is_superuser",
-        False,
-    ):
-        return True
-
-    if getattr(
-        user,
-        "is_staff",
-        False,
-    ):
-        return True
-
-    role = str(
-        getattr(
-            user,
-            "role",
-            "",
-        )
-        or ""
-    ).upper()
-
-    return role in ADMIN_ROLES
+    return is_admin_user(user)
 
 
 @require_http_methods(["GET", "POST"])

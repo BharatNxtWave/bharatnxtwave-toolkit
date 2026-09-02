@@ -14,6 +14,12 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 
 from .activity import log_activity
+from .login_throttle import (
+    is_locked_out,
+    lockout_message,
+    register_failure,
+    reset as reset_login_failures,
+)
 from .models import LoginSession
 from .network_security import get_request_ip
 from .portal_access import (
@@ -38,6 +44,50 @@ def _make_form(request):
         )
 
     return AuthenticationForm(request=request)
+
+
+def _attempted_username(request):
+    return str(
+        request.POST.get("username", "")
+    ).strip()
+
+
+def _reject_locked_out(request, form):
+    """Add the lockout error to `form` and log it. True when locked out."""
+
+    username = _attempted_username(request)
+
+    if not is_locked_out(request, username):
+        return False
+
+    form.add_error(None, lockout_message())
+
+    log_activity(
+        request,
+        "LOGIN_BLOCKED",
+        "Sign-in blocked: too many failed attempts.",
+        metadata={"username": username},
+    )
+
+    return True
+
+
+def _record_failed_attempt(request):
+    """Count a failed sign-in and log it for the audit trail."""
+
+    username = _attempted_username(request)
+
+    count = register_failure(request, username)
+
+    log_activity(
+        request,
+        "LOGIN_FAILED",
+        "Sign-in failed: invalid credentials.",
+        metadata={
+            "username": username,
+            "failed_attempts": count,
+        },
+    )
 
 
 def _record_login(request, user):
@@ -114,7 +164,10 @@ def login_view(request):
 
     form = _make_form(request)
 
-    if request.method == "POST" and form.is_valid():
+    if request.method == "POST" and _reject_locked_out(request, form):
+        pass
+
+    elif request.method == "POST" and form.is_valid():
         user = form.get_user()
 
         if not getattr(
@@ -122,6 +175,8 @@ def login_view(request):
             "is_account_active",
             True,
         ):
+            # The password was correct, so this is not a brute-force
+            # signal - do not count it against the attempt limit.
             form.add_error(
                 None,
                 (
@@ -140,11 +195,19 @@ def login_view(request):
             )
 
         else:
+            reset_login_failures(
+                request,
+                _attempted_username(request),
+            )
+
             _record_login(request, user)
 
             return redirect(
                 "dashboard:home"
             )
+
+    elif request.method == "POST":
+        _record_failed_attempt(request)
 
     return render(
         request,
@@ -177,7 +240,10 @@ def admin_login_view(request):
 
     form = _make_form(request)
 
-    if request.method == "POST" and form.is_valid():
+    if request.method == "POST" and _reject_locked_out(request, form):
+        pass
+
+    elif request.method == "POST" and form.is_valid():
         user = form.get_user()
 
         if not getattr(
@@ -185,6 +251,8 @@ def admin_login_view(request):
             "is_account_active",
             True,
         ):
+            # The password was correct, so this is not a brute-force
+            # signal - do not count it against the attempt limit.
             form.add_error(
                 None,
                 (
@@ -203,6 +271,11 @@ def admin_login_view(request):
             )
 
         else:
+            reset_login_failures(
+                request,
+                _attempted_username(request),
+            )
+
             _record_login(request, user)
 
             destination = _safe_admin_next(
@@ -215,6 +288,9 @@ def admin_login_view(request):
             return redirect(
                 "dashboard:admin_overview"
             )
+
+    elif request.method == "POST":
+        _record_failed_attempt(request)
 
     return render(
         request,

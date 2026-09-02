@@ -1825,7 +1825,7 @@ def import_extraction_row_decision(
             == "CHANGED_INFORMATION"
         ):
 
-            messages.error(
+            _review_messages.error(
                 request,
                 (
                     "Approval blocked: this file replaces "
@@ -1835,7 +1835,7 @@ def import_extraction_row_decision(
                 ),
             )
 
-            return redirect(
+            return _review_redirect(
                 "toolkit:import_extraction_review",
                 batch_id=batch.pk,
             )

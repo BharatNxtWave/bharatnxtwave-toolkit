@@ -1,4 +1,24 @@
-Django>=6.1,<6.2
-gunicorn>=23,<24
-psycopg[binary]>=3.2,<4
-openpyxl>=3.1,<4
+# BharatNXT Wave - production dependencies
+#
+# Exact pins: the same versions that the test suite was verified against.
+# Install on the server with:
+#   /opt/bharatnxt-toolkit/.venv/bin/pip install -r deployment/requirements-production.txt
+
+Django==6.1
+asgiref==3.12.1
+sqlparse==0.6.0
+tzdata==2026.3
+
+# .xlsx import/export
+openpyxl==3.1.5
+et_xmlfile==2.0.0
+
+# Serves static files from the app process (needed on Render, harmless
+# behind nginx because nginx answers /static/ first)
+whitenoise==6.12.0
+
+# WSGI server (Linux only - not installed on the Windows dev box)
+gunicorn==23.0.0
+
+# PostgreSQL driver
+psycopg[binary]==3.3.5

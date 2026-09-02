@@ -4,7 +4,7 @@ import hashlib
 import json
 import re
 
-from collections import Counter, defaultdict
+from collections import Counter
 from datetime import date, datetime
 from decimal import Decimal
 from pathlib import Path

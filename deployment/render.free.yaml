@@ -1,0 +1,122 @@
+# BharatNXT Wave - Render Blueprint for a FREE TEST deployment
+#
+# ===========================================================================
+#  TEST DEPLOYMENT ONLY. NOT FOR REAL BHARATNXT DATA.
+#
+#  A free Render instance cannot have a persistent disk, so every uploaded
+#  scheme flyer is deleted on the next deploy or restart - while its database
+#  row survives and then points at a file that no longer exists.
+#
+#  Use this to let the team click around the real application. Put throwaway
+#  data in it. When it becomes the system people actually rely on, move to
+#  ../render.yaml (see "Upgrading" below).
+# ===========================================================================
+#
+# To use this file:
+#
+#     cp deployment/render.free.yaml render.yaml
+#     git add render.yaml && git commit -m "Free test deployment"
+#
+# Render only reads `render.yaml` at the repository root, which is why this
+# has to be copied rather than pointed at.
+#
+# ---------------------------------------------------------------------------
+# Upgrading to the paid production setup later
+# ---------------------------------------------------------------------------
+#
+#   1. cp render.yaml deployment/render.free.yaml   # keep this variant
+#      git checkout render.yaml                     # restore the paid one
+#   2. In the Render dashboard: change the instance type from Free to
+#      Starter, then add a disk named `bharatnxt-data` mounted at /var/data.
+#   3. Delete the BHARATNXT_ALLOW_EPHEMERAL_STORAGE variable.
+#   4. Upgrade the database off the free plan before it expires.
+#   5. Redeploy. Confirm the boot log no longer prints the EPHEMERAL banner.
+#
+# BHARATNXT_DATA_ROOT stays /var/data in both files, so the upgrade changes
+# where that path is *backed*, not the configuration around it.
+
+databases:
+  - name: bharatnxt-db
+    databaseName: bharatnxt_toolkit
+    user: bharatnxt_app
+    region: singapore
+    # Render deletes free databases after their trial window. Everything in
+    # it goes with them. Fine for a test, fatal for real data.
+    plan: free
+    postgresMajorVersion: "16"
+    ipAllowList: []
+
+services:
+  - type: web
+    name: bharatnxt-toolkit-test
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: singapore
+
+    # Free instances sleep after ~15 minutes idle. The next request wakes
+    # them and takes roughly a minute. Tell the team, so a slow first load
+    # is not reported as a bug.
+    plan: free
+
+    healthCheckPath: /healthz/
+
+    # No `disk:` block - free instances cannot have one. That is exactly
+    # what BHARATNXT_ALLOW_EPHEMERAL_STORAGE below is acknowledging.
+
+    envVars:
+      - key: BHARATNXT_ENVIRONMENT
+        value: production
+
+      - key: BHARATNXT_SECRET_KEY
+        generateValue: true
+
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bharatnxt-db
+          property: connectionString
+
+      # Same path the paid setup uses, so upgrading only changes what backs
+      # it. Here it is ordinary container storage and does not survive.
+      - key: BHARATNXT_DATA_ROOT
+        value: /var/data
+
+      # Required, because the app refuses to start on storage that does not
+      # persist unless someone says so deliberately. Delete this variable
+      # when a real disk is attached.
+      - key: BHARATNXT_ALLOW_EPHEMERAL_STORAGE
+        value: "true"
+
+      - key: BHARATNXT_PROXY_MODE
+        value: forwarded
+
+      - key: BHARATNXT_TRUSTED_PROXY_HOPS
+        value: "1"
+
+      # The office's PUBLIC egress IP in CIDR form - `curl https://ifconfig.me`
+      # from the office. Still worth setting for a test instance: it is on a
+      # public URL either way.
+      - key: BHARATNXT_OFFICE_NETWORKS
+        sync: false
+
+      - key: BHARATNXT_DJANGO_ADMIN_PATH
+        sync: false
+
+      - key: BHARATNXT_ALLOWED_HOSTS
+        sync: false
+
+      - key: BHARATNXT_CSRF_TRUSTED_ORIGINS
+        sync: false
+
+      - key: BHARATNXT_LOGIN_MAX_ATTEMPTS
+        value: "5"
+
+      - key: BHARATNXT_LOGIN_LOCKOUT_SECONDS
+        value: "900"
+
+      - key: BHARATNXT_LOG_LEVEL
+        value: INFO
+
+      # A free instance has far less memory than a paid one. Three gunicorn
+      # workers will not fit comfortably.
+      - key: WEB_CONCURRENCY
+        value: "2"

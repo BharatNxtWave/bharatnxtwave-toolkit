@@ -20,7 +20,6 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 
 from accounts.activity import log_activity
 
-from .admin_views import can_manage_toolkit
 from .flyer_forms import ServiceFlyerUploadForm
 from .flyer_validation import inspect_flyer_upload
 from .models import Service, ServiceFlyer
