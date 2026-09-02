@@ -1,0 +1,651 @@
+{% extends "admin_base.html" %}
+{% load static %}
+
+{% block title %}BDE Analytics | BharatNXT Wave{% endblock %}
+
+{% block content %}
+
+<div class="page-eyebrow">
+    ADMIN CENTER
+</div>
+
+<div class="dashboard-title-row">
+
+    <div>
+
+        <h1 class="page-title">
+            BDE Analytics
+        </h1>
+
+        <p class="page-description">
+            Analyse real toolkit searches, service usage and employee activity.
+        </p>
+
+    </div>
+
+    <div class="live-data-badge">
+        ● LIVE DATABASE
+    </div>
+
+</div>
+
+
+{% if not selected_bde %}
+
+    <div class="card admin-no-bde">
+
+        <div class="table-title">
+            No BDE accounts available
+        </div>
+
+        <p class="page-description">
+            Analytics will become available after BDE employee accounts are created.
+        </p>
+
+    </div>
+
+{% else %}
+
+
+<!-- =====================================================
+     EMPLOYEE SELECTOR
+====================================================== -->
+
+<section class="card analytics-control-bar">
+
+    <form method="get"
+          class="analytics-employee-form">
+
+        <div>
+
+            <label class="analytics-control-label">
+                BDE EMPLOYEE
+            </label>
+
+            <select
+                name="employee"
+                onchange="this.form.submit()">
+
+                {% for bde in bdes %}
+
+                    <option
+                        value="{{ bde.pk }}"
+                        {% if bde.pk == selected_bde.pk %}selected{% endif %}>
+
+                        {% if bde.get_full_name %}
+                            {{ bde.get_full_name }}
+                        {% else %}
+                            {{ bde.username }}
+                        {% endif %}
+
+                        {% if bde.employee_id %}
+                            — {{ bde.employee_id }}
+                        {% endif %}
+
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+        <input
+            type="hidden"
+            name="start"
+            value="{{ selected_start|date:'Y-m-d' }}">
+
+        <input
+            type="hidden"
+            name="end"
+            value="{{ selected_end|date:'Y-m-d' }}">
+
+    </form>
+
+
+    <div class="selected-bde-status">
+
+        <span class="status-dot
+            {% if selected_bde.is_account_active %}active{% endif %}">
+        </span>
+
+        {% if selected_bde.is_account_active %}
+            Active account
+        {% else %}
+            Inactive account
+        {% endif %}
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     KPI CARDS
+====================================================== -->
+
+<div class="admin-analytics-kpi-grid">
+
+    <div class="card search-kpi-card">
+        <div class="stat-label">SEARCHES</div>
+        <div class="search-kpi-value">{{ searches }}</div>
+        <div class="search-kpi-meta">Selected period</div>
+    </div>
+
+    <div class="card search-kpi-card">
+        <div class="stat-label">SERVICES VIEWED</div>
+        <div class="search-kpi-value">{{ service_views }}</div>
+        <div class="search-kpi-meta">Service detail opens</div>
+    </div>
+
+    <div class="card search-kpi-card">
+        <div class="stat-label">UNIQUE QUERIES</div>
+        <div class="search-kpi-value">{{ unique_queries }}</div>
+        <div class="search-kpi-meta">Distinct searches</div>
+    </div>
+
+    <div class="card search-kpi-card">
+        <div class="stat-label">ZERO RESULTS</div>
+        <div class="search-kpi-value">{{ zero_results }}</div>
+        <div class="search-kpi-meta">Possible toolkit gaps</div>
+    </div>
+
+    <div class="card search-kpi-card">
+        <div class="stat-label">SAVED SERVICES</div>
+        <div class="search-kpi-value">{{ current_saved }}</div>
+        <div class="search-kpi-meta">Currently starred</div>
+    </div>
+
+    <div class="card search-kpi-card">
+        <div class="stat-label">LOGINS</div>
+        <div class="search-kpi-value">{{ login_count }}</div>
+        <div class="search-kpi-meta">Selected period</div>
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     CALENDAR
+====================================================== -->
+
+<section class="card admin-calendar-section">
+
+    <div class="calendar-header">
+
+        <div>
+
+            <div class="table-title">
+                Employee Activity Calendar
+            </div>
+
+            <div class="table-subtitle">
+                Search counts are shown directly on each date
+            </div>
+
+        </div>
+
+
+        <div class="calendar-month-controls">
+
+            <a
+                href="?employee={{ selected_bde.pk }}&month={{ previous_month }}&start={{ selected_start|date:'Y-m-d' }}&end={{ selected_end|date:'Y-m-d' }}"
+                class="calendar-arrow">
+                ‹
+            </a>
+
+            <strong>
+                {{ calendar_title }}
+            </strong>
+
+            <a
+                href="?employee={{ selected_bde.pk }}&month={{ next_month }}&start={{ selected_start|date:'Y-m-d' }}&end={{ selected_end|date:'Y-m-d' }}"
+                class="calendar-arrow">
+                ›
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="calendar-presets">
+
+        <a
+            href="?employee={{ selected_bde.pk }}&preset=today"
+            class="calendar-preset {% if preset == 'today' %}active{% endif %}">
+            Today
+        </a>
+
+        <a
+            href="?employee={{ selected_bde.pk }}&preset=7d"
+            class="calendar-preset {% if preset == '7d' or not preset %}active{% endif %}">
+            Last 7 Days
+        </a>
+
+        <a
+            href="?employee={{ selected_bde.pk }}&preset=30d"
+            class="calendar-preset {% if preset == '30d' %}active{% endif %}">
+            Last 30 Days
+        </a>
+
+    </div>
+
+
+    <form method="get"
+          id="calendar-range-form">
+
+        <input
+            type="hidden"
+            name="employee"
+            value="{{ selected_bde.pk }}">
+
+        <input
+            type="hidden"
+            name="month"
+            value="{{ calendar_month_value }}">
+
+        <input
+            type="hidden"
+            id="calendar-start"
+            name="start"
+            value="{{ selected_start|date:'Y-m-d' }}">
+
+        <input
+            type="hidden"
+            id="calendar-end"
+            name="end"
+            value="{{ selected_end|date:'Y-m-d' }}">
+
+
+        <div class="calendar-weekdays">
+
+            <span>MON</span>
+            <span>TUE</span>
+            <span>WED</span>
+            <span>THU</span>
+            <span>FRI</span>
+            <span>SAT</span>
+            <span>SUN</span>
+
+        </div>
+
+
+        <div class="analytics-calendar">
+
+            {% for week in calendar_weeks %}
+
+                {% for day in week %}
+
+                    <button
+                        type="button"
+                        class="calendar-day
+                        {% if not day.in_month %}outside{% endif %}
+                        {% if day.is_today %}today{% endif %}
+                        {% if day.selected %}selected{% endif %}"
+                        data-date="{{ day.date_value }}">
+
+                        <span class="calendar-day-number">
+                            {{ day.day }}
+                        </span>
+
+                        {% if day.search_count %}
+
+                            <span class="calendar-search-count">
+                                {{ day.search_count }}
+                                search{{ day.search_count|pluralize:"es" }}
+                            </span>
+
+                        {% endif %}
+
+                    </button>
+
+                {% endfor %}
+
+            {% endfor %}
+
+        </div>
+
+
+        <div class="calendar-selection-footer">
+
+            <div>
+
+                <span class="calendar-selection-label">
+                    ANALYSING
+                </span>
+
+                <strong id="calendar-range-label">
+                    {{ selected_start|date:"d M Y" }}
+                    —
+                    {{ selected_end|date:"d M Y" }}
+                </strong>
+
+            </div>
+
+            <button
+                type="submit"
+                class="primary-button">
+                Analyse Range
+            </button>
+
+        </div>
+
+    </form>
+
+</section>
+
+
+<!-- =====================================================
+     INTERACTIVE ACTIVITY CHART
+====================================================== -->
+
+<section class="card dashboard-chart-large">
+
+    <div class="dashboard-card-heading">
+
+        <div>
+
+            <div class="table-title">
+                Searches vs Service Views
+            </div>
+
+            <div class="table-subtitle">
+                Click a date to inspect that day's activity
+            </div>
+
+        </div>
+
+
+        <div class="analytics-chart-legend">
+
+            <span>
+                <i class="legend-search"></i>
+                Searches
+            </span>
+
+            <span>
+                <i class="legend-view"></i>
+                Service Views
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="dual-bar-chart">
+
+        {% for day in chart %}
+
+            <a
+                href="?employee={{ selected_bde.pk }}&start={{ day.date_value }}&end={{ day.date_value }}&month={{ day.date|date:'Y-m' }}"
+                class="dual-bar-column">
+
+                <div class="dual-values">
+                    {{ day.searches }} / {{ day.views }}
+                </div>
+
+                <div class="dual-bars">
+
+                    <div class="dual-bar-track">
+                        <div
+                            class="dual-bar search-series"
+                            style="height: {{ day.search_height }}%;">
+                        </div>
+                    </div>
+
+                    <div class="dual-bar-track">
+                        <div
+                            class="dual-bar view-series"
+                            style="height: {{ day.view_height }}%;">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="search-bar-day">
+                    {{ day.label }}
+                </div>
+
+            </a>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     SEARCH INTELLIGENCE
+====================================================== -->
+
+<div class="admin-analytics-grid">
+
+
+    <section class="card dashboard-list-card">
+
+        <div class="dashboard-card-heading">
+
+            <div>
+                <div class="table-title">
+                    Top Searches
+                </div>
+
+                <div class="table-subtitle">
+                    Most frequent queries
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="top-query-list">
+
+            {% for item in top_queries %}
+
+                <div class="top-query-item">
+
+                    <span class="top-query-name">
+                        {{ item.query }}
+                    </span>
+
+                    <span class="top-query-count">
+                        {{ item.total }}
+                    </span>
+
+                </div>
+
+            {% empty %}
+
+                <div class="dashboard-empty">
+                    No searches in this period.
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+
+    <section class="card dashboard-list-card">
+
+        <div class="dashboard-card-heading">
+
+            <div>
+                <div class="table-title">
+                    Zero-Result Searches
+                </div>
+
+                <div class="table-subtitle">
+                    Searches where the toolkit returned nothing
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="top-query-list">
+
+            {% for item in zero_result_queries %}
+
+                <div class="top-query-item zero-query">
+
+                    <span class="top-query-name">
+                        {{ item.query }}
+                    </span>
+
+                    <span class="top-query-count">
+                        {{ item.total }}
+                    </span>
+
+                </div>
+
+            {% empty %}
+
+                <div class="dashboard-empty">
+                    No zero-result searches.
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+
+    <section class="card dashboard-list-card">
+
+        <div class="dashboard-card-heading">
+
+            <div>
+                <div class="table-title">
+                    Most Viewed Services
+                </div>
+
+                <div class="table-subtitle">
+                    Services this BDE opened most
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="top-query-list">
+
+            {% for item in top_services %}
+
+                <div class="top-query-item">
+
+                    <span class="top-query-name">
+                        {{ item.service.title }}
+                    </span>
+
+                    <span class="top-query-count">
+                        {{ item.total }}
+                    </span>
+
+                </div>
+
+            {% empty %}
+
+                <div class="dashboard-empty">
+                    No service views recorded.
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<!-- =====================================================
+     REAL SEARCH LOG
+====================================================== -->
+
+<section class="card admin-search-log">
+
+    <div class="dashboard-card-heading">
+
+        <div>
+
+            <div class="table-title">
+                Search Event Log
+            </div>
+
+            <div class="table-subtitle">
+                Actual searches submitted by this BDE
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="admin-analytics-table-wrap">
+
+        <table class="admin-analytics-table">
+
+            <thead>
+                <tr>
+                    <th>Date / Time</th>
+                    <th>Query</th>
+                    <th>Results</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for event in recent_search_events %}
+
+                    <tr>
+
+                        <td>
+                            {{ event.created_at|date:"d M Y, h:i A" }}
+                        </td>
+
+                        <td>
+                            {{ event.query|default:"—" }}
+                        </td>
+
+                        <td>
+                            {{ event.result_count }}
+                        </td>
+
+                        <td>
+                            {{ event.get_event_type_display }}
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+                        <td colspan="4">
+                            No recorded searches.
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<script src="{% static 'js/dashboard_calendar.js' %}"></script>
+<script src="{% static 'js/dashboard_live.js' %}"></script>
+
+{% endif %}
+
+{% endblock %}

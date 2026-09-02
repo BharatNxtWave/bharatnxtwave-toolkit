@@ -1,0 +1,217 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Employees | BharatNXT Wave Admin Center{% endblock %}
+
+{% block content %}
+
+<div class="page-eyebrow">
+    ADMINISTRATION
+</div>
+
+<h1 class="page-title">
+    Employees
+</h1>
+
+<p class="page-description">
+    Manage internal employee accounts, access roles and account status.
+</p>
+
+
+<div class="employee-stats">
+
+    <div class="card stat-card">
+        <div class="stat-label">TOTAL EMPLOYEES</div>
+        <div class="stat-value">{{ total_employees }}</div>
+    </div>
+
+    <div class="card stat-card">
+        <div class="stat-label">ACTIVE ACCOUNTS</div>
+        <div class="stat-value">{{ active_employees }}</div>
+    </div>
+
+    <div class="card stat-card">
+        <div class="stat-label">ACTIVE BDES</div>
+        <div class="stat-value">{{ bde_count }}</div>
+    </div>
+
+</div>
+
+
+<div class="card employee-table-card">
+
+    <div class="table-header">
+
+        <div>
+            <div class="table-title">
+                Employee Directory
+            </div>
+
+            <div class="table-subtitle">
+                Internal user accounts and access permissions
+            </div>
+        </div>
+
+        <a href="{% url 'accounts:employee_create' %}"
+           class="primary-button">
+            + Add Employee
+        </a>
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table class="employee-table">
+
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Employee ID</th>
+                    <th>Department</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for employee in employees %}
+
+                <tr>
+
+                    <td>
+                        <div class="employee-cell">
+
+                            <div class="employee-avatar">
+                                {{ employee.first_name|default:employee.username|slice:":1"|upper }}
+                            </div>
+
+                            <div>
+                                <div class="employee-name">
+                                    {% if employee.get_full_name %}
+                                        {{ employee.get_full_name }}
+                                    {% else %}
+                                        {{ employee.username }}
+                                    {% endif %}
+                                </div>
+
+                                <div class="employee-email">
+                                    {{ employee.email|default:"No email" }}
+                                </div>
+                            </div>
+
+                        </div>
+                    </td>
+
+                    <td>
+                        {{ employee.employee_id|default:"—" }}
+                    </td>
+
+                    <td>
+                        {{ employee.department|default:"—" }}
+                    </td>
+
+                    <td>
+                        {{ employee.get_role_display }}
+                    </td>
+
+                    <td>
+
+                        {% if employee.is_account_active %}
+
+                            <span class="status-badge active">
+                                Active
+                            </span>
+
+                        {% else %}
+
+                            <span class="status-badge inactive">
+                                Inactive
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {% if employee.last_login %}
+                            {{ employee.last_login|date:"d M Y, h:i A" }}
+                        {% else %}
+                            Never
+                        {% endif %}
+                    </td>
+
+                    <td>
+
+                        {% if employee.pk in manageable_employee_ids %}
+
+                        <div class="employee-actions">
+
+                            <a href="{% url 'accounts:employee_edit' employee.pk %}"
+                               class="table-action-button">
+                                Edit
+                            </a>
+
+                            {% if employee.pk != request.user.pk %}
+
+                            <form method="post"
+                                  action="{% url 'accounts:employee_toggle_active' employee.pk %}"
+                                  class="inline-action-form">
+
+                                {% csrf_token %}
+
+                                {% if employee.is_account_active %}
+
+                                    <button type="submit"
+                                            class="table-action-button danger-action">
+                                        Deactivate
+                                    </button>
+
+                                {% else %}
+
+                                    <button type="submit"
+                                            class="table-action-button success-action">
+                                        Activate
+                                    </button>
+
+                                {% endif %}
+
+                            </form>
+
+                            {% endif %}
+
+                        </div>
+
+                        {% else %}
+
+                            <span class="muted-action">
+                                Restricted
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="7">
+                        No employee accounts found.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

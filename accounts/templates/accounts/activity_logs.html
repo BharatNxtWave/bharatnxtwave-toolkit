@@ -1,0 +1,164 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Activity Logs | BharatNXT Wave Admin Center{% endblock %}
+
+{% block content %}
+
+<div class="page-eyebrow">
+    SECURITY & AUDIT
+</div>
+
+<h1 class="page-title">
+    Activity Logs
+</h1>
+
+<p class="page-description">
+    Review important employee and administrative activity across the internal platform.
+</p>
+
+
+<div class="card activity-filter-card">
+
+    <form method="get" class="activity-filters">
+
+        <input
+            type="search"
+            name="q"
+            value="{{ search_query }}"
+            placeholder="Search employee, activity or IP..."
+            class="activity-search"
+        >
+
+        <select name="action" class="activity-select">
+
+            <option value="">
+                All activities
+            </option>
+
+            {% for value, label in action_choices %}
+
+                <option
+                    value="{{ value }}"
+                    {% if selected_action == value %}selected{% endif %}
+                >
+                    {{ label }}
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+        <button type="submit" class="primary-button">
+            Filter
+        </button>
+
+        {% if search_query or selected_action %}
+
+            <a href="{% url 'accounts:activity_logs' %}"
+               class="secondary-button">
+                Clear
+            </a>
+
+        {% endif %}
+
+    </form>
+
+</div>
+
+
+<div class="card employee-table-card">
+
+    <div class="table-header">
+
+        <div>
+            <div class="table-title">
+                Audit Activity
+            </div>
+
+            <div class="table-subtitle">
+                Showing up to the latest 200 matching events
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table class="employee-table">
+
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Employee</th>
+                    <th>Activity</th>
+                    <th>Description</th>
+                    <th>IP Address</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for log in logs %}
+
+                <tr>
+
+                    <td>
+                        {{ log.created_at|date:"d M Y, h:i A" }}
+                    </td>
+
+                    <td>
+
+                        {% if log.user %}
+
+                            <div class="employee-name">
+                                {{ log.user.get_full_name|default:log.user.username }}
+                            </div>
+
+                            <div class="employee-email">
+                                {{ log.user.employee_id|default:log.user.username }}
+                            </div>
+
+                        {% else %}
+
+                            Unknown
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        <span class="activity-type">
+                            {{ log.get_action_display }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {{ log.description }}
+                    </td>
+
+                    <td>
+                        {{ log.ip_address|default:"—" }}
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="5">
+                        No activity records found.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,4359 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Dashboard | BharatNXT Wave
+{% endblock %}
+
+
+{% block content %}
+
+
+<style id="premium-dashboard-v11">
+
+/* =========================================================
+   PERSONAL BDE DASHBOARD
+========================================================= */
+
+.bn-home-v2{
+
+    max-width:1480px;
+
+    margin-left:auto;
+    margin-right:auto;
+}
+
+
+.bn-home-header{
+
+    align-items:flex-start;
+
+    margin-bottom:20px;
+}
+
+
+.bn-dashboard-eyebrow{
+
+    display:block;
+
+    margin-bottom:7px;
+
+    color:#667085;
+
+    font-size:10px;
+    font-weight:850;
+
+    letter-spacing:.13em;
+}
+
+
+.bn-home-header h1{
+
+    margin-top:0;
+    margin-bottom:0;
+
+    font-size:32px;
+
+    line-height:1.12;
+
+    letter-spacing:-.035em;
+
+    color:#101828;
+}
+
+
+.bn-dashboard-actions{
+
+    margin-top:15px;
+
+    display:flex;
+    flex-wrap:wrap;
+
+    gap:8px;
+}
+
+
+.bn-dashboard-actions a{
+
+    min-height:36px;
+
+    padding:0 12px;
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    border:1px solid #e4e7ec;
+    border-radius:10px;
+
+    background:#ffffff;
+
+    color:#344054;
+
+    text-decoration:none;
+
+    font-size:11px;
+    font-weight:750;
+
+    transition:
+        transform .15s ease,
+        border-color .15s ease,
+        box-shadow .15s ease,
+        color .15s ease;
+}
+
+
+.bn-dashboard-actions a:hover{
+
+    transform:
+        translateY(-1px);
+
+    color:#1769ff;
+
+    border-color:#b9ceff;
+
+    box-shadow:
+        0 5px 14px
+        rgba(16,24,40,.06);
+}
+
+
+.bn-dashboard-actions
+.bn-primary-shortcut{
+
+    background:#1769ff;
+
+    border-color:#1769ff;
+
+    color:#ffffff;
+}
+
+
+.bn-dashboard-actions
+.bn-primary-shortcut:hover{
+
+    color:#ffffff;
+}
+
+
+/* =========================================================
+   PREMIUM KPI STRIP
+========================================================= */
+
+.bn-home-kpi-strip{
+
+    gap:10px !important;
+
+    margin-bottom:20px;
+
+    background:transparent !important;
+
+    border:0 !important;
+}
+
+
+.bn-home-kpi{
+
+    min-height:88px;
+
+    background:#ffffff !important;
+
+    border:
+        1px solid #e4e7ec !important;
+
+    border-radius:
+        15px !important;
+
+    box-shadow:
+        0 1px 2px
+        rgba(16,24,40,.025);
+
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        border-color .15s ease;
+}
+
+
+a.bn-home-kpi:hover{
+
+    transform:
+        translateY(-2px);
+
+    border-color:
+        #c7d2e0 !important;
+
+    box-shadow:
+        0 8px 22px
+        rgba(16,24,40,.07);
+}
+
+
+/* =========================================================
+   PREMIUM DASHBOARD PANELS
+========================================================= */
+
+.bn-dashboard-panel{
+
+    border:
+        1px solid #e4e7ec !important;
+
+    border-radius:
+        18px !important;
+
+    box-shadow:
+        0 1px 3px
+        rgba(16,24,40,.025);
+}
+
+
+.bn-panel-header h2{
+
+    letter-spacing:
+        -.02em;
+}
+
+
+.bn-closing-item,
+.bn-recent-item{
+
+    transition:
+        background .15s ease;
+}
+
+
+.bn-closing-item:hover,
+.bn-recent-item:hover{
+
+    background:
+        #fafbff;
+}
+
+
+.bn-pie-legend-item{
+
+    border-radius:
+        12px !important;
+
+    transition:
+        transform .15s ease,
+        border-color .15s ease,
+        background .15s ease;
+}
+
+
+.bn-pie-legend-item:hover{
+
+    transform:
+        translateX(2px);
+}
+
+</style>
+
+<div class="bn-home-v2">
+
+
+<!-- =====================================================
+     DASHBOARD HEADER
+====================================================== -->
+
+<header class="bn-home-header">
+
+    <div>
+
+        
+<span class="bn-dashboard-eyebrow">
+    MY TOOLKIT WORKSPACE
+</span>
+
+<h1>
+
+    {% if request.user.first_name %}
+
+        {{ request.user.first_name }}'s Toolkit Activity
+
+    {% else %}
+
+        {{ request.user.username|cut:".admin"|cut:".bde"|capfirst }}'s
+        Toolkit Activity
+
+    {% endif %}
+
+</h1>
+
+
+        <p>
+            Your BharatNXT Wave Toolkit activity and important services at a glance.
+        </p>
+
+<div class="bn-dashboard-actions">
+
+    <a
+        href="{% url 'toolkit:home' %}"
+        class="bn-primary-shortcut">
+        ⌕ Search Toolkit
+    </a>
+
+    <a
+        href="{% url 'toolkit:client_matcher' %}">
+        ◇ Find for Client
+    </a>
+
+    <a
+        href="{% url 'toolkit:service_library' %}">
+        ▦ Service Library
+    </a>
+
+    <a
+        href="{% url 'toolkit:saved_services' %}">
+        <span class="bn-bookmark-icon" aria-hidden="true"></span> Saved Services
+    </a>
+
+</div>
+
+
+    </div>
+
+
+    <!-- DATE RANGE POPOVER -->
+
+    <details class="bn-date-picker">
+
+        <summary>
+
+            <span class="bn-date-icon">
+                ◷
+            </span>
+
+            <span>
+
+                {{ selected_start|date:"d M" }}
+                –
+                {{ selected_end|date:"d M Y" }}
+
+            </span>
+
+            <span class="bn-date-chevron">
+                ▾
+            </span>
+
+        </summary>
+
+
+        <div class="bn-date-popover">
+
+
+            <div class="bn-date-popover-title">
+
+                <strong>
+                    Select Date Range
+                </strong>
+
+                <span>
+                    Change dashboard reporting period
+                </span>
+
+            </div>
+
+
+            <div class="bn-date-presets">
+
+                <a href="?preset=today">
+                    Today
+                </a>
+
+                <a href="?preset=7d">
+                    Last 7 Days
+                </a>
+
+                <a href="?preset=30d">
+                    Last 30 Days
+                </a>
+
+            </div>
+
+
+            <form method="get">
+
+                <label>
+
+                    <span>
+                        From
+                    </span>
+
+                    <input
+                        type="date"
+                        name="start"
+                        value="{{ selected_start|date:'Y-m-d' }}">
+
+                </label>
+
+
+                <label>
+
+                    <span>
+                        To
+                    </span>
+
+                    <input
+                        type="date"
+                        name="end"
+                        value="{{ selected_end|date:'Y-m-d' }}">
+
+                </label>
+
+
+                <button
+                    type="submit"
+                    class="primary-button">
+
+                    Apply Range
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </details>
+
+</header>
+
+
+
+<!-- =====================================================
+     KPI STRIP
+====================================================== -->
+
+<section class="bn-home-kpi-strip">
+
+
+    <a
+        href="{% url 'toolkit:home' %}"
+        class="bn-home-kpi">
+
+        <div class="bn-kpi-icon">
+<svg viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="1.7"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     aria-hidden="true">
+    <circle cx="11" cy="11" r="6"></circle>
+    <path d="M15.5 15.5L20 20"></path>
+</svg>
+</div>
+
+        <div>
+
+            <span>
+                Toolkit Searches
+            </span>
+
+            <strong>
+                {{ search_count }}
+            </strong>
+
+        </div>
+
+    </a>
+
+
+    <a
+        href="{% url 'toolkit:client_matcher' %}"
+        class="bn-home-kpi">
+
+        <div class="bn-kpi-icon">
+<svg viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="1.7"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     aria-hidden="true">
+    <circle cx="8.5" cy="8" r="3"></circle>
+    <path d="M3.5 18C4.3 14.8 6 13.2 8.5 13.2C10.1 13.2 11.4 13.8 12.3 15"></path>
+    <circle cx="17" cy="16" r="4"></circle>
+    <path d="M15.4 16L16.5 17.1L18.8 14.7"></path>
+</svg>
+</div>
+
+        <div>
+
+            <span>
+                Client Service Checks
+            </span>
+
+            <strong>
+                {{ client_check_count }}
+            </strong>
+
+        </div>
+
+    </a>
+
+
+    <div class="bn-home-kpi">
+
+        <div class="bn-kpi-icon">
+<svg viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="1.7"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     aria-hidden="true">
+    <path d="M2.5 12C4.9 8.5 8 6.8 12 6.8C16 6.8 19.1 8.5 21.5 12C19.1 15.5 16 17.2 12 17.2C8 17.2 4.9 15.5 2.5 12Z"></path>
+    <circle cx="12" cy="12" r="2.6"></circle>
+</svg>
+</div>
+
+        <div>
+
+            <span>
+                Services Viewed
+            </span>
+
+            <strong>
+                {{ service_view_count }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <a
+        href="{% url 'toolkit:saved_services' %}"
+        class="bn-home-kpi">
+
+        <div class="bn-kpi-icon">
+<svg viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="1.7"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     aria-hidden="true">
+    <path d="M7 4.5C7 3.7 7.7 3 8.5 3H15.5C16.3 3 17 3.7 17 4.5V20L12 16.8L7 20V4.5Z"></path>
+</svg>
+</div>
+
+        <div>
+
+            <span>
+                Saved Services
+            </span>
+
+            <strong>
+                {{ saved_service_count }}
+            </strong>
+
+        </div>
+
+    </a>
+
+
+    <div class="bn-home-kpi">
+
+        <div class="bn-kpi-icon warning">
+<svg viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="1.7"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     aria-hidden="true">
+    <circle cx="10.5" cy="10.5" r="6"></circle>
+    <path d="M15 15L20 20"></path>
+    <path d="M8.3 8.3L12.7 12.7"></path>
+    <path d="M12.7 8.3L8.3 12.7"></path>
+</svg>
+</div>
+
+        <div>
+
+            <span>
+                Searches With No Result
+            </span>
+
+            <strong>
+                {{ zero_result_count }}
+            </strong>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     MAIN ROW
+====================================================== -->
+
+<div class="bn-home-main-grid">
+
+
+
+<!-- TOOLKIT ACTIVITY -->
+
+<section class="bn-dashboard-panel bn-activity-panel">
+
+
+    <div class="bn-panel-header">
+
+        <div>
+
+            <h2>
+                Toolkit Activity
+            </h2>
+
+            <p>
+                How you used the Toolkit during the selected period
+            </p>
+
+        </div>
+
+
+        <span class="bn-activity-period">
+
+            {{ selected_start|date:"d M" }}
+            –
+            {{ selected_end|date:"d M Y" }}
+
+        </span>
+
+    </div>
+
+
+
+        <!-- BNW_ACTIVITY_DASHBOARD_V2 -->
+    <div class="bnw-v2-activity" data-bnw-activity-v2>
+
+        <div class="bnw-v2-intro">
+            <div>
+                <span>ACTIVITY OVERVIEW</span>
+                <h3>Understand your Toolkit usage at a glance</h3>
+                <p>
+                    The overview groups related actions. The comparison below
+                    keeps every exact activity category visible.
+                </p>
+            </div>
+
+            <button type="button" class="bnw-v2-reset" data-bnw-reset hidden>
+                Show all
+            </button>
+        </div>
+
+        <div class="bnw-v2-overview-card">
+
+            <div class="bnw-v2-donut-wrap">
+                <svg
+                    class="bnw-v2-donut"
+                    viewBox="0 0 240 240"
+                    role="img"
+                    aria-labelledby="bnw-v2-chart-title bnw-v2-chart-description">
+
+                    <title id="bnw-v2-chart-title">
+                        Toolkit activity grouped by purpose
+                    </title>
+
+                    <desc id="bnw-v2-chart-description">
+                        A high-resolution interactive chart of all recorded activity.
+                    </desc>
+
+                    <circle
+                        class="bnw-v2-donut-track"
+                        cx="120"
+                        cy="120"
+                        r="88"
+                        pathLength="100">
+                    </circle>
+
+                    {% for item in activity_overview %}
+                        {% if item.count %}
+                            <circle
+                                class="bnw-v2-donut-segment"
+                                data-bnw-segment="{{ item.key }}"
+                                data-label="{{ item.label }}"
+                                data-count="{{ item.count }}"
+                                data-percentage="{{ item.percentage }}"
+                                cx="120"
+                                cy="120"
+                                r="88"
+                                pathLength="100"
+                                stroke="{{ item.color }}"
+                                stroke-dasharray="{{ item.dasharray }}"
+                                stroke-dashoffset="{{ item.dashoffset }}"
+                                tabindex="0"
+                                role="button"
+                                aria-label="{{ item.label }}: {{ item.count }} actions, {{ item.percentage }} percent">
+                                <title>
+                                    {{ item.label }}: {{ item.count }} actions
+                                    ({{ item.percentage }}%)
+                                </title>
+                            </circle>
+                        {% endif %}
+                    {% endfor %}
+
+                </svg>
+
+                <div class="bnw-v2-donut-centre" aria-live="polite">
+                    <span data-bnw-centre-label>TOTAL ACTIONS</span>
+                    <strong data-bnw-centre-value>{{ total_activity_count }}</strong>
+                    <small data-bnw-centre-detail>Selected period</small>
+                </div>
+            </div>
+
+            <div class="bnw-v2-overview-content">
+
+                <div class="bnw-v2-section-heading">
+                    <h3>Activity by purpose</h3>
+                    <p>
+                        Hover or click a group to highlight it and see its total.
+                    </p>
+                </div>
+
+                <div class="bnw-v2-overview-list">
+                    {% for item in activity_overview %}
+                        <button
+                            type="button"
+                            class="bnw-v2-overview-item"
+                            data-bnw-series="{{ item.key }}"
+                            data-label="{{ item.label }}"
+                            data-count="{{ item.count }}"
+                            data-percentage="{{ item.percentage }}"
+                            style="--series-color: {{ item.color }};">
+
+                            <span class="bnw-v2-overview-mark"></span>
+
+                            <span class="bnw-v2-overview-copy">
+                                <strong>{{ item.label }}</strong>
+                                <small>{{ item.description }}</small>
+                            </span>
+
+                            <span class="bnw-v2-overview-number">
+                                <strong>{{ item.count }}</strong>
+                                <small>{{ item.percentage }}%</small>
+                            </span>
+
+                        </button>
+                    {% endfor %}
+                </div>
+
+            </div>
+
+        </div>
+
+        <section class="bnw-v2-comparison">
+
+            <div class="bnw-v2-subheader">
+                <div>
+                    <h3>Exact activity comparison</h3>
+                    <p>
+                        Bar length compares each category with the busiest one.
+                        The percentage shows its share of all actions.
+                    </p>
+                </div>
+
+                <strong>
+                    {{ total_activity_count }} total action{{ total_activity_count|pluralize }}
+                </strong>
+            </div>
+
+            <div class="bnw-v2-comparison-grid">
+                {% for item in activity_breakdown %}
+                    <article class="bnw-v2-comparison-row">
+
+                        <div class="bnw-v2-comparison-label">
+                            <i style="background: {{ item.color }};"></i>
+                            <div>
+                                <strong>{{ item.label }}</strong>
+                                <small>{{ item.description }}</small>
+                            </div>
+                        </div>
+
+                        <div class="bnw-v2-comparison-measure">
+                            <div class="bnw-v2-comparison-track">
+                                <span
+                                    data-bnw-exact-bar
+                                    data-width="{{ item.relative_width }}"
+                                    style="
+                                        width: {{ item.relative_width }}%;
+                                        background: {{ item.color }};
+                                    ">
+                                </span>
+                            </div>
+
+                            <div class="bnw-v2-comparison-value">
+                                <strong>{{ item.count }}</strong>
+                                <small>{{ item.percentage }}%</small>
+                            </div>
+                        </div>
+
+                    </article>
+                {% endfor %}
+            </div>
+
+        </section>
+
+        <section class="bnw-v2-trend">
+
+            <div class="bnw-v2-subheader">
+                <div>
+                    <h3>Daily activity trend</h3>
+                    <p>
+                        Each column is one day's total. Hover or focus a column
+                        for the exact category breakdown.
+                    </p>
+                </div>
+
+                <span>Scale: busiest day = {{ max_daily_total }}</span>
+            </div>
+
+            <div class="bnw-v2-trend-layout">
+
+                <div class="bnw-v2-axis" aria-hidden="true">
+                    <strong>{{ max_daily_total }}</strong>
+                    <span>{{ mid_daily_total }}</span>
+                    <span>0</span>
+                </div>
+
+                <div
+                    class="bnw-v2-day-scroll{% if daily_activity|length == 1 %} is-single-day{% endif %}">
+
+                    <div class="bnw-v2-grid-lines" aria-hidden="true">
+                        <i></i><i></i><i></i>
+                    </div>
+
+                    <div class="bnw-v2-days">
+                        {% for day in daily_activity %}
+                            <button
+                                type="button"
+                                class="bnw-v2-day"
+                                data-bnw-day
+                                data-total="{{ day.total_count }}"
+                                aria-label="{{ day.date|date:'d M Y' }}: {{ day.total_count }} total actions">
+
+                                <strong>{{ day.total_count }}</strong>
+
+                                <span class="bnw-v2-day-plot">
+                                    <span
+                                        class="bnw-v2-day-bar"
+                                        data-bnw-day-bar
+                                        data-height="{{ day.height }}"
+                                        style="height: {{ day.height }}%;">
+                                    </span>
+                                </span>
+
+                                <time datetime="{{ day.date|date:'Y-m-d' }}">
+                                    {{ day.label }}
+                                </time>
+
+                                <span hidden data-bnw-day-data>
+                                    {% for segment in day.segments %}
+                                        {% if segment.count %}
+                                            <i
+                                                data-bnw-day-segment
+                                                data-label="{{ segment.label }}"
+                                                data-count="{{ segment.count }}"
+                                                data-color="{{ segment.color }}">
+                                            </i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+
+                            </button>
+                        {% endfor %}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</section>
+
+<!-- CLOSING SOON -->
+
+<aside class="bn-dashboard-panel bn-closing-panel">
+
+
+    <div class="bn-panel-header">
+
+        <div>
+
+            <h2>
+                Closing Soon
+            </h2>
+
+            <p>
+                Services to prioritise
+            </p>
+
+        </div>
+
+
+        
+            <a
+                href="{% url 'toolkit:home' %}?deadline=closing"
+                class="bn-panel-link">
+
+                View All →
+
+            </a>
+
+
+    </div>
+
+
+    <div class="bn-closing-list">
+
+
+        {% for service in closing_soon_services %}
+
+            <a
+                href="{% url 'toolkit:service_detail' service.slug %}"
+                class="bn-closing-item">
+
+                <div>
+
+                    <strong>
+                        {{ service.title }}
+                    </strong>
+
+                    <span>
+
+                        {{ service.domain.name }}
+
+                        {% if service.industries %}
+                            · {{ service.industries.0 }}
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+
+                <div class="bn-days-left {% if service.pitch_days_remaining <= 7 %}urgent{% endif %}">
+
+                    <strong>
+                        {{ service.pitch_days_remaining }}
+                    </strong>
+
+                    <span>
+                        days
+                    </span>
+
+                </div>
+
+            </a>
+
+
+        {% empty %}
+
+            <div class="bn-panel-empty">
+
+                <strong>
+                    Nothing closing soon
+                </strong>
+
+                <span>
+                    No currently pitchable service closes within 30 days.
+                </span>
+
+            </div>
+
+        {% endfor %}
+
+
+    </div>
+
+</aside>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     SECOND ROW
+====================================================== -->
+
+<div class="bn-home-secondary-grid">
+
+
+<!-- RECENT ACTIVITY -->
+
+<section
+    class="bn-dashboard-panel bnw-v2-recent-panel"
+    id="recent-toolkit-activity">
+
+    <div class="bn-panel-header bnw-v2-recent-header">
+        <div>
+            <h2>Recent Toolkit Activity</h2>
+            <p>Your latest recorded actions across every Toolkit feature</p>
+        </div>
+
+        <span>Newest first</span>
+    </div>
+
+    <div class="bnw-v2-recent-list">
+        {% for item in recent_activity %}
+            <article
+                class="bnw-v2-recent-row"
+                style="--activity-color: {{ item.color }};">
+
+                <i class="bnw-v2-recent-accent" aria-hidden="true"></i>
+
+                <time datetime="{{ item.created_at|date:'c' }}">
+                    {{ item.created_at|date:"h:i A" }}
+                </time>
+
+                <span class="bnw-v2-recent-type">
+                    {{ item.label }}
+                </span>
+
+                <div class="bnw-v2-recent-copy">
+                    <strong>{{ item.description }}</strong>
+                    <span>{{ item.detail }}</span>
+                </div>
+
+                <a class="bnw-v2-view" href="{{ item.view_url }}">
+                    View <span aria-hidden="true">→</span>
+                </a>
+
+            </article>
+        {% empty %}
+            <div class="bn-panel-empty">
+                <strong>No activity yet</strong>
+                <span>Your recorded Toolkit actions will appear here.</span>
+            </div>
+        {% endfor %}
+    </div>
+
+</section>
+
+<!-- MOST SEARCHED -->
+
+<section class="bn-dashboard-panel">
+
+
+    <div class="bn-panel-header">
+
+        <div>
+
+            <h2>
+                Most Searched
+            </h2>
+
+            <p>
+                What you searched for most often
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="bn-top-search-list">
+
+
+        {% for item in top_queries %}
+
+            <a
+                href="{% url 'toolkit:home' %}?q={{ item.query|urlencode }}">
+
+                <div>
+
+                    <span class="bn-search-rank">
+                        {{ forloop.counter }}
+                    </span>
+
+                    <strong>
+                        {{ item.query }}
+                    </strong>
+
+                </div>
+
+
+                <span>
+                    {{ item.total }}
+                    search{{ item.total|pluralize }}
+                </span>
+
+            </a>
+
+
+        {% empty %}
+
+            <div class="bn-panel-empty">
+
+                <strong>
+                    No search trend yet
+                </strong>
+
+                <span>
+                    Your most frequent Toolkit searches will appear here.
+                </span>
+
+            </div>
+
+        {% endfor %}
+
+
+    </div>
+
+</section>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     SEARCH GAPS
+====================================================== -->
+
+<section class="bn-dashboard-panel bn-search-gap-panel">
+
+
+    <div class="bn-panel-header">
+
+        <div>
+
+            <h2>
+                Searches With No Result
+            </h2>
+
+            <p>
+                These searches may indicate missing Toolkit information
+            </p>
+
+        </div>
+
+
+        <span class="bn-gap-total">
+            {{ zero_result_count }}
+        </span>
+
+    </div>
+
+
+    {% if zero_queries %}
+
+        <div class="bn-gap-list">
+
+
+            {% for item in zero_queries %}
+
+                <div class="bn-gap-item">
+
+                    <div>
+
+                        <span>
+                            SEARCH
+                        </span>
+
+                        <strong>
+                            {{ item.query }}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        {{ item.total }}
+                        time{{ item.total|pluralize }}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+
+        </div>
+
+
+    {% else %}
+
+        <div class="bn-gap-good">
+
+            <span>
+                ✓
+            </span>
+
+            <div>
+
+                <strong>
+                    No search gaps in this period
+                </strong>
+
+                <p>
+                    Every recorded Toolkit search returned at least one result.
+                </p>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
+</section>
+
+
+</div>
+
+
+<script src="{% static 'js/dashboard_home_v2.js' %}"></script>
+<script src="{% static 'js/dashboard_activity_v2.js' %}?v=2" defer></script>
+
+
+
+<!-- =========================================================
+     BNX_DASHBOARD_PREMIUM_TECH_V2
+
+     BharatNXT Wave — Premium BDE Workspace
+     Visual-only enhancement.
+
+     Existing:
+     - metrics
+     - database queries
+     - URLs
+     - chart logic
+     - date filtering
+     - activity data
+
+     remain untouched.
+========================================================== -->
+
+<style id="BNX_DASHBOARD_PREMIUM_TECH_V2">
+
+/* =========================================================
+   01. DASHBOARD DESIGN TOKENS
+========================================================= */
+
+.bn-home-v2 {
+
+    --bnx-blue:
+        #1769ff;
+
+    --bnx-blue-deep:
+        #0d55e8;
+
+    --bnx-blue-soft:
+        #eef4ff;
+
+    --bnx-cyan:
+        #14b8d4;
+
+    --bnx-violet:
+        #7457f5;
+
+    --bnx-amber:
+        #e5a11b;
+
+    --bnx-green:
+        #18a96b;
+
+    --bnx-red:
+        #e14242;
+
+    --bnx-ink:
+        #101828;
+
+    --bnx-muted:
+        #667085;
+
+    --bnx-border:
+        #e2e8f0;
+
+    --bnx-panel:
+        rgba(
+            255,
+            255,
+            255,
+            .94
+        );
+
+    --bnx-shadow:
+        0 8px 28px
+        rgba(
+            16,
+            24,
+            40,
+            .055
+        );
+
+    --bnx-shadow-hover:
+        0 15px 36px
+        rgba(
+            16,
+            24,
+            40,
+            .09
+        );
+
+
+    position:
+        relative;
+
+    isolation:
+        isolate;
+
+    padding-bottom:
+        36px;
+
+}
+
+
+/* =========================================================
+   02. TECHNICAL BACKGROUND
+========================================================= */
+
+.bn-home-v2::before {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    z-index:
+        -2;
+
+    top:
+        -32px;
+
+    left:
+        -34px;
+
+    right:
+        -34px;
+
+    height:
+        440px;
+
+    pointer-events:
+        none;
+
+    background:
+
+        radial-gradient(
+            circle at 76% 5%,
+            rgba(
+                23,
+                105,
+                255,
+                .09
+            ),
+            transparent 30%
+        ),
+
+        radial-gradient(
+            circle at 36% 0%,
+            rgba(
+                116,
+                87,
+                245,
+                .045
+            ),
+            transparent 26%
+        ),
+
+        linear-gradient(
+            180deg,
+            #fbfdff 0%,
+            rgba(
+                248,
+                250,
+                252,
+                .25
+            ) 75%,
+            transparent 100%
+        );
+
+}
+
+
+.bn-home-v2::after {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    z-index:
+        -1;
+
+    top:
+        -24px;
+
+    right:
+        -18px;
+
+    width:
+        510px;
+
+    height:
+        330px;
+
+    opacity:
+        .23;
+
+    pointer-events:
+        none;
+
+    background-image:
+
+        linear-gradient(
+            rgba(
+                23,
+                105,
+                255,
+                .11
+            )
+            1px,
+            transparent 1px
+        ),
+
+        linear-gradient(
+            90deg,
+            rgba(
+                23,
+                105,
+                255,
+                .11
+            )
+            1px,
+            transparent 1px
+        );
+
+    background-size:
+        28px 28px;
+
+    mask-image:
+        linear-gradient(
+            to bottom left,
+            black,
+            transparent 74%
+        );
+
+}
+
+
+/* =========================================================
+   03. HERO / PAGE HEADER
+========================================================= */
+
+.bn-home-header {
+
+    position:
+        relative;
+
+    min-height:
+        104px;
+
+    margin-bottom:
+        12px !important;
+
+    align-items:
+        flex-start !important;
+
+}
+
+
+.bn-home-header > div:first-child {
+
+    position:
+        relative;
+
+}
+
+
+.bn-home-header > div:first-child::before {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    left:
+        0;
+
+    top:
+        -14px;
+
+    width:
+        42px;
+
+    height:
+        3px;
+
+    border-radius:
+        99px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--bnx-blue),
+            var(--bnx-cyan)
+        );
+
+    box-shadow:
+        0 0 17px
+        rgba(
+            23,
+            105,
+            255,
+            .28
+        );
+
+}
+
+
+.bn-home-header h1 {
+
+    margin-top:
+        6px !important;
+
+    margin-bottom:
+        6px !important;
+
+    color:
+        var(--bnx-ink);
+
+    font-size:
+        clamp(
+            31px,
+            3vw,
+            43px
+        ) !important;
+
+    font-weight:
+        720 !important;
+
+    line-height:
+        1.05 !important;
+
+    letter-spacing:
+        -.035em !important;
+
+}
+
+
+.bn-home-header p {
+
+    max-width:
+        700px;
+
+    color:
+        var(--bnx-muted) !important;
+
+    font-size:
+        14px !important;
+
+    line-height:
+        1.6 !important;
+
+}
+
+
+.bn-home-header
+.page-eyebrow,
+.bn-home-header
+.bn-home-eyebrow {
+
+    color:
+        var(--bnx-blue) !important;
+
+    font-size:
+        10px !important;
+
+    font-weight:
+        760 !important;
+
+    letter-spacing:
+        .14em !important;
+
+}
+
+
+/* =========================================================
+   04. DATE RANGE CONTROL
+========================================================= */
+
+.bn-date-picker {
+
+    position:
+        relative;
+
+    z-index:
+        20;
+
+}
+
+
+.bn-date-picker > summary {
+
+    min-height:
+        44px !important;
+
+    padding:
+        0 15px !important;
+
+    border:
+        1px solid
+        rgba(
+            148,
+            163,
+            184,
+            .28
+        ) !important;
+
+    border-radius:
+        12px !important;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .82
+        ) !important;
+
+    backdrop-filter:
+        blur(14px);
+
+    box-shadow:
+        0 4px 15px
+        rgba(
+            16,
+            24,
+            40,
+            .04
+        ) !important;
+
+    transition:
+        border-color .16s ease,
+        box-shadow .16s ease,
+        transform .16s ease;
+
+}
+
+
+.bn-date-picker > summary:hover {
+
+    border-color:
+        #b8cbff !important;
+
+    box-shadow:
+        0 7px 20px
+        rgba(
+            23,
+            105,
+            255,
+            .08
+        ) !important;
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+.bn-date-icon {
+
+    color:
+        var(--bnx-blue) !important;
+
+}
+
+
+/* =========================================================
+   05. QUICK ACTIONS
+========================================================= */
+
+.bn-home-v2
+.bnx-dashboard-quick-actions,
+.bn-home-v2
+.bn-dashboard-quick-actions {
+
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        9px;
+
+    margin:
+        3px 0 20px !important;
+
+}
+
+
+.bn-home-v2
+.bnx-dashboard-quick-actions a,
+.bn-home-v2
+.bn-dashboard-quick-actions a {
+
+    min-height:
+        42px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        0 16px !important;
+
+    border:
+        1px solid
+        #dde5f0 !important;
+
+    border-radius:
+        10px !important;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .93
+        ) !important;
+
+    color:
+        #25324a !important;
+
+    font-size:
+        12px !important;
+
+    font-weight:
+        650 !important;
+
+    text-decoration:
+        none;
+
+    box-shadow:
+        0 3px 10px
+        rgba(
+            16,
+            24,
+            40,
+            .025
+        );
+
+    transition:
+        all .16s ease;
+
+}
+
+
+.bn-home-v2
+.bnx-dashboard-quick-actions a:hover,
+.bn-home-v2
+.bn-dashboard-quick-actions a:hover {
+
+    border-color:
+        #b9ceff !important;
+
+    color:
+        var(--bnx-blue) !important;
+
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 7px 18px
+        rgba(
+            23,
+            105,
+            255,
+            .08
+        );
+
+}
+
+
+.bn-home-v2
+.bnx-dashboard-quick-actions a:first-child,
+.bn-home-v2
+.bn-dashboard-quick-actions a:first-child {
+
+    border-color:
+        var(--bnx-blue) !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            #1769ff,
+            #2d7bff
+        ) !important;
+
+    color:
+        #ffffff !important;
+
+    box-shadow:
+        0 7px 18px
+        rgba(
+            23,
+            105,
+            255,
+            .20
+        );
+
+}
+
+
+.bn-home-v2
+.bnx-dashboard-quick-actions a:first-child:hover,
+.bn-home-v2
+.bn-dashboard-quick-actions a:first-child:hover {
+
+    color:
+        #ffffff !important;
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 10px 23px
+        rgba(
+            23,
+            105,
+            255,
+            .25
+        );
+
+}
+
+
+/* =========================================================
+   06. KPI CARDS
+========================================================= */
+
+.bn-home-kpi-strip {
+
+    display:
+        grid !important;
+
+    grid-template-columns:
+        repeat(
+            5,
+            minmax(
+                0,
+                1fr
+            )
+        ) !important;
+
+    gap:
+        11px !important;
+
+    margin:
+        0 0 18px !important;
+
+    padding:
+        0 !important;
+
+    border:
+        0 !important;
+
+    border-radius:
+        0 !important;
+
+    background:
+        transparent !important;
+
+    overflow:
+        visible !important;
+
+}
+
+
+.bn-home-kpi {
+
+    position:
+        relative;
+
+    min-height:
+        96px !important;
+
+    padding:
+        17px 16px !important;
+
+    border:
+        1px solid
+        var(--bnx-border) !important;
+
+    border-radius:
+        15px !important;
+
+    background:
+        var(--bnx-panel) !important;
+
+    overflow:
+        hidden;
+
+    box-shadow:
+        0 5px 18px
+        rgba(
+            16,
+            24,
+            40,
+            .035
+        );
+
+    transition:
+        transform .16s ease,
+        border-color .16s ease,
+        box-shadow .16s ease !important;
+
+}
+
+
+.bn-home-kpi::before {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    left:
+        0;
+
+    right:
+        0;
+
+    top:
+        0;
+
+    height:
+        2px;
+
+    opacity:
+        0;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--bnx-blue),
+            var(--bnx-cyan)
+        );
+
+    transition:
+        opacity .16s ease;
+
+}
+
+
+.bn-home-kpi:hover {
+
+    transform:
+        translateY(-3px);
+
+    border-color:
+        #c8d7f7 !important;
+
+    background:
+        #ffffff !important;
+
+    box-shadow:
+        var(--bnx-shadow-hover);
+
+}
+
+
+.bn-home-kpi:hover::before {
+
+    opacity:
+        1;
+
+}
+
+
+.bn-kpi-icon {
+
+    width:
+        40px !important;
+
+    height:
+        40px !important;
+
+    border-radius:
+        12px !important;
+
+    border:
+        1px solid
+        rgba(
+            23,
+            105,
+            255,
+            .08
+        );
+
+    background:
+        linear-gradient(
+            145deg,
+            #f3f7ff,
+            #eaf2ff
+        ) !important;
+
+    box-shadow:
+        inset 0 1px 0
+        rgba(
+            255,
+            255,
+            255,
+            .8
+        );
+
+    color:
+        var(--bnx-blue) !important;
+
+    font-weight:
+        700;
+
+}
+
+
+.bn-home-kpi:nth-child(2)
+.bn-kpi-icon {
+
+    background:
+        linear-gradient(
+            145deg,
+            #f6f3ff,
+            #eee9ff
+        ) !important;
+
+    color:
+        var(--bnx-violet) !important;
+
+}
+
+
+.bn-home-kpi:nth-child(3)
+.bn-kpi-icon {
+
+    background:
+        linear-gradient(
+            145deg,
+            #eefcff,
+            #e4f8fc
+        ) !important;
+
+    color:
+        #089ab8 !important;
+
+}
+
+
+.bn-home-kpi:nth-child(4)
+.bn-kpi-icon {
+
+    background:
+        linear-gradient(
+            145deg,
+            #effbf4,
+            #e7f8ef
+        ) !important;
+
+    color:
+        var(--bnx-green) !important;
+
+}
+
+
+.bn-kpi-icon.warning {
+
+    background:
+        linear-gradient(
+            145deg,
+            #fff9eb,
+            #fff2d7
+        ) !important;
+
+    color:
+        #cb8410 !important;
+
+}
+
+
+.bn-home-kpi > div:last-child {
+
+    min-width:
+        0;
+
+}
+
+
+.bn-home-kpi span {
+
+    color:
+        #68758b !important;
+
+    font-size:
+        11.5px !important;
+
+    font-weight:
+        500 !important;
+
+    letter-spacing:
+        -.005em;
+
+}
+
+
+.bn-home-kpi strong {
+
+    margin-top:
+        4px !important;
+
+    color:
+        #0c1526 !important;
+
+    font-size:
+        25px !important;
+
+    font-weight:
+        720 !important;
+
+    line-height:
+        1 !important;
+
+    letter-spacing:
+        -.035em;
+
+}
+
+
+/* =========================================================
+   07. MAIN / SECONDARY GRIDS
+========================================================= */
+
+.bn-home-main-grid {
+
+    grid-template-columns:
+        minmax(
+            0,
+            1.72fr
+        )
+        minmax(
+            320px,
+            .78fr
+        ) !important;
+
+    gap:
+        15px !important;
+
+}
+
+
+.bn-home-secondary-grid {
+
+    gap:
+        15px !important;
+
+    margin-top:
+        15px !important;
+
+}
+
+
+/* =========================================================
+   08. PREMIUM PANELS
+========================================================= */
+
+.bn-dashboard-panel {
+
+    position:
+        relative;
+
+    border:
+        1px solid
+        var(--bnx-border) !important;
+
+    border-radius:
+        16px !important;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .96
+        ) !important;
+
+    box-shadow:
+        var(--bnx-shadow) !important;
+
+    overflow:
+        hidden !important;
+
+    transition:
+        border-color .18s ease,
+        box-shadow .18s ease;
+
+}
+
+
+.bn-dashboard-panel:hover {
+
+    border-color:
+        #d3ddeb !important;
+
+    box-shadow:
+        0 11px 31px
+        rgba(
+            16,
+            24,
+            40,
+            .065
+        ) !important;
+
+}
+
+
+.bn-panel-header {
+
+    min-height:
+        76px !important;
+
+    padding:
+        17px 20px !important;
+
+    border-bottom:
+        1px solid
+        #ebeff4 !important;
+
+    background:
+
+        linear-gradient(
+            180deg,
+            rgba(
+                250,
+                252,
+                255,
+                .95
+            ),
+            rgba(
+                255,
+                255,
+                255,
+                .82
+            )
+        ) !important;
+
+}
+
+
+.bn-panel-header h2 {
+
+    color:
+        #101828 !important;
+
+    font-size:
+        17px !important;
+
+    font-weight:
+        690 !important;
+
+    letter-spacing:
+        -.02em;
+
+}
+
+
+.bn-panel-header p {
+
+    margin-top:
+        4px !important;
+
+    color:
+        #748095 !important;
+
+    font-size:
+        11.5px !important;
+
+}
+
+
+.bn-panel-link {
+
+    min-height:
+        32px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        0 10px;
+
+    border-radius:
+        8px;
+
+    color:
+        var(--bnx-blue) !important;
+
+    font-size:
+        11.5px !important;
+
+    font-weight:
+        650 !important;
+
+    transition:
+        background .14s ease;
+
+}
+
+
+.bn-panel-link:hover {
+
+    background:
+        #eef4ff;
+
+}
+
+
+/* =========================================================
+   09. ACTIVITY PANEL
+========================================================= */
+
+.bn-activity-panel {
+
+    background:
+
+        radial-gradient(
+            circle at 14% 63%,
+            rgba(
+                23,
+                105,
+                255,
+                .035
+            ),
+            transparent 30%
+        ),
+
+        #ffffff !important;
+
+}
+
+
+.bn-activity-pie-layout {
+
+    min-height:
+        330px !important;
+
+    gap:
+        35px !important;
+
+    padding:
+        27px 31px !important;
+
+}
+
+
+.bn-pie-visual {
+
+    width:
+        245px !important;
+
+    height:
+        245px !important;
+
+    position:
+        relative;
+
+}
+
+
+.bn-pie-visual::before {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    left:
+        14%;
+
+    right:
+        14%;
+
+    bottom:
+        -14px;
+
+    height:
+        28px;
+
+    border:
+        1px solid
+        rgba(
+            23,
+            105,
+            255,
+            .14
+        );
+
+    border-radius:
+        50%;
+
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(
+                23,
+                105,
+                255,
+                .11
+            ),
+            transparent 68%
+        );
+
+    filter:
+        blur(.2px);
+
+    transform:
+        perspective(140px)
+        rotateX(72deg);
+
+    pointer-events:
+        none;
+
+}
+
+
+.bn-pie-track {
+
+    stroke:
+        #edf1f6 !important;
+
+}
+
+
+.bn-pie-segment {
+
+    filter:
+        drop-shadow(
+            0 3px 4px
+            rgba(
+                23,
+                105,
+                255,
+                .09
+            )
+        );
+
+}
+
+
+.bn-pie-center span {
+
+    color:
+        #667085 !important;
+
+    font-size:
+        10px !important;
+
+    font-weight:
+        650 !important;
+
+    letter-spacing:
+        .055em;
+
+}
+
+
+.bn-pie-center strong {
+
+    color:
+        #101828 !important;
+
+    font-size:
+        42px !important;
+
+    font-weight:
+        720 !important;
+
+    letter-spacing:
+        -.045em;
+
+}
+
+
+.bn-pie-center small {
+
+    color:
+        #7b879a !important;
+
+    font-size:
+        10.5px !important;
+
+}
+
+
+/* =========================================================
+   10. ACTIVITY BREAKDOWN
+========================================================= */
+
+.bn-pie-summary-heading h3 {
+
+    color:
+        #101828 !important;
+
+    font-size:
+        17px !important;
+
+    font-weight:
+        680 !important;
+
+    letter-spacing:
+        -.018em;
+
+}
+
+
+.bn-pie-summary-heading p {
+
+    color:
+        #738095 !important;
+
+    font-size:
+        11.5px !important;
+
+}
+
+
+.bn-pie-legend-item {
+
+    position:
+        relative;
+
+    min-height:
+        68px !important;
+
+    padding:
+        13px 14px !important;
+
+    border:
+        1px solid
+        #e2e8f0 !important;
+
+    border-radius:
+        12px !important;
+
+    background:
+        #ffffff !important;
+
+    box-shadow:
+        0 3px 11px
+        rgba(
+            16,
+            24,
+            40,
+            .025
+        );
+
+    transition:
+        transform .15s ease,
+        border-color .15s ease,
+        box-shadow .15s ease;
+
+}
+
+
+.bn-pie-legend-item:hover {
+
+    transform:
+        translateX(3px);
+
+    border-color:
+        #c8d7f6 !important;
+
+    box-shadow:
+        0 6px 16px
+        rgba(
+            23,
+            105,
+            255,
+            .06
+        );
+
+}
+
+
+.bn-pie-legend-mark {
+
+    width:
+        6px !important;
+
+    border-radius:
+        99px !important;
+
+}
+
+
+.bn-pie-legend-copy strong {
+
+    color:
+        #172033 !important;
+
+    font-size:
+        13px !important;
+
+    font-weight:
+        660 !important;
+
+}
+
+
+.bn-pie-legend-copy span {
+
+    color:
+        #7a8699 !important;
+
+    font-size:
+        10.5px !important;
+
+}
+
+
+.bn-pie-legend-number strong {
+
+    color:
+        #101828 !important;
+
+    font-size:
+        23px !important;
+
+    font-weight:
+        700 !important;
+
+    letter-spacing:
+        -.03em;
+
+}
+
+
+.bn-pie-actions {
+
+    margin-top:
+        10px !important;
+
+}
+
+
+.bn-pie-action-link {
+
+    color:
+        var(--bnx-blue) !important;
+
+    font-size:
+        11px !important;
+
+    font-weight:
+        620 !important;
+
+}
+
+
+/* =========================================================
+   11. CLOSING SOON
+========================================================= */
+
+.bn-closing-panel {
+
+    background:
+
+        linear-gradient(
+            180deg,
+            #ffffff,
+            #fdfefe
+        ) !important;
+
+}
+
+
+.bn-closing-item {
+
+    min-height:
+        67px !important;
+
+    padding:
+        13px 18px !important;
+
+    border-bottom:
+        1px solid
+        #edf0f4 !important;
+
+    transition:
+        background .14s ease,
+        padding-left .14s ease;
+
+}
+
+
+.bn-closing-item:hover {
+
+    padding-left:
+        21px !important;
+
+    background:
+        #f8fbff !important;
+
+}
+
+
+.bn-closing-item > div:first-child {
+
+    min-width:
+        0;
+
+}
+
+
+.bn-closing-item > div:first-child > strong {
+
+    color:
+        #172033 !important;
+
+    font-size:
+        12px !important;
+
+    font-weight:
+        650 !important;
+
+    line-height:
+        1.35;
+
+}
+
+
+.bn-closing-item > div:first-child > span {
+
+    margin-top:
+        3px;
+
+    color:
+        #778397 !important;
+
+    font-size:
+        10px !important;
+
+}
+
+
+.bn-days-left {
+
+    min-width:
+        43px;
+
+    text-align:
+        center;
+
+}
+
+
+.bn-days-left strong {
+
+    font-size:
+        20px !important;
+
+    font-weight:
+        690 !important;
+
+    line-height:
+        1 !important;
+
+    color:
+        #d18b0b;
+
+}
+
+
+.bn-days-left span {
+
+    margin-top:
+        4px;
+
+    color:
+        #818ca0 !important;
+
+    font-size:
+        9px !important;
+
+}
+
+
+.bn-days-left.urgent strong {
+
+    color:
+        var(--bnx-red) !important;
+
+}
+
+
+/* =========================================================
+   12. RECENT ACTIVITY
+========================================================= */
+
+.bn-recent-item {
+
+    min-height:
+        61px !important;
+
+    padding:
+        11px 17px !important;
+
+    border-bottom:
+        1px solid
+        #edf0f4 !important;
+
+    transition:
+        background .14s ease;
+
+}
+
+
+.bn-recent-item:hover {
+
+    background:
+        #fafcff !important;
+
+}
+
+
+.bn-recent-item time {
+
+    color:
+        #8a95a7 !important;
+
+    font-size:
+        10px !important;
+
+    font-variant-numeric:
+        tabular-nums;
+
+}
+
+
+.bn-recent-detail strong {
+
+    color:
+        #1b2536 !important;
+
+    font-size:
+        11.5px !important;
+
+    font-weight:
+        620 !important;
+
+}
+
+
+.bn-recent-detail span {
+
+    color:
+        #8590a2 !important;
+
+    font-size:
+        10px !important;
+
+}
+
+
+.bn-row-action {
+
+    color:
+        var(--bnx-blue) !important;
+
+    font-size:
+        10.5px !important;
+
+    font-weight:
+        620 !important;
+
+}
+
+
+/* =========================================================
+   13. MOST SEARCHED / SEARCH GAPS / OTHER PANELS
+========================================================= */
+
+.bn-home-secondary-grid
+.bn-dashboard-panel {
+
+    min-height:
+        100%;
+
+}
+
+
+.bn-home-secondary-grid
+.bn-dashboard-panel
+a {
+
+    transition:
+        color .14s ease,
+        background .14s ease;
+
+}
+
+
+/* =========================================================
+   14. EMPTY STATES
+========================================================= */
+
+.bn-panel-empty {
+
+    padding:
+        35px 20px !important;
+
+}
+
+
+.bn-panel-empty strong {
+
+    color:
+        #253047 !important;
+
+    font-size:
+        12px !important;
+
+    font-weight:
+        650 !important;
+
+}
+
+
+.bn-panel-empty span {
+
+    color:
+        #8490a3 !important;
+
+    font-size:
+        10.5px !important;
+
+}
+
+
+/* =========================================================
+   15. FOCUS / ACCESSIBILITY
+========================================================= */
+
+.bn-home-v2 a:focus-visible,
+.bn-home-v2 button:focus-visible,
+.bn-home-v2 summary:focus-visible {
+
+    outline:
+        3px solid
+        rgba(
+            23,
+            105,
+            255,
+            .20
+        ) !important;
+
+    outline-offset:
+        2px !important;
+
+}
+
+
+/* =========================================================
+   16. RESPONSIVE
+========================================================= */
+
+@media(
+    max-width: 1250px
+) {
+
+    .bn-home-kpi-strip {
+
+        grid-template-columns:
+            repeat(
+                3,
+                minmax(
+                    0,
+                    1fr
+                )
+            ) !important;
+
+    }
+
+
+    .bn-home-main-grid {
+
+        grid-template-columns:
+            minmax(
+                0,
+                1.5fr
+            )
+            minmax(
+                290px,
+                .8fr
+            ) !important;
+
+    }
+
+}
+
+
+@media(
+    max-width: 1000px
+) {
+
+    .bn-home-main-grid {
+
+        grid-template-columns:
+            1fr !important;
+
+    }
+
+
+    .bn-activity-pie-layout {
+
+        grid-template-columns:
+            1fr !important;
+
+    }
+
+
+    .bn-pie-summary {
+
+        max-width:
+            650px;
+
+        width:
+            100%;
+
+        margin:
+            0 auto;
+
+    }
+
+}
+
+
+@media(
+    max-width: 760px
+) {
+
+    .bn-home-v2::after {
+
+        display:
+            none;
+
+    }
+
+
+    .bn-home-header {
+
+        min-height:
+            auto;
+
+    }
+
+
+    .bn-home-header h1 {
+
+        font-size:
+            30px !important;
+
+    }
+
+
+    .bn-home-kpi-strip {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            ) !important;
+
+        gap:
+            9px !important;
+
+    }
+
+
+    .bn-home-kpi {
+
+        min-height:
+            88px !important;
+
+        padding:
+            13px !important;
+
+    }
+
+
+    .bn-kpi-icon {
+
+        width:
+            36px !important;
+
+        height:
+            36px !important;
+
+    }
+
+
+    .bn-home-kpi strong {
+
+        font-size:
+            22px !important;
+
+    }
+
+
+    .bn-activity-pie-layout {
+
+        padding:
+            22px 16px !important;
+
+    }
+
+
+    .bn-pie-visual {
+
+        width:
+            215px !important;
+
+        height:
+            215px !important;
+
+    }
+
+}
+
+
+@media(
+    max-width: 480px
+) {
+
+    .bn-home-kpi-strip {
+
+        grid-template-columns:
+            1fr !important;
+
+    }
+
+
+    .bn-home-kpi {
+
+        min-height:
+            76px !important;
+
+    }
+
+}
+
+
+/* =========================================================
+   17. REDUCED MOTION
+========================================================= */
+
+@media(
+    prefers-reduced-motion:
+    reduce
+) {
+
+    .bn-home-v2 *,
+    .bn-home-v2 *::before,
+    .bn-home-v2 *::after {
+
+        transition:
+            none !important;
+
+        animation:
+            none !important;
+
+    }
+
+}
+
+</style>
+
+
+
+
+<!-- =========================================================
+     BNX_REFERENCE_KPI_V31
+     Clean enterprise SaaS KPI cards.
+========================================================== -->
+
+<style id="BNX_REFERENCE_KPI_V31">
+
+
+/* =========================================================
+   KPI STRIP
+========================================================= */
+
+.bn-home-kpi-strip {
+
+    display:
+        grid !important;
+
+    grid-template-columns:
+        repeat(
+            5,
+            minmax(0, 1fr)
+        ) !important;
+
+    gap:
+        12px !important;
+
+    margin:
+        0 0 20px !important;
+
+    padding:
+        0 !important;
+
+    border:
+        0 !important;
+
+    border-radius:
+        0 !important;
+
+    background:
+        transparent !important;
+
+    overflow:
+        visible !important;
+
+}
+
+
+/* =========================================================
+   CARD
+   Reference direction:
+   flat, structured, compact, enterprise
+========================================================= */
+
+.bn-home-kpi {
+
+    position:
+        relative !important;
+
+    min-height:
+        104px !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        flex-start !important;
+
+    gap:
+        10px !important;
+
+    padding:
+        16px 17px !important;
+
+    border:
+        1px solid
+        #e1e6ee !important;
+
+    border-radius:
+        9px !important;
+
+    background:
+        #ffffff !important;
+
+    box-shadow:
+        0 1px 3px
+        rgba(
+            15,
+            23,
+            42,
+            .025
+        ) !important;
+
+    overflow:
+        hidden !important;
+
+    color:
+        #101828 !important;
+
+    text-decoration:
+        none !important;
+
+    transform:
+        none !important;
+
+    transition:
+        border-color .15s ease,
+        box-shadow .15s ease,
+        background .15s ease !important;
+
+}
+
+
+/* remove old decorative gradients */
+
+.bn-home-kpi::before,
+.bn-home-kpi::after {
+
+    display:
+        none !important;
+
+    content:
+        none !important;
+
+}
+
+
+.bn-home-kpi:hover {
+
+    background:
+        #ffffff !important;
+
+    border-color:
+        #cfd7e3 !important;
+
+    box-shadow:
+        0 5px 14px
+        rgba(
+            15,
+            23,
+            42,
+            .055
+        ) !important;
+
+    transform:
+        none !important;
+
+}
+
+
+/* =========================================================
+   ICON
+========================================================= */
+
+.bn-kpi-icon,
+.bn-home-kpi:nth-child(1) .bn-kpi-icon,
+.bn-home-kpi:nth-child(2) .bn-kpi-icon,
+.bn-home-kpi:nth-child(3) .bn-kpi-icon,
+.bn-home-kpi:nth-child(4) .bn-kpi-icon {
+
+    width:
+        26px !important;
+
+    height:
+        26px !important;
+
+    min-width:
+        26px !important;
+
+    flex:
+        0 0 26px !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    border:
+        1px solid
+        #e5e9f0 !important;
+
+    border-radius:
+        6px !important;
+
+    background:
+        #f7f8fa !important;
+
+    color:
+        #667085 !important;
+
+    box-shadow:
+        none !important;
+
+}
+
+
+.bn-kpi-icon.warning {
+
+    border-color:
+        #f2e4c7 !important;
+
+    background:
+        #fffaf0 !important;
+
+    color:
+        #b7791f !important;
+
+}
+
+
+.bn-kpi-icon svg {
+
+    display:
+        block !important;
+
+    width:
+        14px !important;
+
+    height:
+        14px !important;
+
+}
+
+
+/* =========================================================
+   TEXT
+========================================================= */
+
+.bn-home-kpi > div:last-child {
+
+    min-width:
+        0 !important;
+
+    flex:
+        1 !important;
+
+}
+
+
+.bn-home-kpi span {
+
+    display:
+        block !important;
+
+    margin:
+        1px 0 0 !important;
+
+    color:
+        #667085 !important;
+
+    font-size:
+        11px !important;
+
+    font-weight:
+        500 !important;
+
+    line-height:
+        1.3 !important;
+
+    letter-spacing:
+        0 !important;
+
+}
+
+
+.bn-home-kpi strong {
+
+    display:
+        block !important;
+
+    margin:
+        12px 0 0 !important;
+
+    color:
+        #101828 !important;
+
+    font-size:
+        28px !important;
+
+    font-weight:
+        650 !important;
+
+    line-height:
+        .95 !important;
+
+    letter-spacing:
+        -.035em !important;
+
+}
+
+
+/* =========================================================
+   SMALL CONTEXT LINE
+========================================================= */
+
+.bn-home-kpi > div:last-child::after {
+
+    content:
+        "Selected period";
+
+    display:
+        block;
+
+    margin-top:
+        10px;
+
+    color:
+        #98a2b3;
+
+    font-size:
+        9px;
+
+    font-weight:
+        450;
+
+    line-height:
+        1.2;
+
+}
+
+
+.bn-home-kpi:last-child
+> div:last-child::after {
+
+    content:
+        "Review search gaps";
+
+    color:
+        #b7791f;
+
+}
+
+
+/* =========================================================
+   QUICK ACTIONS
+   Cleaner like supplied reference
+========================================================= */
+
+.bn-home-v2
+.bnx-dashboard-quick-actions,
+.bn-home-v2
+.bn-dashboard-quick-actions {
+
+    gap:
+        8px !important;
+
+    margin:
+        4px 0 16px !important;
+
+}
+
+
+.bn-home-v2
+.bnx-dashboard-quick-actions a,
+.bn-home-v2
+.bn-dashboard-quick-actions a {
+
+    min-height:
+        37px !important;
+
+    padding:
+        0 13px !important;
+
+    border:
+        1px solid
+        #e0e5ec !important;
+
+    border-radius:
+        7px !important;
+
+    background:
+        #ffffff !important;
+
+    color:
+        #344054 !important;
+
+    font-size:
+        10.5px !important;
+
+    font-weight:
+        600 !important;
+
+    box-shadow:
+        none !important;
+
+    transform:
+        none !important;
+
+}
+
+
+.bn-home-v2
+.bnx-dashboard-quick-actions a:hover,
+.bn-home-v2
+.bn-dashboard-quick-actions a:hover {
+
+    border-color:
+        #cbd3df !important;
+
+    background:
+        #fafbfc !important;
+
+    color:
+        #101828 !important;
+
+    box-shadow:
+        none !important;
+
+    transform:
+        none !important;
+
+}
+
+
+.bn-home-v2
+.bnx-dashboard-quick-actions a:first-child,
+.bn-home-v2
+.bn-dashboard-quick-actions a:first-child {
+
+    border-color:
+        #1769ff !important;
+
+    background:
+        #1769ff !important;
+
+    color:
+        #ffffff !important;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1250px) {
+
+    .bn-home-kpi-strip {
+
+        grid-template-columns:
+            repeat(
+                3,
+                minmax(0, 1fr)
+            ) !important;
+
+    }
+
+}
+
+
+@media(max-width:760px) {
+
+    .bn-home-kpi-strip {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            ) !important;
+
+    }
+
+}
+
+
+@media(max-width:500px) {
+
+    .bn-home-kpi-strip {
+
+        grid-template-columns:
+            1fr !important;
+
+    }
+
+}
+
+
+/* =========================================================
+   BNW_ACTIVITY_DASHBOARD_V2
+========================================================= */
+
+.bnw-v2-activity {
+    --v2-ink: #101828;
+    --v2-muted: #667085;
+    --v2-line: #e2e8f0;
+    padding: 30px 28px 28px;
+    color: var(--v2-ink);
+}
+
+.bnw-v2-intro,
+.bnw-v2-subheader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 22px;
+}
+
+.bnw-v2-intro { margin-bottom: 20px; }
+.bnw-v2-intro > div > span {
+    display: block;
+    margin-bottom: 6px;
+    color: #1769ff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .13em;
+}
+
+.bnw-v2-intro h3,
+.bnw-v2-subheader h3,
+.bnw-v2-section-heading h3 {
+    margin: 0;
+    color: var(--v2-ink);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -.02em;
+}
+
+.bnw-v2-intro p,
+.bnw-v2-subheader p,
+.bnw-v2-section-heading p {
+    margin: 5px 0 0;
+    max-width: 680px;
+    color: var(--v2-muted);
+    font-size: 11px;
+    line-height: 1.55;
+}
+
+.bnw-v2-reset {
+    flex: 0 0 auto;
+    min-height: 34px;
+    padding: 0 13px;
+    border: 1px solid #bfd5ff;
+    border-radius: 999px;
+    background: #eef5ff;
+    color: #1769ff;
+    font: inherit;
+    font-size: 10px;
+    font-weight: 750;
+    cursor: pointer;
+}
+
+.bnw-v2-overview-card {
+    display: grid;
+    grid-template-columns: minmax(260px, .8fr) minmax(390px, 1.2fr);
+    gap: clamp(28px, 4vw, 54px);
+    align-items: center;
+    min-height: 350px;
+    padding: 28px clamp(22px, 3vw, 38px);
+    border: 1px solid #dce5f0;
+    border-radius: 20px;
+    background:
+        radial-gradient(circle at 18% 18%, rgba(23,105,255,.08), transparent 38%),
+        linear-gradient(145deg, #ffffff, #fbfdff);
+    box-shadow: 0 16px 42px rgba(15, 23, 42, .065);
+}
+
+.bnw-v2-donut-wrap {
+    position: relative;
+    width: min(100%, 300px);
+    aspect-ratio: 1;
+    justify-self: center;
+    filter: drop-shadow(0 15px 18px rgba(23,105,255,.11));
+}
+
+.bnw-v2-donut {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    shape-rendering: geometricPrecision;
+}
+
+.bnw-v2-donut-track,
+.bnw-v2-donut-segment {
+    fill: none;
+    stroke-width: 26;
+    transform: rotate(-90deg);
+    transform-origin: 120px 120px;
+}
+
+.bnw-v2-donut-track { stroke: #e8edf4; }
+.bnw-v2-donut-segment {
+    cursor: pointer;
+    outline: none;
+    transition:
+        stroke-dasharray .8s cubic-bezier(.2,.8,.2,1),
+        opacity .18s ease,
+        stroke-width .18s ease,
+        filter .18s ease;
+}
+
+.bnw-v2-donut-segment:hover,
+.bnw-v2-donut-segment:focus-visible,
+.bnw-v2-donut-segment.is-active {
+    stroke-width: 32;
+    filter: drop-shadow(0 3px 5px rgba(15,23,42,.2));
+}
+
+.bnw-v2-donut-segment.is-muted { opacity: .15; }
+.bnw-v2-donut-centre {
+    position: absolute;
+    inset: 28%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+}
+
+.bnw-v2-donut-centre span {
+    color: #667085;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .075em;
+}
+
+.bnw-v2-donut-centre strong {
+    margin: 5px 0 3px;
+    color: #0f172a;
+    font-size: clamp(39px, 5vw, 53px);
+    line-height: 1;
+    letter-spacing: -.055em;
+}
+
+.bnw-v2-donut-centre small {
+    color: #7b89a2;
+    font-size: 11px;
+}
+
+.bnw-v2-overview-content { min-width: 0; }
+.bnw-v2-section-heading { margin-bottom: 14px; }
+.bnw-v2-overview-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+}
+
+.bnw-v2-overview-item {
+    display: grid;
+    grid-template-columns: 7px minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+    min-height: 72px;
+    padding: 11px 12px;
+    border: 1px solid #dfe6ef;
+    border-radius: 13px;
+    background: rgba(255,255,255,.94);
+    color: inherit;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    transition:
+        transform .16s ease,
+        border-color .16s ease,
+        box-shadow .16s ease,
+        opacity .16s ease;
+}
+
+.bnw-v2-overview-item:hover,
+.bnw-v2-overview-item:focus-visible,
+.bnw-v2-overview-item.is-active {
+    transform: translateY(-2px);
+    border-color: var(--series-color);
+    box-shadow: 0 9px 22px rgba(15,23,42,.08);
+    outline: none;
+}
+
+.bnw-v2-overview-item.is-muted { opacity: .32; }
+.bnw-v2-overview-mark {
+    align-self: stretch;
+    border-radius: 999px;
+    background: var(--series-color);
+}
+
+.bnw-v2-overview-copy,
+.bnw-v2-overview-copy strong,
+.bnw-v2-overview-copy small,
+.bnw-v2-overview-number strong,
+.bnw-v2-overview-number small {
+    display: block;
+    min-width: 0;
+}
+
+.bnw-v2-overview-copy strong {
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.bnw-v2-overview-copy small {
+    margin-top: 3px;
+    color: var(--v2-muted);
+    font-size: 9px;
+    line-height: 1.4;
+}
+
+.bnw-v2-overview-number { text-align: right; }
+.bnw-v2-overview-number strong {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.bnw-v2-overview-number small {
+    margin-top: 5px;
+    color: var(--v2-muted);
+    font-size: 9px;
+}
+
+.bnw-v2-comparison,
+.bnw-v2-trend {
+    margin-top: 28px;
+    padding-top: 25px;
+    border-top: 1px solid var(--v2-line);
+}
+
+.bnw-v2-subheader > strong,
+.bnw-v2-subheader > span {
+    flex: 0 0 auto;
+    margin-top: 3px;
+    color: #475467;
+    font-size: 10px;
+    font-weight: 750;
+}
+
+.bnw-v2-comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 13px;
+    margin-top: 17px;
+}
+
+.bnw-v2-comparison-row {
+    padding: 12px 13px;
+    border: 1px solid #e1e7ef;
+    border-radius: 12px;
+    background: #fff;
+    transition: transform .16s, border-color .16s, box-shadow .16s;
+}
+
+.bnw-v2-comparison-row:hover {
+    transform: translateY(-1px);
+    border-color: #cbd5e1;
+    box-shadow: 0 7px 18px rgba(15,23,42,.05);
+}
+
+.bnw-v2-comparison-label {
+    display: grid;
+    grid-template-columns: 5px minmax(0, 1fr);
+    gap: 9px;
+    align-items: stretch;
+}
+
+.bnw-v2-comparison-label > i {
+    min-height: 34px;
+    border-radius: 999px;
+}
+
+.bnw-v2-comparison-label strong,
+.bnw-v2-comparison-label small { display: block; }
+.bnw-v2-comparison-label strong {
+    font-size: 11px;
+    line-height: 1.3;
+}
+
+.bnw-v2-comparison-label small {
+    margin-top: 2px;
+    color: var(--v2-muted);
+    font-size: 9px;
+    line-height: 1.35;
+}
+
+.bnw-v2-comparison-measure {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 52px;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.bnw-v2-comparison-track {
+    height: 8px;
+    overflow: hidden;
+    border-radius: 99px;
+    background: #edf1f6;
+}
+
+.bnw-v2-comparison-track span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    transition: width .8s cubic-bezier(.2,.8,.2,1);
+}
+
+.bnw-v2-comparison-value {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 4px;
+}
+
+.bnw-v2-comparison-value strong { font-size: 17px; }
+.bnw-v2-comparison-value small {
+    color: var(--v2-muted);
+    font-size: 9px;
+}
+
+.bnw-v2-trend-layout {
+    display: grid;
+    grid-template-columns: 31px minmax(0, 1fr);
+    gap: 9px;
+    margin-top: 17px;
+}
+
+.bnw-v2-axis {
+    display: flex;
+    height: 242px;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2px 0 29px;
+    color: #98a2b3;
+    font-size: 9px;
+    text-align: right;
+}
+
+.bnw-v2-axis strong {
+    color: #667085;
+    font-size: 9px;
+}
+
+.bnw-v2-day-scroll {
+    position: relative;
+    min-width: 0;
+    overflow-x: auto;
+    padding: 0 8px 4px;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+.bnw-v2-grid-lines {
+    position: absolute;
+    inset: 0 8px 34px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+.bnw-v2-grid-lines i {
+    display: block;
+    border-top: 1px dashed #dce4ed;
+}
+
+.bnw-v2-days {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    gap: 18px;
+    width: max-content;
+    min-width: 100%;
+    height: 242px;
+}
+
+.bnw-v2-day-scroll.is-single-day .bnw-v2-days {
+    justify-content: center;
+}
+
+.bnw-v2-day {
+    display: grid;
+    grid-template-rows: 20px 188px 24px;
+    justify-items: center;
+    width: 58px;
+    min-width: 58px;
+    height: 238px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.bnw-v2-day:focus-visible {
+    outline: 3px solid rgba(23,105,255,.24);
+    outline-offset: 3px;
+}
+
+.bnw-v2-day > strong {
+    color: #344054;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.bnw-v2-day-plot {
+    display: flex;
+    width: 30px;
+    height: 184px;
+    align-items: flex-end;
+    overflow: hidden;
+    border-radius: 8px 8px 3px 3px;
+    background: linear-gradient(to top, rgba(226,232,240,.65), rgba(248,250,252,.18));
+}
+
+.bnw-v2-day-bar {
+    display: block;
+    width: 100%;
+    border-radius: 8px 8px 3px 3px;
+    background: linear-gradient(180deg, #60a5fa, #1769ff 58%, #1455d9);
+    box-shadow: 0 7px 16px rgba(23,105,255,.22);
+    transition:
+        height .8s cubic-bezier(.2,.8,.2,1),
+        filter .16s,
+        transform .16s;
+}
+
+.bnw-v2-day:hover .bnw-v2-day-bar,
+.bnw-v2-day:focus-visible .bnw-v2-day-bar {
+    filter: saturate(1.2) brightness(1.05);
+    transform: scaleX(1.12);
+}
+
+.bnw-v2-day time {
+    align-self: end;
+    color: #667085;
+    font-size: 9px;
+    white-space: nowrap;
+}
+
+.bnw-v2-tooltip {
+    position: fixed;
+    z-index: 10000;
+    width: 250px;
+    padding: 12px;
+    border: 1px solid rgba(148,163,184,.35);
+    border-radius: 12px;
+    background: rgba(15,23,42,.97);
+    color: #fff;
+    box-shadow: 0 16px 46px rgba(15,23,42,.28);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: opacity .14s, transform .14s;
+}
+
+.bnw-v2-tooltip.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.bnw-v2-tooltip > strong {
+    display: block;
+    font-size: 12px;
+}
+
+.bnw-v2-tooltip > span {
+    display: block;
+    margin-top: 3px;
+    color: #cbd5e1;
+    font-size: 10px;
+}
+
+.bnw-v2-tooltip-list {
+    display: grid;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.bnw-v2-tooltip-row {
+    display: grid;
+    grid-template-columns: 7px minmax(0, 1fr) auto;
+    gap: 7px;
+    align-items: center;
+    font-size: 10px;
+}
+
+.bnw-v2-tooltip-row i {
+    width: 7px;
+    height: 7px;
+    border-radius: 99px;
+}
+
+.bnw-v2-recent-panel { overflow: hidden; }
+.bnw-v2-recent-header > span {
+    color: #98a2b3;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.bnw-v2-recent-list { display: grid; }
+.bnw-v2-recent-row {
+    display: grid !important;
+    grid-template-columns: 4px 72px 138px minmax(0, 1fr) 66px !important;
+    gap: 13px !important;
+    align-items: center !important;
+    min-height: 76px;
+    padding: 13px 20px !important;
+    border-bottom: 1px solid #e8edf3;
+    background: #fff;
+    transition: background .15s;
+}
+
+.bnw-v2-recent-row:last-child { border-bottom: 0; }
+.bnw-v2-recent-row:hover { background: #f8fafc; }
+.bnw-v2-recent-accent {
+    align-self: stretch;
+    min-height: 42px;
+    border-radius: 999px;
+    background: var(--activity-color);
+}
+
+.bnw-v2-recent-row time {
+    color: #8290a8;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.bnw-v2-recent-type {
+    justify-self: start;
+    max-width: 100%;
+    padding: 5px 9px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--activity-color) 10%, #f8fafc);
+    color: var(--activity-color);
+    font-size: 9px;
+    font-weight: 750;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bnw-v2-recent-copy { min-width: 0; }
+.bnw-v2-recent-copy strong,
+.bnw-v2-recent-copy span {
+    display: block;
+    overflow-wrap: anywhere;
+}
+
+.bnw-v2-recent-copy strong {
+    color: #172033;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.bnw-v2-recent-copy span {
+    margin-top: 3px;
+    color: #8491a8;
+    font-size: 9px;
+}
+
+.bnw-v2-view {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 32px;
+    padding: 6px 9px;
+    border: 1px solid #cfe0ff;
+    border-radius: 8px;
+    background: #f2f7ff;
+    color: #1769ff !important;
+    font-size: 10px;
+    font-weight: 800;
+    text-decoration: none !important;
+    transition: transform .15s, border-color .15s, background .15s;
+}
+
+.bnw-v2-view:hover,
+.bnw-v2-view:focus-visible {
+    transform: translateY(-1px);
+    border-color: #8db8ff;
+    background: #e9f2ff;
+    outline: none;
+}
+
+@media(max-width: 1050px) {
+    .bnw-v2-overview-card {
+        grid-template-columns: 270px minmax(0, 1fr);
+        gap: 25px;
+    }
+
+    .bnw-v2-overview-list,
+    .bnw-v2-comparison-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width: 760px) {
+    .bnw-v2-activity { padding: 24px 16px; }
+    .bnw-v2-intro,
+    .bnw-v2-subheader { display: block; }
+    .bnw-v2-reset { margin-top: 12px; }
+    .bnw-v2-subheader > strong,
+    .bnw-v2-subheader > span {
+        display: block;
+        margin-top: 8px;
+    }
+
+    .bnw-v2-overview-card {
+        grid-template-columns: 1fr;
+        padding: 23px 16px;
+    }
+
+    .bnw-v2-donut-wrap {
+        width: min(82vw, 285px);
+    }
+
+    .bnw-v2-recent-header > span { display: none; }
+    .bnw-v2-recent-row {
+        grid-template-columns: 4px minmax(0, 1fr) 62px !important;
+        grid-template-areas:
+            "accent time view"
+            "accent type view"
+            "accent copy copy";
+        gap: 7px 10px !important;
+        padding: 13px 15px !important;
+    }
+
+    .bnw-v2-recent-accent { grid-area: accent; }
+    .bnw-v2-recent-row time { grid-area: time; }
+    .bnw-v2-recent-type { grid-area: type; }
+    .bnw-v2-recent-copy { grid-area: copy; padding-top: 3px; }
+    .bnw-v2-view { grid-area: view; }
+}
+
+@media(prefers-reduced-motion: reduce) {
+    .bnw-v2-activity *,
+    .bnw-v2-recent-panel * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+</style>
+
+
+{% endblock %}

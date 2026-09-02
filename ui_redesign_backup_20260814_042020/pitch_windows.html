@@ -1,0 +1,314 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Pitch Windows | BharatNXT Wave{% endblock %}
+
+{% block content %}
+
+
+<div class="page-eyebrow">
+    TOOLKIT MANAGEMENT
+</div>
+
+<h1 class="page-title">
+    Pitch Windows
+</h1>
+
+<p class="page-description">
+    Monitor which schemes and services BDEs can pitch now, which are closing soon, and which should no longer be pitched.
+</p>
+
+
+
+<div class="pitch-admin-kpis">
+
+    <a href="?state=active" class="card pitch-admin-kpi">
+
+        <span>
+            ACTIVE
+        </span>
+
+        <strong>
+            {{ active_count }}
+        </strong>
+
+    </a>
+
+
+    <a href="?state=closing" class="card pitch-admin-kpi closing">
+
+        <span>
+            CLOSING SOON
+        </span>
+
+        <strong>
+            {{ closing_count }}
+        </strong>
+
+    </a>
+
+
+    <a href="?state=urgent" class="card pitch-admin-kpi urgent">
+
+        <span>
+            ≤ 7 DAYS
+        </span>
+
+        <strong>
+            {{ urgent_count }}
+        </strong>
+
+    </a>
+
+
+    <a href="?state=upcoming" class="card pitch-admin-kpi">
+
+        <span>
+            UPCOMING
+        </span>
+
+        <strong>
+            {{ upcoming_count }}
+        </strong>
+
+    </a>
+
+
+    <a href="?state=closed" class="card pitch-admin-kpi closed">
+
+        <span>
+            CLOSED
+        </span>
+
+        <strong>
+            {{ closed_count }}
+        </strong>
+
+    </a>
+
+</div>
+
+
+
+<section class="card pitch-admin-filter">
+
+    <form method="get">
+
+        <input
+            type="search"
+            name="q"
+            value="{{ query }}"
+            placeholder="Search scheme or service name...">
+
+
+        <select name="state">
+
+            <option value="active" {% if selected_state == 'active' %}selected{% endif %}>
+                Active
+            </option>
+
+            <option value="closing" {% if selected_state == 'closing' %}selected{% endif %}>
+                Closing Soon
+            </option>
+
+            <option value="urgent" {% if selected_state == 'urgent' %}selected{% endif %}>
+                Closing in 7 Days
+            </option>
+
+            <option value="upcoming" {% if selected_state == 'upcoming' %}selected{% endif %}>
+                Upcoming
+            </option>
+
+            <option value="closed" {% if selected_state == 'closed' %}selected{% endif %}>
+                Closed
+            </option>
+
+            <option value="all" {% if selected_state == 'all' %}selected{% endif %}>
+                All
+            </option>
+
+        </select>
+
+
+        <button
+            type="submit"
+            class="secondary-button">
+
+            Apply
+
+        </button>
+
+    </form>
+
+</section>
+
+
+
+<section class="card pitch-admin-table-card">
+
+    <div class="dashboard-card-heading">
+
+        <div>
+
+            <div class="table-title">
+                Scheme / Service Pitch Status
+            </div>
+
+            <div class="table-subtitle">
+                Calculated automatically from effective date, internal pitch-until date and application deadline
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="admin-analytics-table-wrap">
+
+        <table class="admin-analytics-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Service</th>
+                    <th>Sector</th>
+                    <th>Effective From</th>
+                    <th>Pitch Until</th>
+                    <th>Application Deadline</th>
+                    <th>Days Left</th>
+                    <th>BDE Status</th>
+                    <th></th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for service in services %}
+
+                    <tr>
+
+                        <td>
+
+                            <strong>
+                                {{ service.title }}
+                            </strong>
+
+                            <div class="muted-text">
+                                {{ service.service_id }}
+                            </div>
+
+                        </td>
+
+
+                        <td>
+
+                            {% if service.industries %}
+
+                                {{ service.industries|join:", " }}
+
+                            {% else %}
+
+                                —
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if service.effective_from %}
+                                {{ service.effective_from|date:"d M Y" }}
+                            {% else %}
+                                —
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if service.pitch_until %}
+                                {{ service.pitch_until|date:"d M Y" }}
+                            {% else %}
+                                —
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if service.application_deadline %}
+                                {{ service.application_deadline|date:"d M Y" }}
+                            {% else %}
+                                —
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if service.pitch_days_remaining != None and service.pitch_days_remaining >= 0 %}
+
+                                {{ service.pitch_days_remaining }}
+
+                            {% else %}
+
+                                —
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="toolkit-pitch-badge {{ service.pitch_state_code|lower }}">
+                                {{ service.pitch_state_label }}
+                            </span>
+
+                        </td>
+
+
+                        <td>
+
+                            <a
+                                href="{% url 'toolkit:admin_service_edit' service.pk %}"
+                                class="table-link">
+
+                                Edit →
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+
+                {% empty %}
+
+                    <tr>
+
+                        <td colspan="8">
+                            No services found for this filter.
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+{% endblock %}

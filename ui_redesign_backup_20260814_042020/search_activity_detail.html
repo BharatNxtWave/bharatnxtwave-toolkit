@@ -1,0 +1,538 @@
+{% extends "base.html" %}
+
+{% block title %}
+Search Activity | BharatNXT Wave
+{% endblock %}
+
+
+{% block content %}
+
+<div class="search-drilldown-page">
+
+
+<!-- =====================================================
+     HEADER
+====================================================== -->
+
+<div class="search-drilldown-top">
+
+    <div>
+
+        <div class="page-eyebrow">
+            BDE SEARCH INTELLIGENCE
+        </div>
+
+
+        <h1 class="page-title">
+            Search Activity
+        </h1>
+
+
+        <p class="page-description">
+            Actual Toolkit activity recorded for
+            {{ selected_date|date:"d M Y" }}.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{% url 'dashboard:home' %}"
+        class="secondary-button">
+
+        ← Back to Dashboard
+
+    </a>
+
+</div>
+
+
+
+<!-- =====================================================
+     DATE NAVIGATION
+====================================================== -->
+
+<div class="search-drilldown-datebar">
+
+
+    <a
+        href="?date={{ previous_date|date:'Y-m-d' }}"
+        class="search-date-nav">
+
+        ← {{ previous_date|date:"d M" }}
+
+    </a>
+
+
+    <div class="search-selected-date">
+
+        <span>
+            SELECTED DATE
+        </span>
+
+        <strong>
+            {{ selected_date|date:"l, d M Y" }}
+        </strong>
+
+    </div>
+
+
+    {% if next_date <= today %}
+
+        <a
+            href="?date={{ next_date|date:'Y-m-d' }}"
+            class="search-date-nav">
+
+            {{ next_date|date:"d M" }} →
+
+        </a>
+
+    {% else %}
+
+        <span class="search-date-nav disabled">
+            Next →
+        </span>
+
+    {% endif %}
+
+
+</div>
+
+
+
+<!-- =====================================================
+     KPI
+====================================================== -->
+
+<div class="search-drilldown-kpis">
+
+
+    <div class="card search-drilldown-kpi">
+
+        <span>
+            SEARCHES
+        </span>
+
+        <strong>
+            {{ total_searches }}
+        </strong>
+
+        <small>
+            Toolkit searches
+        </small>
+
+    </div>
+
+
+
+    <div class="card search-drilldown-kpi successful">
+
+        <span>
+            FOUND RESULTS
+        </span>
+
+        <strong>
+            {{ successful_searches }}
+        </strong>
+
+        <small>
+            Searches with results
+        </small>
+
+    </div>
+
+
+
+    <div class="card search-drilldown-kpi zero">
+
+        <span>
+            ZERO RESULTS
+        </span>
+
+        <strong>
+            {{ zero_result_searches }}
+        </strong>
+
+        <small>
+            Search gaps to review
+        </small>
+
+    </div>
+
+
+
+    <div class="card search-drilldown-kpi">
+
+        <span>
+            FILTER ACTIONS
+        </span>
+
+        <strong>
+            {{ filter_count }}
+        </strong>
+
+        <small>
+            Filters applied
+        </small>
+
+    </div>
+
+
+
+    <div class="card search-drilldown-kpi">
+
+        <span>
+            CLIENT MATCHES
+        </span>
+
+        <strong>
+            {{ matcher_count }}
+        </strong>
+
+        <small>
+            Matcher requests
+        </small>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     ACTIVITY TABLE
+====================================================== -->
+
+<section class="card search-drilldown-table-card">
+
+
+    <div class="search-drilldown-table-heading">
+
+        <div>
+
+            <div class="table-title">
+                Activity Timeline
+            </div>
+
+            <div class="table-subtitle">
+
+                {{ total_events }}
+                recorded action{{ total_events|pluralize }}
+                on this date
+
+            </div>
+
+        </div>
+
+
+        <div class="real-data-label">
+            ● REAL DATA
+        </div>
+
+    </div>
+
+
+
+    {% if events %}
+
+
+    <div class="search-drilldown-table-wrap">
+
+        <table class="search-drilldown-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Time
+                    </th>
+
+                    <th>
+                        Activity
+                    </th>
+
+                    <th>
+                        Search / Action
+                    </th>
+
+                    <th>
+                        Results
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+            {% for event in events %}
+
+
+                <tr>
+
+
+                    <td class="search-activity-time">
+
+                        {{ event.created_at|date:"h:i A" }}
+
+                    </td>
+
+
+
+                    <td>
+
+                        {% if event.event_type == "SEARCH" %}
+
+                            <span class="search-event-badge search">
+                                SEARCH
+                            </span>
+
+                        {% elif event.event_type == "FILTER" %}
+
+                            <span class="search-event-badge filter">
+                                FILTER
+                            </span>
+
+                        {% elif event.event_type == "CLIENT_MATCH" %}
+
+                            <span class="search-event-badge matcher">
+                                CLIENT MATCHER
+                            </span>
+
+                        {% elif event.event_type == "SUGGESTION_CLICK" %}
+
+                            <span class="search-event-badge suggestion">
+                                SUGGESTION
+                            </span>
+
+                        {% else %}
+
+                            <span class="search-event-badge">
+                                {{ event.get_event_type_display }}
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+
+                    <td>
+
+
+                        {% if event.query %}
+
+                            <strong class="search-event-query">
+                                {{ event.query }}
+                            </strong>
+
+
+                        {% elif event.event_type == "CLIENT_MATCH" %}
+
+                            <strong class="search-event-query">
+                                Client Matcher
+                            </strong>
+
+
+                            {% if event.filters.criteria_count %}
+
+                                <div class="search-event-meta">
+
+                                    {{ event.filters.criteria_count }}
+                                    client criteria supplied
+
+                                </div>
+
+                            {% endif %}
+
+
+                        {% elif event.event_type == "FILTER" %}
+
+                            <strong class="search-event-query">
+                                Toolkit filters applied
+                            </strong>
+
+
+                            <div class="search-event-meta">
+
+
+                                {% if event.filters.sector %}
+
+                                    Sector:
+                                    {{ event.filters.sector }}
+
+                                {% endif %}
+
+
+                                {% if event.filters.service_kind %}
+
+                                    • Type:
+                                    {{ event.filters.service_kind }}
+
+                                {% endif %}
+
+
+                                {% if event.filters.deadline %}
+
+                                    • Deadline:
+                                    {{ event.filters.deadline }}
+
+                                {% endif %}
+
+                            </div>
+
+
+                        {% else %}
+
+                            <span class="muted-text">
+                                —
+                            </span>
+
+                        {% endif %}
+
+
+
+                        {% if event.selected_service %}
+
+                            <div class="search-event-selected">
+
+                                Opened:
+                                <a
+                                    href="{% url 'toolkit:service_detail' event.selected_service.slug %}">
+
+                                    {{ event.selected_service.title }}
+
+                                </a>
+
+                            </div>
+
+                        {% endif %}
+
+
+                    </td>
+
+
+
+                    <td>
+
+                        <strong>
+                            {{ event.result_count }}
+                        </strong>
+
+                    </td>
+
+
+
+                    <td>
+
+
+                        {% if event.event_type == "SEARCH" %}
+
+
+                            {% if event.result_count > 0 %}
+
+                                <span class="search-result-status success">
+
+                                    Found results
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="search-result-status zero">
+
+                                    Zero results
+
+                                </span>
+
+                            {% endif %}
+
+
+                        {% elif event.event_type == "CLIENT_MATCH" %}
+
+                            <span class="search-result-status info">
+
+                                Match completed
+
+                            </span>
+
+
+                        {% else %}
+
+                            <span class="search-result-status neutral">
+
+                                Recorded
+
+                            </span>
+
+                        {% endif %}
+
+
+                    </td>
+
+
+                </tr>
+
+
+            {% endfor %}
+
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+
+    {% else %}
+
+
+        <div class="search-drilldown-empty">
+
+            <div class="search-drilldown-empty-icon">
+                ⌕
+            </div>
+
+
+            <h3>
+                No search activity on this date
+            </h3>
+
+
+            <p>
+
+                There are no recorded Toolkit searches,
+                filters or client-matcher requests for
+                {{ selected_date|date:"d M Y" }}.
+
+            </p>
+
+
+            <a
+                href="{% url 'dashboard:home' %}"
+                class="secondary-button">
+
+                Return to Dashboard
+
+            </a>
+
+        </div>
+
+
+    {% endif %}
+
+
+</section>
+
+
+</div>
+
+{% endblock %}

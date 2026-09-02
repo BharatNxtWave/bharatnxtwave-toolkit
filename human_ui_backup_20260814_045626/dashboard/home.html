@@ -1,0 +1,937 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Dashboard | BharatNXT Wave
+{% endblock %}
+
+
+{% block content %}
+
+<div class="bn-home-v2">
+
+
+<!-- =====================================================
+     DASHBOARD HEADER
+====================================================== -->
+
+<header class="bn-home-header">
+
+    <div>
+
+        <h1>
+            Dashboard
+        </h1>
+
+        <p>
+            Your BharatNXT Wave Toolkit activity and important services at a glance.
+        </p>
+
+    </div>
+
+
+    <!-- DATE RANGE POPOVER -->
+
+    <details class="bn-date-picker">
+
+        <summary>
+
+            <span class="bn-date-icon">
+                ◷
+            </span>
+
+            <span>
+
+                {{ selected_start|date:"d M" }}
+                –
+                {{ selected_end|date:"d M Y" }}
+
+            </span>
+
+            <span class="bn-date-chevron">
+                ▾
+            </span>
+
+        </summary>
+
+
+        <div class="bn-date-popover">
+
+
+            <div class="bn-date-popover-title">
+
+                <strong>
+                    Select Date Range
+                </strong>
+
+                <span>
+                    Change dashboard reporting period
+                </span>
+
+            </div>
+
+
+            <div class="bn-date-presets">
+
+                <a href="?preset=today">
+                    Today
+                </a>
+
+                <a href="?preset=7d">
+                    Last 7 Days
+                </a>
+
+                <a href="?preset=30d">
+                    Last 30 Days
+                </a>
+
+            </div>
+
+
+            <form method="get">
+
+                <label>
+
+                    <span>
+                        From
+                    </span>
+
+                    <input
+                        type="date"
+                        name="start"
+                        value="{{ selected_start|date:'Y-m-d' }}">
+
+                </label>
+
+
+                <label>
+
+                    <span>
+                        To
+                    </span>
+
+                    <input
+                        type="date"
+                        name="end"
+                        value="{{ selected_end|date:'Y-m-d' }}">
+
+                </label>
+
+
+                <button
+                    type="submit"
+                    class="primary-button">
+
+                    Apply Range
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </details>
+
+</header>
+
+
+
+<!-- =====================================================
+     KPI STRIP
+====================================================== -->
+
+<section class="bn-home-kpi-strip">
+
+
+    <a
+        href="{% url 'toolkit:home' %}"
+        class="bn-home-kpi">
+
+        <div class="bn-kpi-icon">
+            ⌕
+        </div>
+
+        <div>
+
+            <span>
+                Toolkit Searches
+            </span>
+
+            <strong>
+                {{ search_count }}
+            </strong>
+
+        </div>
+
+    </a>
+
+
+    <a
+        href="{% url 'toolkit:client_matcher' %}"
+        class="bn-home-kpi">
+
+        <div class="bn-kpi-icon">
+            ◇
+        </div>
+
+        <div>
+
+            <span>
+                Client Service Checks
+            </span>
+
+            <strong>
+                {{ client_check_count }}
+            </strong>
+
+        </div>
+
+    </a>
+
+
+    <div class="bn-home-kpi">
+
+        <div class="bn-kpi-icon">
+            ◉
+        </div>
+
+        <div>
+
+            <span>
+                Services Viewed
+            </span>
+
+            <strong>
+                {{ service_view_count }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <a
+        href="{% url 'toolkit:saved_services' %}"
+        class="bn-home-kpi">
+
+        <div class="bn-kpi-icon">
+            ★
+        </div>
+
+        <div>
+
+            <span>
+                Saved Services
+            </span>
+
+            <strong>
+                {{ saved_service_count }}
+            </strong>
+
+        </div>
+
+    </a>
+
+
+    <div class="bn-home-kpi">
+
+        <div class="bn-kpi-icon warning">
+            !
+        </div>
+
+        <div>
+
+            <span>
+                Searches With No Result
+            </span>
+
+            <strong>
+                {{ zero_result_count }}
+            </strong>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     MAIN ROW
+====================================================== -->
+
+<div class="bn-home-main-grid">
+
+
+
+<!-- TOOLKIT ACTIVITY -->
+
+<section class="bn-dashboard-panel bn-activity-panel">
+
+
+    <div class="bn-panel-header">
+
+        <div>
+
+            <h2>
+                Toolkit Activity
+            </h2>
+
+            <p>
+                How you used the Toolkit during the selected period
+            </p>
+
+        </div>
+
+
+        <span class="bn-activity-period">
+
+            {{ selected_start|date:"d M" }}
+            –
+            {{ selected_end|date:"d M Y" }}
+
+        </span>
+
+    </div>
+
+
+
+    <div
+        id="bn-activity-pie"
+        class="bn-activity-pie-layout"
+
+        data-searches="{{ search_count }}"
+        data-client-checks="{{ client_check_count }}">
+
+
+        <!-- =================================================
+             DONUT
+        ================================================== -->
+
+        <div class="bn-pie-visual">
+
+
+            <svg
+                class="bn-pie-svg"
+                viewBox="0 0 220 220"
+                role="img"
+                aria-label="Toolkit activity composition">
+
+                <circle
+                    class="bn-pie-track"
+                    cx="110"
+                    cy="110"
+                    r="82">
+                </circle>
+
+
+                <circle
+                    id="bn-pie-search"
+                    class="bn-pie-segment search"
+                    cx="110"
+                    cy="110"
+                    r="82">
+                </circle>
+
+
+                <circle
+                    id="bn-pie-client"
+                    class="bn-pie-segment client"
+                    cx="110"
+                    cy="110"
+                    r="82">
+                </circle>
+
+            </svg>
+
+
+
+            <div class="bn-pie-center">
+
+                <span id="bn-pie-center-label">
+                    TOTAL ACTIONS
+                </span>
+
+                <strong id="bn-pie-center-value">
+                    0
+                </strong>
+
+                <small id="bn-pie-center-detail">
+                    Selected period
+                </small>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             EASY-TO-READ ACTIVITY SUMMARY
+        ================================================== -->
+
+        <div class="bn-pie-summary">
+
+
+            <div class="bn-pie-summary-heading">
+
+                <h3>
+                    Activity Breakdown
+                </h3>
+
+                <p>
+                    See which Toolkit feature you used more.
+                </p>
+
+            </div>
+
+
+
+            <button
+                type="button"
+                class="bn-pie-legend-item search"
+                data-pie-series="search">
+
+
+                <span class="bn-pie-legend-mark">
+                </span>
+
+
+                <div class="bn-pie-legend-copy">
+
+                    <strong>
+                        Toolkit Searches
+                    </strong>
+
+                    <span>
+                        Searches made in the Business Toolkit
+                    </span>
+
+                </div>
+
+
+                <div class="bn-pie-legend-number">
+
+                    <strong>
+                        {{ search_count }}
+                    </strong>
+
+                    <span id="bn-search-percent">
+                        0%
+                    </span>
+
+                </div>
+
+            </button>
+
+
+
+            <button
+                type="button"
+                class="bn-pie-legend-item client"
+                data-pie-series="client">
+
+
+                <span class="bn-pie-legend-mark">
+                </span>
+
+
+                <div class="bn-pie-legend-copy">
+
+                    <strong>
+                        Client Service Checks
+                    </strong>
+
+                    <span>
+                        Times you checked which services fit a client
+                    </span>
+
+                </div>
+
+
+                <div class="bn-pie-legend-number">
+
+                    <strong>
+                        {{ client_check_count }}
+                    </strong>
+
+                    <span id="bn-client-percent">
+                        0%
+                    </span>
+
+                </div>
+
+            </button>
+
+
+
+            <div
+                id="bn-pie-empty"
+                class="bn-pie-empty"
+                hidden>
+
+                No Toolkit searches or client service checks were
+                recorded during this period.
+
+            </div>
+
+
+
+            <div class="bn-pie-actions">
+
+                <a
+                    href="{% url 'toolkit:home' %}"
+                    class="bn-pie-action-link">
+
+                    Search Toolkit →
+
+                </a>
+
+
+                <a
+                    href="{% url 'toolkit:client_matcher' %}"
+                    class="bn-pie-action-link">
+
+                    Find Services for Client →
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- CLOSING SOON -->
+
+<aside class="bn-dashboard-panel bn-closing-panel">
+
+
+    <div class="bn-panel-header">
+
+        <div>
+
+            <h2>
+                Closing Soon
+            </h2>
+
+            <p>
+                Services to prioritise
+            </p>
+
+        </div>
+
+
+        {% if request.user.is_superuser %}
+
+            <a
+                href="{% url 'toolkit:pitch_windows' %}"
+                class="bn-panel-link">
+
+                View All →
+
+            </a>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="bn-closing-list">
+
+
+        {% for service in closing_soon_services %}
+
+            <a
+                href="{% url 'toolkit:service_detail' service.slug %}"
+                class="bn-closing-item">
+
+                <div>
+
+                    <strong>
+                        {{ service.title }}
+                    </strong>
+
+                    <span>
+
+                        {{ service.domain.name }}
+
+                        {% if service.industries %}
+                            · {{ service.industries.0 }}
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+
+                <div class="bn-days-left {% if service.pitch_days_remaining <= 7 %}urgent{% endif %}">
+
+                    <strong>
+                        {{ service.pitch_days_remaining }}
+                    </strong>
+
+                    <span>
+                        days
+                    </span>
+
+                </div>
+
+            </a>
+
+
+        {% empty %}
+
+            <div class="bn-panel-empty">
+
+                <strong>
+                    Nothing closing soon
+                </strong>
+
+                <span>
+                    No currently pitchable service closes within 30 days.
+                </span>
+
+            </div>
+
+        {% endfor %}
+
+
+    </div>
+
+</aside>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     SECOND ROW
+====================================================== -->
+
+<div class="bn-home-secondary-grid">
+
+
+<!-- RECENT ACTIVITY -->
+
+<section class="bn-dashboard-panel">
+
+
+    <div class="bn-panel-header">
+
+        <div>
+
+            <h2>
+                Recent Toolkit Activity
+            </h2>
+
+            <p>
+                Your latest searches and client service checks
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="bn-recent-list">
+
+
+        {% for event in recent_events %}
+
+            <div class="bn-recent-item">
+
+
+                <time>
+                    {{ event.created_at|date:"h:i A" }}
+                </time>
+
+
+                <div class="bn-recent-type">
+
+
+                    {% if event.event_type == "SEARCH" %}
+
+                        <span class="search">
+                            Search
+                        </span>
+
+
+                    {% elif event.event_type == "CLIENT_MATCH" %}
+
+                        <span class="client">
+                            Client Service Check
+                        </span>
+
+
+                    {% elif event.event_type == "FILTER" %}
+
+                        <span>
+                            Filter
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="bn-recent-detail">
+
+
+                    {% if event.event_type == "SEARCH" %}
+
+                        <strong>
+
+                            {% if event.query %}
+                                {{ event.query }}
+                            {% else %}
+                                Toolkit Search
+                            {% endif %}
+
+                        </strong>
+
+
+                    {% elif event.event_type == "CLIENT_MATCH" %}
+
+                        <strong>
+                            Checked suitable services for a client
+                        </strong>
+
+
+                    {% else %}
+
+                        <strong>
+                            Toolkit filters applied
+                        </strong>
+
+                    {% endif %}
+
+
+                    <span>
+
+                        {{ event.result_count }}
+                        result{{ event.result_count|pluralize }}
+                        shown
+
+                    </span>
+
+                </div>
+
+
+                <a
+                    href="{% url 'dashboard:search_activity_detail' %}?date={{ event.created_at|date:'Y-m-d' }}">
+
+                    →
+
+                </a>
+
+            </div>
+
+
+        {% empty %}
+
+            <div class="bn-panel-empty">
+
+                <strong>
+                    No activity yet
+                </strong>
+
+                <span>
+                    Searches and client service checks will appear here.
+                </span>
+
+            </div>
+
+        {% endfor %}
+
+
+    </div>
+
+</section>
+
+
+
+<!-- MOST SEARCHED -->
+
+<section class="bn-dashboard-panel">
+
+
+    <div class="bn-panel-header">
+
+        <div>
+
+            <h2>
+                Most Searched
+            </h2>
+
+            <p>
+                What you searched for most often
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="bn-top-search-list">
+
+
+        {% for item in top_queries %}
+
+            <a
+                href="{% url 'toolkit:home' %}?q={{ item.query|urlencode }}">
+
+                <div>
+
+                    <span class="bn-search-rank">
+                        {{ forloop.counter }}
+                    </span>
+
+                    <strong>
+                        {{ item.query }}
+                    </strong>
+
+                </div>
+
+
+                <span>
+                    {{ item.total }}
+                    search{{ item.total|pluralize }}
+                </span>
+
+            </a>
+
+
+        {% empty %}
+
+            <div class="bn-panel-empty">
+
+                <strong>
+                    No search trend yet
+                </strong>
+
+                <span>
+                    Your most frequent Toolkit searches will appear here.
+                </span>
+
+            </div>
+
+        {% endfor %}
+
+
+    </div>
+
+</section>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     SEARCH GAPS
+====================================================== -->
+
+<section class="bn-dashboard-panel bn-search-gap-panel">
+
+
+    <div class="bn-panel-header">
+
+        <div>
+
+            <h2>
+                Searches With No Result
+            </h2>
+
+            <p>
+                These searches may indicate missing Toolkit information
+            </p>
+
+        </div>
+
+
+        <span class="bn-gap-total">
+            {{ zero_result_count }}
+        </span>
+
+    </div>
+
+
+    {% if zero_queries %}
+
+        <div class="bn-gap-list">
+
+
+            {% for item in zero_queries %}
+
+                <div class="bn-gap-item">
+
+                    <div>
+
+                        <span>
+                            SEARCH
+                        </span>
+
+                        <strong>
+                            {{ item.query }}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        {{ item.total }}
+                        time{{ item.total|pluralize }}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+
+        </div>
+
+
+    {% else %}
+
+        <div class="bn-gap-good">
+
+            <span>
+                ✓
+            </span>
+
+            <div>
+
+                <strong>
+                    No search gaps in this period
+                </strong>
+
+                <p>
+                    Every recorded Toolkit search returned at least one result.
+                </p>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
+</section>
+
+
+</div>
+
+
+<script src="{% static 'js/dashboard_home_v2.js' %}"></script>
+
+{% endblock %}

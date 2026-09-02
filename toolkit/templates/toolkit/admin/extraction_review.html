@@ -1,0 +1,2839 @@
+{% extends "admin_base.html" %}
+
+{% block title %}
+Review Import | BharatNXT Wave
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+.import-review-page{
+    max-width:1500px;
+    margin:0 auto;
+}
+
+/* HEADER */
+
+.ir-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:24px;
+    margin-bottom:22px;
+}
+
+.ir-title{
+    margin:6px 0 8px;
+    font-size:38px;
+    letter-spacing:-.035em;
+    line-height:1.08;
+}
+
+.ir-description{
+    margin:0;
+    max-width:760px;
+    font-size:14px;
+    line-height:1.6;
+    opacity:.62;
+}
+
+.ir-header-actions{
+    display:flex;
+    gap:9px;
+    flex-wrap:wrap;
+}
+
+
+/* WHAT TO DO */
+
+.task-card{
+    padding:20px 22px;
+    margin-bottom:18px;
+
+    display:grid;
+    grid-template-columns:minmax(280px,.7fr) minmax(500px,1.3fr);
+    gap:25px;
+
+    border:1px solid rgba(37,99,235,.16);
+    border-radius:16px;
+    background:linear-gradient(
+        135deg,
+        rgba(37,99,235,.055),
+        rgba(37,99,235,.015)
+    );
+}
+
+.task-card h2{
+    margin:4px 0 7px;
+    font-size:18px;
+}
+
+.task-card p{
+    margin:0;
+    font-size:13px;
+    line-height:1.55;
+    opacity:.65;
+}
+
+.task-steps{
+    display:grid;
+    gap:9px;
+}
+
+.task-step{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+
+    font-size:13px;
+    line-height:1.5;
+}
+
+.task-number{
+    flex:0 0 27px;
+
+    width:27px;
+    height:27px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:50%;
+    background:#2563eb;
+    color:#fff;
+
+    font-size:11px;
+    font-weight:800;
+}
+
+
+/* KPIS */
+
+.ir-kpis{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:10px;
+    margin-bottom:17px;
+}
+
+.ir-kpi{
+    padding:15px 17px;
+
+    background:#fff;
+    border:1px solid rgba(15,23,42,.09);
+    border-radius:14px;
+}
+
+.ir-kpi small{
+    display:block;
+    margin-bottom:7px;
+
+    font-size:10px;
+    font-weight:750;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+
+    opacity:.48;
+}
+
+.ir-kpi strong{
+    font-size:24px;
+}
+
+
+/* WORKSPACE */
+
+.ir-workspace{
+    display:grid;
+    grid-template-columns:minmax(350px,.7fr) minmax(570px,1.3fr);
+    gap:15px;
+
+    min-height:700px;
+}
+
+
+/* LEFT */
+
+.ir-list-panel{
+    overflow:hidden;
+
+    background:#fff;
+    border:1px solid rgba(15,23,42,.09);
+    border-radius:16px;
+}
+
+.ir-list-toolbar{
+    padding:15px;
+    border-bottom:1px solid rgba(15,23,42,.08);
+}
+
+.ir-search{
+    width:100%;
+    height:44px;
+
+    box-sizing:border-box;
+    padding:0 13px;
+
+    border:1px solid rgba(15,23,42,.12);
+    border-radius:10px;
+
+    background:#fff;
+    font:inherit;
+}
+
+.ir-tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+
+    margin-top:10px;
+}
+
+.ir-tab{
+    padding:7px 11px;
+
+    border:1px solid rgba(15,23,42,.1);
+    border-radius:999px;
+
+    background:#fff;
+
+    font-size:11px;
+    font-weight:700;
+
+    cursor:pointer;
+}
+
+.ir-tab.active{
+    color:#fff;
+    background:#111827;
+    border-color:#111827;
+}
+
+.ir-list{
+    max-height:720px;
+    overflow-y:auto;
+}
+
+.ir-item{
+    padding:15px 16px;
+
+    border-bottom:1px solid rgba(15,23,42,.07);
+
+    cursor:pointer;
+}
+
+.ir-item:hover{
+    background:rgba(15,23,42,.022);
+}
+
+.ir-item.active{
+    background:rgba(37,99,235,.05);
+    box-shadow:inset 3px 0 0 #2563eb;
+}
+
+.ir-item:last-child{
+    border-bottom:0;
+}
+
+.ir-item-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+}
+
+.ir-item-title{
+    font-size:14px;
+    line-height:1.4;
+    font-weight:750;
+}
+
+.ir-item-source{
+    margin-top:4px;
+
+    font-size:11px;
+    opacity:.45;
+}
+
+.ir-badges{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+
+    margin-top:9px;
+}
+
+.ir-badge{
+    display:inline-flex;
+    align-items:center;
+
+    padding:5px 8px;
+
+    border-radius:999px;
+
+    background:rgba(15,23,42,.055);
+
+    font-size:10px;
+    font-weight:700;
+}
+
+.badge-existing{
+    color:#1d4ed8;
+    background:rgba(37,99,235,.09);
+}
+
+.badge-new{
+    color:#15803d;
+    background:rgba(22,163,74,.10);
+}
+
+.badge-review{
+    color:#b45309;
+    background:rgba(217,119,6,.11);
+}
+
+.badge-approved{
+    color:#15803d;
+    background:rgba(22,163,74,.10);
+}
+
+.badge-skipped{
+    color:#475569;
+}
+
+.open-review{
+    margin-top:10px;
+
+    padding:0;
+
+    border:0;
+    background:none;
+
+    color:#1d4ed8;
+
+    font-size:12px;
+    font-weight:750;
+
+    cursor:pointer;
+}
+
+
+/* RIGHT */
+
+.ir-detail-shell{
+    position:relative;
+
+    overflow:hidden;
+
+    background:#fff;
+    border:1px solid rgba(15,23,42,.09);
+    border-radius:16px;
+}
+
+.ir-empty{
+    padding:80px 40px;
+
+    text-align:center;
+
+    font-size:14px;
+    line-height:1.6;
+
+    opacity:.5;
+}
+
+.ir-detail{
+    display:none;
+}
+
+.ir-detail.active{
+    display:block;
+}
+
+.ir-detail-scroll{
+    max-height:780px;
+    overflow-y:auto;
+}
+
+.ir-detail-header{
+    position:sticky;
+    top:0;
+    z-index:4;
+
+    padding:19px 21px;
+
+    background:rgba(255,255,255,.97);
+    backdrop-filter:blur(12px);
+
+    border-bottom:1px solid rgba(15,23,42,.08);
+}
+
+.ir-detail-head-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:18px;
+}
+
+.ir-eyebrow{
+    margin-bottom:5px;
+
+    color:#2563eb;
+
+    font-size:10px;
+    font-weight:750;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+}
+
+.ir-detail-title{
+    margin:0 0 5px;
+
+    font-size:23px;
+    line-height:1.28;
+}
+
+.ir-detail-sub{
+    font-size:12px;
+    opacity:.52;
+}
+
+.ir-state{
+    display:inline-flex;
+
+    padding:6px 9px;
+
+    border-radius:999px;
+
+    font-size:10px;
+    font-weight:750;
+
+    white-space:nowrap;
+}
+
+.state-attention{
+    color:#b45309;
+    background:rgba(217,119,6,.11);
+}
+
+.state-existing{
+    color:#1d4ed8;
+    background:rgba(37,99,235,.09);
+}
+
+.state-new{
+    color:#15803d;
+    background:rgba(22,163,74,.10);
+}
+
+.state-approved{
+    color:#15803d;
+    background:rgba(22,163,74,.10);
+}
+
+.state-skipped{
+    color:#475569;
+    background:rgba(15,23,42,.06);
+}
+
+
+/* DETAIL BODY */
+
+.ir-detail-body{
+    padding:20px;
+}
+
+.ir-section{
+    margin-bottom:14px;
+    padding:18px;
+
+    border:1px solid rgba(15,23,42,.08);
+    border-radius:14px;
+}
+
+.ir-section h3{
+    margin:0 0 6px;
+    font-size:15px;
+}
+
+.ir-section-intro{
+    margin:0 0 14px;
+
+    font-size:12px;
+    line-height:1.55;
+
+    opacity:.6;
+}
+
+
+/* SIMPLE MEANING BOX */
+
+.meaning-box{
+    padding:15px 16px;
+
+    border-radius:12px;
+    background:rgba(37,99,235,.045);
+
+    font-size:13px;
+    line-height:1.6;
+}
+
+.meaning-box strong{
+    display:block;
+    margin-bottom:4px;
+}
+
+
+/* CURRENT CLASSIFICATION */
+
+.current-classification{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.info-card{
+    padding:14px;
+
+    border-radius:11px;
+    background:rgba(15,23,42,.03);
+}
+
+.info-label{
+    display:block;
+
+    margin-bottom:5px;
+
+    font-size:9px;
+    font-weight:750;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+
+    opacity:.45;
+}
+
+.info-value{
+    font-size:14px;
+    font-weight:650;
+    line-height:1.45;
+}
+
+
+/* NEW CLASSIFICATION */
+
+.classification-form{
+    display:grid;
+    grid-template-columns:1fr 1fr auto;
+    align-items:end;
+    gap:9px;
+}
+
+.field-label{
+    display:block;
+
+    margin-bottom:5px;
+
+    font-size:10px;
+    font-weight:750;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+
+    opacity:.48;
+}
+
+.ir-select{
+    width:100%;
+    height:42px;
+
+    padding:0 10px;
+
+    border:1px solid rgba(15,23,42,.12);
+    border-radius:9px;
+
+    background:#fff;
+}
+
+
+/* INCOMING DATA */
+
+.incoming-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+}
+
+.incoming-field{
+    padding:13px;
+
+    border-radius:10px;
+    background:rgba(15,23,42,.03);
+
+    overflow-wrap:anywhere;
+}
+
+.incoming-field.full{
+    grid-column:1 / -1;
+}
+
+.incoming-label{
+    display:block;
+
+    margin-bottom:5px;
+
+    font-size:9px;
+    font-weight:750;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+
+    opacity:.45;
+}
+
+.incoming-value{
+    font-size:13px;
+    line-height:1.55;
+}
+
+
+/* BUTTONS */
+
+.review-actions{
+    display:flex;
+    gap:9px;
+    flex-wrap:wrap;
+
+    margin-top:8px;
+}
+
+.ir-button{
+    min-height:40px;
+
+    padding:0 14px;
+
+    border:1px solid rgba(15,23,42,.11);
+    border-radius:9px;
+
+    background:#fff;
+
+    font-weight:700;
+
+    cursor:pointer;
+}
+
+.ir-primary{
+    color:#fff;
+    background:#2563eb;
+    border-color:#2563eb;
+}
+
+.ir-danger{
+    color:#b91c1c;
+}
+
+.ir-link{
+    color:#1d4ed8;
+}
+
+.decision-help{
+    margin:0 0 12px;
+
+    font-size:12px;
+    line-height:1.55;
+
+    opacity:.6;
+}
+
+.no-results{
+    display:none;
+
+    padding:30px 18px;
+
+    text-align:center;
+
+    opacity:.5;
+}
+
+
+@media(max-width:1150px){
+
+    .ir-kpis{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .task-card,
+    .ir-workspace{
+        grid-template-columns:1fr;
+    }
+
+    .ir-list{
+        max-height:420px;
+    }
+
+}
+
+
+@media(max-width:700px){
+
+    .ir-header{
+        flex-direction:column;
+    }
+
+    .ir-kpis{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .classification-form,
+    .current-classification,
+    .incoming-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+</style>
+
+
+<div class="import-review-page">
+
+<!-- ADMIN_IMPORT_UX_V2 -->
+
+<style>
+.bnx-quick-review{
+    background:#fff;
+    border:1px solid #e4e7ec;
+    border-radius:18px;
+    padding:22px;
+    margin:0 0 22px;
+    box-shadow:
+        0 1px 2px rgba(16,24,40,.03);
+}
+
+.bnx-quick-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+}
+
+.bnx-quick-kicker{
+    color:#667085;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.12em;
+    margin-bottom:7px;
+}
+
+.bnx-quick-review h2{
+    margin:0;
+    font-size:23px;
+    letter-spacing:-.025em;
+}
+
+.bnx-quick-review p{
+    margin:8px 0 0;
+    color:#667085;
+    max-width:670px;
+    line-height:1.55;
+}
+
+.bnx-quick-stats{
+    display:grid;
+    grid-template-columns:
+        repeat(3,minmax(110px,1fr));
+    gap:9px;
+    margin-top:18px;
+}
+
+.bnx-quick-stat{
+    padding:14px;
+    border-radius:12px;
+    background:#f8fafc;
+    border:1px solid #eef1f5;
+}
+
+.bnx-quick-stat strong{
+    display:block;
+    font-size:23px;
+    letter-spacing:-.03em;
+}
+
+.bnx-quick-stat span{
+    display:block;
+    margin-top:2px;
+    color:#667085;
+    font-size:11px;
+}
+
+.bnx-quick-actions{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:18px;
+    padding-top:18px;
+    border-top:1px solid #eef1f5;
+}
+
+.bnx-q-primary,
+.bnx-q-import,
+.bnx-q-secondary{
+    min-height:43px;
+    border-radius:10px;
+    padding:0 16px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:13px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.bnx-q-primary{
+    border:0;
+    background:#111827;
+    color:#fff;
+}
+
+.bnx-q-import{
+    border:0;
+    background:#1570ef;
+    color:#fff;
+}
+
+.bnx-q-secondary{
+    border:1px solid #d0d5dd;
+    color:#344054;
+    background:#fff;
+}
+
+.bnx-q-primary:disabled,
+.bnx-q-import:disabled{
+    opacity:.42;
+    cursor:not-allowed;
+}
+
+.bnx-q-message{
+    font-size:12px;
+    color:#667085;
+}
+
+.bnx-manual-alert{
+    padding:10px 12px;
+    background:#fffaeb;
+    color:#93370d;
+    border:1px solid #fedf89;
+    border-radius:9px;
+    font-size:12px;
+    font-weight:700;
+}
+
+@media(max-width:760px){
+    .bnx-quick-top{
+        flex-direction:column;
+    }
+
+    .bnx-quick-stats{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+
+
+<section
+    class="bnx-quick-review"
+    id="bnx-quick-review"
+    data-safe-count="{{ stats.create|add:stats.safe_update }}"
+    data-approved-count="{{ stats.approved }}"
+    data-review-count="{{ stats.needs_attention }}"
+    data-skipped-count="{{ stats.skipped }}">
+
+    <div class="bnx-quick-top">
+
+        <div>
+
+            <div class="bnx-quick-kicker">
+                SIMPLE REVIEW
+            </div>
+
+            <h2>
+                Review only what needs attention
+            </h2>
+
+            <p>
+                Ready items can be approved together.
+                Potential matches and ambiguous changes
+                stay manual so the Toolkit is never
+                silently overwritten.
+            </p>
+
+        </div>
+
+        {% if stats.needs_attention %}
+
+            <div class="bnx-manual-alert">
+                {{ stats.needs_attention }}
+                item{{ stats.needs_attention|pluralize }}
+                need{{ stats.needs_attention|pluralize:"s," }}
+                your decision
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="bnx-quick-stats">
+
+        <div class="bnx-quick-stat">
+            <strong>
+                {{ stats.create|add:stats.safe_update }}
+            </strong>
+            <span>Ready candidates</span>
+        </div>
+
+        <div class="bnx-quick-stat">
+            <strong>
+                {{ stats.needs_attention }}
+            </strong>
+            <span>Need manual review</span>
+        </div>
+
+        <div class="bnx-quick-stat">
+            <strong>
+                {{ stats.approved }}
+            </strong>
+            <span>Approved</span>
+        </div>
+
+    </div>
+
+
+    {% if batch.status == "PREVIEWED" or batch.status == "VALIDATED" %}
+
+    <div class="bnx-quick-actions">
+
+        <form
+            method="post"
+            action="{% url 'toolkit:import_bulk_safe_approve' batch.pk %}">
+
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                class="bnx-q-primary"
+                id="bnx-approve-safe">
+                Approve all ready items
+            </button>
+
+        </form>
+
+
+        <form
+            method="post"
+            action="{% url 'toolkit:import_finalize' batch.pk %}"
+            id="bnx-final-import-form">
+
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="action"
+                value="final_import">
+
+            <button
+                type="submit"
+                class="bnx-q-import"
+                id="bnx-final-import">
+                Import approved changes →
+            </button>
+
+        </form>
+
+
+        {% if stats.needs_attention %}
+
+            <button
+                type="button"
+                class="bnx-q-secondary"
+                id="bnx-show-review">
+                Show items needing attention
+            </button>
+
+        {% endif %}
+
+
+        <span
+            class="bnx-q-message"
+            id="bnx-import-message">
+        </span>
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+
+<script>
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
+
+        const card = document.getElementById(
+            "bnx-quick-review"
+        );
+
+        if(!card){
+            return;
+        }
+
+
+        const safeCount = Number(
+            card.dataset.safeCount || 0
+        );
+
+        const approvedCount = Number(
+            card.dataset.approvedCount || 0
+        );
+
+        const reviewCount = Number(
+            card.dataset.reviewCount || 0
+        );
+
+
+        const pendingSafe = Math.max(
+            0,
+            safeCount - approvedCount
+        );
+
+
+        const approveButton =
+            document.getElementById(
+                "bnx-approve-safe"
+            );
+
+        const importButton =
+            document.getElementById(
+                "bnx-final-import"
+            );
+
+        const message =
+            document.getElementById(
+                "bnx-import-message"
+            );
+
+
+        if(
+            approveButton
+            && pendingSafe === 0
+        ){
+
+            approveButton.disabled = true;
+
+            approveButton.textContent =
+                "Ready items approved";
+        }
+
+
+        if(importButton){
+
+            if(
+                pendingSafe > 0
+                || reviewCount > 0
+                || approvedCount === 0
+            ){
+
+                importButton.disabled = true;
+
+
+                if(reviewCount > 0){
+
+                    message.textContent =
+                        "Resolve the items needing attention, "
+                        + "then import.";
+
+                }else if(pendingSafe > 0){
+
+                    message.textContent =
+                        "Approve the ready items first.";
+
+                }else{
+
+                    message.textContent =
+                        "No approved changes are waiting.";
+                }
+
+            }else{
+
+                message.textContent =
+                    "Everything is ready for final import.";
+            }
+        }
+
+
+        const showReview =
+            document.getElementById(
+                "bnx-show-review"
+            );
+
+
+        function openReviewFilter(){
+
+            const reviewFilter =
+                document.querySelector(
+                    '[data-filter="review"]'
+                );
+
+            if(reviewFilter){
+
+                reviewFilter.click();
+
+                reviewFilter.scrollIntoView(
+                    {
+                        behavior: "smooth",
+                        block: "center",
+                    }
+                );
+            }
+        }
+
+
+        if(showReview){
+
+            showReview.addEventListener(
+                "click",
+                openReviewFilter
+            );
+        }
+
+
+        // When genuine exceptions exist,
+        // make those the default view.
+        if(reviewCount > 0){
+
+            window.setTimeout(
+                openReviewFilter,
+                100
+            );
+        }
+
+    }
+);
+</script>
+
+
+
+
+    <!-- HEADER -->
+
+    <div class="ir-header">
+
+        <div>
+
+            <div class="page-eyebrow">
+                TOOLKIT DATA / IMPORT
+            </div>
+
+            <h1 class="ir-title">
+                Review Import
+            </h1>
+
+            <p class="ir-description">
+                Check only the items that need your decision.
+                Existing Services keep their current category and
+                type unless you explicitly change them later.
+            </p>
+
+        </div>
+
+
+        <div class="ir-header-actions">
+
+            <a
+                href="{% url 'toolkit:import_center' %}"
+                class="secondary-button">
+                ← Import Data
+            </a>
+
+            <a
+                href="{% url 'toolkit:import_history' %}"
+                class="secondary-button">
+                Source History
+            </a>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- WHAT YOU ACTUALLY NEED TO DO -->
+
+    <section class="task-card">
+
+        <div>
+
+            <div class="page-eyebrow">
+                WHAT YOU NEED TO DO
+            </div>
+
+            {% if stats.needs_attention %}
+
+                <h2>
+                    Resolve the items needing attention
+                </h2>
+
+                <p>
+                    These items require your decision before
+                    the Toolkit can be updated safely.
+                </p>
+
+            {% elif stats.create or stats.safe_update %}
+
+                <h2>
+                    Review the detected changes
+                </h2>
+
+                <p>
+                    Check the ready items below. They can be
+                    approved automatically during final import.
+                </p>
+
+            {% elif stats.skipped %}
+
+                <h2>
+                    Review is complete
+                </h2>
+
+                <p>
+                    All detected Service changes were skipped.
+                    Use Finish review above to close this source
+                    without changing Toolkit data.
+                </p>
+
+            {% else %}
+
+                <h2>
+                    No Service changes need review
+                </h2>
+
+                <p>
+                    This source did not produce any Service
+                    changes requiring approval.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="task-steps">
+
+            {% if stats.needs_attention %}
+
+                <div class="task-step">
+
+                    <span class="task-number">
+                        !
+                    </span>
+
+                    <div>
+                        Review
+                        <strong>
+                            {{ stats.needs_attention }}
+                        </strong>
+                        item{{ stats.needs_attention|pluralize }}
+                        requiring attention before final import.
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+
+            {% if stats.create %}
+
+                <div class="task-step">
+
+                    <span class="task-number">
+                        +
+                    </span>
+
+                    <div>
+                        Review
+                        <strong>
+                            {{ stats.create }}
+                        </strong>
+                        new Service{{ stats.create|pluralize }}
+                        before creation.
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+
+            {% if stats.safe_update %}
+
+                <div class="task-step">
+
+                    <span class="task-number">
+                        ✓
+                    </span>
+
+                    <div>
+                        <strong>
+                            {{ stats.safe_update }}
+                        </strong>
+                        existing Service
+                        row{{ stats.safe_update|pluralize }}
+                        safely match the current Toolkit.
+                        Their classification will be preserved.
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+
+            {% if not stats.needs_attention and not stats.create and not stats.safe_update %}
+
+                {% if stats.skipped %}
+
+                    <div class="task-step">
+
+                        <span class="task-number">
+                            ✓
+                        </span>
+
+                        <div>
+                            <strong>
+                                {{ stats.skipped }}
+                            </strong>
+                            skipped item{{ stats.skipped|pluralize }}
+                            will remain excluded from this import.
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="task-step">
+
+                        <span class="task-number">
+                            ✓
+                        </span>
+
+                        <div>
+                            No pending Service decision remains.
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+
+
+    <!-- KPIS -->
+
+    <div class="ir-kpis">
+
+        <div class="ir-kpi">
+            <small>Needs Attention</small>
+            <strong>{{ stats.needs_attention }}</strong>
+        </div>
+
+        <div class="ir-kpi">
+            <small>New Services</small>
+            <strong>{{ stats.create }}</strong>
+        </div>
+
+        <div class="ir-kpi">
+            <small>Safe Existing Matches</small>
+            <strong>{{ stats.safe_update }}</strong>
+        </div>
+
+        <div class="ir-kpi">
+            <small>Approved</small>
+            <strong>{{ stats.approved }}</strong>
+        </div>
+
+        <div class="ir-kpi">
+            <small>Other Knowledge</small>
+            <strong>{{ stats.knowledge_rows }}</strong>
+        </div>
+
+    </div>
+
+
+
+    <div class="ir-workspace">
+
+
+        <!-- =================================================
+             LEFT SIDE
+             ================================================= -->
+
+        <section class="ir-list-panel">
+
+
+            <div class="ir-list-toolbar">
+
+                <input
+                    id="irSearch"
+                    type="search"
+                    class="ir-search"
+                    placeholder="Search Services..."
+                >
+
+
+                <div class="ir-tabs">
+
+                    <button
+                        type="button"
+                        class="ir-tab active"
+                        data-filter="attention">
+                        Needs Attention
+                    </button>
+
+                    <button
+                        type="button"
+                        class="ir-tab"
+                        data-filter="create">
+                        New Services
+                    </button>
+
+                    <button
+                        type="button"
+                        class="ir-tab"
+                        data-filter="update">
+                        Safe Existing Matches
+                    </button>
+
+                    <button
+                        type="button"
+                        class="ir-tab"
+                        data-filter="approved">
+                        Approved
+                    </button>
+
+                    <button
+                        type="button"
+                        class="ir-tab"
+                        data-filter="all">
+                        All
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <div
+                class="ir-list"
+                id="irList">
+
+
+                {% for row in rows %}
+
+                <article
+                    id="row-{{ row.pk }}"
+                    class="ir-item"
+                    data-row-id="{{ row.pk }}"
+                    data-title="{{ row.raw_data.candidate.title|escape }}"
+                    data-action="{% if row.needs_attention %}merge_review{% else %}{{ row.candidate_action|lower }}{% endif %}"
+                    data-decision="{{ row.review_decision|lower }}"
+                >
+
+
+                    <div class="ir-item-top">
+
+                        <div>
+
+                            <div class="ir-item-title">
+                                {{ row.raw_data.candidate.title }}
+                            </div>
+
+                            <div class="ir-item-source">
+                                {{ row.sheet_name }}
+                                · Row {{ row.source_row_number }}
+                            </div>
+
+                        </div>
+
+
+                        {% if row.is_changed_information %}
+
+                            <span class="ir-badge badge-review">
+                                Replacement Blocked
+                            </span>
+
+                        {% elif row.needs_attention %}
+
+                            <span class="ir-badge badge-review">
+                                Needs Attention
+                            </span>
+
+                        {% elif row.review_decision == "APPROVED" %}
+
+                            <span class="ir-badge badge-approved">
+                                Approved
+                            </span>
+
+                        {% elif row.candidate_action == "MERGE_REVIEW" %}
+
+                            <span class="ir-badge badge-review">
+                                Needs Attention
+                            </span>
+
+                        {% elif row.candidate_action == "CREATE" %}
+
+                            <span class="ir-badge badge-new">
+                                New
+                            </span>
+
+                        {% elif row.candidate_action == "UPDATE" %}
+
+                            <span class="ir-badge badge-existing">
+                                Existing Match
+                            </span>
+
+                        {% elif row.candidate_action == "SKIP" %}
+
+                            <span class="ir-badge badge-skipped">
+                                Skipped
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+
+                    <div class="ir-badges">
+
+
+                        {% if row.matched_service %}
+
+                            <span class="ir-badge">
+                                {{ row.matched_service.category.name }}
+                            </span>
+
+                            <span class="ir-badge">
+                                {{ row.matched_service.get_service_kind_display }}
+                            </span>
+
+
+                        {% else %}
+
+                            <span class="ir-badge">
+                                {{ row.display_category_name }}
+                            </span>
+
+                            <span class="ir-badge">
+                                {{ row.display_service_kind }}
+                            </span>
+
+                        {% endif %}
+
+
+                    </div>
+
+
+
+                    <button
+                        type="button"
+                        class="open-review">
+
+                        {% if row.is_changed_information %}
+
+                            Review blocked replacement →
+
+                        {% elif row.candidate_action == "MERGE_REVIEW" %}
+
+                            Resolve this item →
+
+                        {% elif row.candidate_action == "CREATE" %}
+
+                            Review new Service →
+
+                        {% elif row.candidate_action == "UPDATE" %}
+
+                            View incoming information →
+
+                        {% elif row.candidate_action == "SKIP" %}
+
+                            View skipped item →
+
+                        {% else %}
+
+                            Review →
+
+                        {% endif %}
+
+                    </button>
+
+
+                </article>
+
+
+                {% empty %}
+
+                <div style="padding:25px;">
+                    No Service candidates found.
+                </div>
+
+                {% endfor %}
+
+
+                <div
+                    id="irNoResults"
+                    class="no-results">
+
+                    Nothing is waiting in this section.
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             RIGHT SIDE
+             ================================================= -->
+
+        <section class="ir-detail-shell">
+
+
+            <div
+                id="irEmpty"
+                class="ir-empty">
+
+                Choose an item on the left.
+                BharatNXT will explain what it found and
+                exactly what you need to decide.
+
+            </div>
+
+
+
+            {% for row in rows %}
+
+
+            <div
+                id="detail-{{ row.pk }}"
+                class="ir-detail">
+
+
+                <div class="ir-detail-scroll">
+
+
+                    <!-- HEADER -->
+
+                    <div class="ir-detail-header">
+
+                        <div class="ir-detail-head-row">
+
+
+                            <div>
+
+                                <div class="ir-eyebrow">
+                                    {{ row.sheet_name }}
+                                    · ROW {{ row.source_row_number }}
+                                </div>
+
+                                <h2 class="ir-detail-title">
+                                    {{ row.raw_data.candidate.title }}
+                                </h2>
+
+
+                                <div class="ir-detail-sub">
+
+                                    {% if row.is_changed_information %}
+
+                                        Replacement information detected and blocked
+
+                                    {% elif row.candidate_action == "UPDATE" %}
+
+                                        Existing Service found in the Toolkit
+
+                                    {% elif row.candidate_action == "CREATE" %}
+
+                                        No matching Service currently exists
+
+                                    {% elif row.candidate_action == "MERGE_REVIEW" %}
+
+                                        BharatNXT is not sure whether this matches an existing Service
+
+                                    {% elif row.candidate_action == "SKIP" %}
+
+                                        This incoming item has been skipped
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+
+                            {% if row.is_changed_information %}
+
+                                <span class="ir-state state-attention">
+                                    Replacement Blocked
+                                </span>
+
+                            {% elif row.needs_attention %}
+
+                                <span class="ir-state state-attention">
+                                    Needs Attention
+                                </span>
+
+                            {% elif row.review_decision == "APPROVED" %}
+
+                                <span class="ir-state state-approved">
+                                    ✓ Approved
+                                </span>
+
+                            {% elif row.candidate_action == "MERGE_REVIEW" %}
+
+                                <span class="ir-state state-attention">
+                                    Needs Attention
+                                </span>
+
+                            {% elif row.candidate_action == "CREATE" %}
+
+                                <span class="ir-state state-new">
+                                    New Service
+                                </span>
+
+                            {% elif row.candidate_action == "UPDATE" %}
+
+                                <span class="ir-state state-existing">
+                                    Existing Match
+                                </span>
+
+                            {% elif row.candidate_action == "SKIP" %}
+
+                                <span class="ir-state state-skipped">
+                                    Skipped
+                                </span>
+
+                            {% endif %}
+
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="ir-detail-body">
+
+
+                        <!-- ==================================
+                             SIMPLE EXPLANATION
+                             ================================== -->
+
+                        <section class="ir-section">
+
+                            <h3>
+                                What does this mean?
+                            </h3>
+
+
+                            <div class="meaning-box">
+
+
+                                {% if row.is_changed_information %}
+
+                                    <strong>
+                                        Replacement information is protected.
+                                    </strong>
+
+                                    The uploaded file changes information already
+                                    stored for this Service. BharatNXT will not
+                                    overwrite that information through this import.
+                                    Verify the source and update the Service manually
+                                    if the replacement is genuinely required.
+
+                                {% elif row.candidate_action == "UPDATE" %}
+
+
+                                    {% if row.raw_data.sheet_kind == "COMMERCIAL_SERVICE_TABLE" %}
+
+                                        <strong>
+                                            New commercial information was found.
+                                        </strong>
+
+                                        This row belongs to an existing Service.
+                                        BharatNXT will keep the Service's current
+                                        category and type. You only need to review
+                                        the commercial information coming from Excel.
+
+                                    {% else %}
+
+                                        <strong>
+                                            This Service already exists.
+                                        </strong>
+
+                                        BharatNXT matched this Excel row to the
+                                        existing Service shown below.
+                                        Its current category and Service type will
+                                        stay unchanged. Review the incoming
+                                        information before approving the update.
+
+                                    {% endif %}
+
+
+                                {% elif row.candidate_action == "CREATE" %}
+
+                                    <strong>
+                                        This looks like a new Service.
+                                    </strong>
+
+                                    BharatNXT could not find the same Service in
+                                    the current Toolkit. Check its category and
+                                    Service type, then approve it if it should be
+                                    added.
+
+
+                                {% elif row.candidate_action == "MERGE_REVIEW" %}
+
+                                    <strong>
+                                        BharatNXT needs your help with this match.
+                                    </strong>
+
+                                    The uploaded Service looks similar to an
+                                    existing Service, but the match is not clear
+                                    enough to decide automatically.
+
+
+                                {% elif row.candidate_action == "SKIP" %}
+
+                                    <strong>
+                                        This item will not be imported.
+                                    </strong>
+
+                                    You can restore it if you want to review it
+                                    again.
+
+
+                                {% endif %}
+
+
+                            </div>
+
+                        </section>
+
+
+
+                        <!-- ==================================
+                             EXISTING SERVICE CLASSIFICATION
+                             ================================== -->
+
+                        {% if row.matched_service and row.candidate_action == "UPDATE" %}
+
+                        <section class="ir-section">
+
+                            <h3>
+                                Current Service Classification
+                            </h3>
+
+                            <p class="ir-section-intro">
+                                No action is required here.
+                                BharatNXT will preserve these existing values.
+                            </p>
+
+
+                            <div class="current-classification">
+
+                                <div class="info-card">
+
+                                    <span class="info-label">
+                                        Category
+                                    </span>
+
+                                    <div class="info-value">
+                                        {{ row.matched_service.category.name }}
+                                    </div>
+
+                                </div>
+
+
+                                <div class="info-card">
+
+                                    <span class="info-label">
+                                        Service Type
+                                    </span>
+
+                                    <div class="info-value">
+                                        {{ row.matched_service.get_service_kind_display }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+                        {% endif %}
+
+
+
+                        <!-- ==================================
+                             CLASSIFICATION ONLY FOR NEW / UNCLEAR
+                             ================================== -->
+
+                        {% if row.candidate_action == "CREATE" or row.candidate_action == "MERGE_REVIEW" %}
+
+                        <section class="ir-section">
+
+                            <h3>
+                                Where should this Service belong?
+                            </h3>
+
+                            <p class="ir-section-intro">
+                                Review BharatNXT's suggestion and change it
+                                if necessary.
+                            </p>
+
+
+                            <form
+                                method="post"
+                                action="{% url 'toolkit:import_extraction_row_decision' batch.pk row.pk %}">
+
+                                {% csrf_token %}
+
+                                <input
+                                    type="hidden"
+                                    name="decision"
+                                    value="save_mapping"
+                                >
+
+
+                                <div class="classification-form">
+
+
+                                    <div>
+
+                                        <label class="field-label">
+                                            Category
+                                        </label>
+
+                                        <select
+                                            name="category_id"
+                                            class="ir-select">
+
+                                            {% for category in categories %}
+
+                                            <option
+                                                value="{{ category.pk }}"
+                                                {% if category.pk == row.selected_category_id %}selected{% endif %}>
+
+                                                {{ category.domain.name }}
+                                                — {{ category.name }}
+
+                                            </option>
+
+                                            {% endfor %}
+
+                                        </select>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <label class="field-label">
+                                            Service Type
+                                        </label>
+
+                                        <select
+                                            name="service_kind"
+                                            class="ir-select">
+
+                                            {% for value, label in service_kind_choices %}
+
+                                            <option
+                                                value="{{ value }}"
+                                                {% if value == row.display_service_kind %}selected{% endif %}>
+
+                                                {{ label }}
+
+                                            </option>
+
+                                            {% endfor %}
+
+                                        </select>
+
+                                    </div>
+
+
+                                    <button
+                                        type="submit"
+                                        class="ir-button">
+
+                                        Save
+
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </section>
+
+                        {% endif %}
+
+
+
+                        <!-- ==================================
+                             INCOMING INFORMATION
+                             ================================== -->
+
+                        <section class="ir-section">
+
+                            <h3>
+                                Information found in the uploaded file
+                            </h3>
+
+                            <p class="ir-section-intro">
+
+                                This is what BharatNXT extracted from
+                                this Excel row.
+
+                            </p>
+
+
+                            <div class="incoming-grid">
+
+
+                                {% if row.raw_data.candidate.fields %}
+
+
+                                    {% for key, value in row.raw_data.candidate.fields.items %}
+
+                                        {% if value %}
+
+                                        <div
+                                            class="incoming-field
+                                            {% if key == 'benefits' or key == 'eligibility' or key == 'additional_info' %}full{% endif %}">
+
+                                            <span
+                                                class="incoming-label humanize-key">
+
+                                                {{ key }}
+
+                                            </span>
+
+                                            <div class="incoming-value">
+                                                {{ value }}
+                                            </div>
+
+                                        </div>
+
+                                        {% endif %}
+
+                                    {% endfor %}
+
+
+
+                                {% elif row.raw_data.candidate.sections %}
+
+
+                                    {% for section in row.raw_data.candidate.sections|slice:":12" %}
+
+                                    <div class="incoming-field full">
+
+                                        <span
+                                            class="incoming-label humanize-key">
+
+                                            {{ section.section_type }}
+
+                                        </span>
+
+                                        <div class="incoming-value">
+                                            {{ section.content }}
+                                        </div>
+
+                                    </div>
+
+                                    {% endfor %}
+
+
+
+                                {% else %}
+
+                                    <div class="incoming-field full">
+
+                                        <div class="incoming-value">
+                                            No additional structured information
+                                            was extracted from this row.
+                                        </div>
+
+                                    </div>
+
+                                {% endif %}
+
+
+                            </div>
+
+                        </section>
+
+
+
+                        <!-- ==================================
+                             EXISTING MATCH
+                             ================================== -->
+
+                        {% if row.matched_service %}
+
+                        <section class="ir-section">
+
+                            <h3>
+                                Matched Toolkit Service
+                            </h3>
+
+
+                            <div class="info-card">
+
+                                <span class="info-label">
+                                    Existing Service
+                                </span>
+
+                                <div class="info-value">
+                                    {{ row.matched_service.title }}
+                                </div>
+
+                            </div>
+
+                        </section>
+
+                        {% endif %}
+
+
+
+                        <!-- ==================================
+                             DECISION
+                             ================================== -->
+
+                        <section class="ir-section">
+
+                            <h3>
+                                What do you want to do?
+                            </h3>
+
+
+                            {% if row.candidate_action == "SKIP" %}
+
+
+                                <p class="decision-help">
+                                    This item is currently excluded from
+                                    the final import.
+                                </p>
+
+
+                                <form
+                                    method="post"
+                                    action="{% url 'toolkit:import_extraction_row_decision' batch.pk row.pk %}">
+
+                                    {% csrf_token %}
+
+                                    <input
+                                        type="hidden"
+                                        name="decision"
+                                        value="restore"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="ir-button ir-link">
+
+                                        Restore to Review
+
+                                    </button>
+
+                                </form>
+
+
+
+                            {% else %}
+
+
+                                <p class="decision-help">
+
+                                    Nothing changes in the live Toolkit yet.
+                                    Your decision is saved for the final
+                                    import step.
+
+                                </p>
+
+
+                                {% if row.is_changed_information %}
+
+                                <div class="meaning-box">
+                                    <strong>
+                                        Import approval is disabled.
+                                    </strong>
+
+                                    This row can only be excluded from this
+                                    import. Existing Toolkit information remains
+                                    unchanged.
+                                </div>
+
+                                {% endif %}
+
+                                <div class="review-actions">
+
+
+                                    {% if row.can_approve_import %}
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'toolkit:import_extraction_row_decision' batch.pk row.pk %}">
+
+                                        {% csrf_token %}
+
+                                        <input
+                                            type="hidden"
+                                            name="decision"
+                                            value="approve"
+                                        >
+
+
+                                        <button
+                                            type="submit"
+                                            class="ir-button ir-primary">
+
+
+                                            {% if row.candidate_action == "UPDATE" %}
+
+                                                Approve this update
+
+                                            {% elif row.candidate_action == "CREATE" %}
+
+                                                Approve new Service
+
+                                            {% else %}
+
+                                                Approve match
+
+                                            {% endif %}
+
+
+                                        </button>
+
+                                    </form>
+
+                                    {% endif %}
+
+
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'toolkit:import_extraction_row_decision' batch.pk row.pk %}">
+
+                                        {% csrf_token %}
+
+                                        <input
+                                            type="hidden"
+                                            name="decision"
+                                            value="skip"
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="ir-button ir-danger">
+
+                                            Do not import this item
+
+                                        </button>
+
+                                    </form>
+
+
+                                </div>
+
+
+                            {% endif %}
+
+
+                        </section>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {% endfor %}
+
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<script>
+
+(function(){
+
+    const items = Array.from(
+        document.querySelectorAll(
+            ".ir-item"
+        )
+    );
+
+    const details = Array.from(
+        document.querySelectorAll(
+            ".ir-detail"
+        )
+    );
+
+    const tabs = Array.from(
+        document.querySelectorAll(
+            ".ir-tab"
+        )
+    );
+
+    const search = document.getElementById(
+        "irSearch"
+    );
+
+    const empty = document.getElementById(
+        "irEmpty"
+    );
+
+    const noResults = document.getElementById(
+        "irNoResults"
+    );
+
+    let activeFilter = "attention";
+
+
+    function selectItem(id){
+
+        items.forEach(
+            item => {
+
+                item.classList.toggle(
+                    "active",
+                    item.dataset.rowId === id
+                );
+
+            }
+        );
+
+        details.forEach(
+            panel => {
+
+                panel.classList.toggle(
+                    "active",
+                    panel.id === "detail-" + id
+                );
+
+            }
+        );
+
+        if(empty){
+            empty.style.display = "none";
+        }
+
+    }
+
+
+    function matchesFilter(item){
+
+        const action = (
+            item.dataset.action || ""
+        );
+
+        const decision = (
+            item.dataset.decision || ""
+        );
+
+
+        if(activeFilter === "all"){
+            return true;
+        }
+
+        if(activeFilter === "attention"){
+            return (
+                action === "merge_review"
+            );
+        }
+
+        if(activeFilter === "create"){
+            return action === "create";
+        }
+
+        if(activeFilter === "update"){
+            return action === "update";
+        }
+
+        if(activeFilter === "approved"){
+            return decision === "approved";
+        }
+
+        return true;
+
+    }
+
+
+    function refreshList(){
+
+        const query = (
+            search.value || ""
+        )
+        .trim()
+        .toLowerCase();
+
+        let visible = [];
+
+
+        items.forEach(
+            item => {
+
+                const title = (
+                    item.dataset.title || ""
+                ).toLowerCase();
+
+                const show = (
+                    title.includes(query)
+                    && matchesFilter(item)
+                );
+
+                item.style.display = (
+                    show
+                    ? ""
+                    : "none"
+                );
+
+                if(show){
+                    visible.push(item);
+                }
+
+            }
+        );
+
+
+        if(noResults){
+
+            noResults.style.display = (
+                visible.length
+                ? "none"
+                : "block"
+            );
+
+        }
+
+
+        const selectedVisible = items.find(
+            item =>
+                item.classList.contains(
+                    "active"
+                )
+                && item.style.display !== "none"
+        );
+
+
+        if(!selectedVisible){
+
+            if(visible.length){
+
+                selectItem(
+                    visible[0].dataset.rowId
+                );
+
+            }
+
+            else{
+
+                details.forEach(
+                    panel =>
+                        panel.classList.remove(
+                            "active"
+                        )
+                );
+
+                if(empty){
+                    empty.style.display = "";
+                }
+
+            }
+
+        }
+
+    }
+
+
+    items.forEach(
+        item => {
+
+            item.addEventListener(
+                "click",
+                function(event){
+
+                    if(
+                        event.target.closest(
+                            "form"
+                        )
+                    ){
+                        return;
+                    }
+
+                    selectItem(
+                        item.dataset.rowId
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    tabs.forEach(
+        tab => {
+
+            tab.addEventListener(
+                "click",
+                function(){
+
+                    tabs.forEach(
+                        item =>
+                            item.classList.remove(
+                                "active"
+                            )
+                    );
+
+                    tab.classList.add(
+                        "active"
+                    );
+
+                    activeFilter = (
+                        tab.dataset.filter
+                        || "all"
+                    );
+
+                    refreshList();
+
+                }
+            );
+
+        }
+    );
+
+
+    search.addEventListener(
+        "input",
+        refreshList
+    );
+
+
+    document
+        .querySelectorAll(
+            ".humanize-key"
+        )
+        .forEach(
+            element => {
+
+                element.textContent = (
+                    element.textContent
+                    || ""
+                )
+                .trim()
+                .replace(
+                    /[-_]+/g,
+                    " "
+                )
+                .replace(
+                    /\b\w/g,
+                    function(char){
+                        return char.toUpperCase();
+                    }
+                );
+
+            }
+        );
+
+
+    const hash = (
+        window.location.hash || ""
+    );
+
+    if(
+        hash.startsWith(
+            "#row-"
+        )
+    ){
+
+        const id = hash.replace(
+            "#row-",
+            ""
+        );
+
+        const target = items.find(
+            item =>
+                item.dataset.rowId === id
+        );
+
+        if(target){
+
+            const action = (
+                target.dataset.action
+                || ""
+            );
+
+            if(action === "create"){
+                activeFilter = "create";
+            }
+            else if(action === "update"){
+                activeFilter = "update";
+            }
+            else if(action === "merge_review"){
+                activeFilter = "attention";
+            }
+            else{
+                activeFilter = "all";
+            }
+
+            tabs.forEach(
+                tab =>
+                    tab.classList.toggle(
+                        "active",
+                        tab.dataset.filter
+                        === activeFilter
+                    )
+            );
+
+            refreshList();
+            selectItem(id);
+
+        }
+
+    }
+    else{
+
+        refreshList();
+
+    }
+
+})();
+
+</script>
+
+
+
+<!-- ONE_CLICK_SAFE_FINAL_IMPORT_V1 -->
+
+<style>
+/*
+The separate bulk-approval action is intentionally hidden.
+Safe rows are approved server-side only when the administrator
+presses the final Import button.
+*/
+form[action*="/approve-safe/"]{
+    display:none !important;
+}
+</style>
+
+<script>
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
+
+        const card =
+            document.getElementById(
+                "bnx-quick-review"
+            );
+
+
+        const finalForm =
+            document.getElementById(
+                "bnx-final-import-form"
+            );
+
+
+        const importButton =
+            document.getElementById(
+                "bnx-final-import"
+            );
+
+
+        const message =
+            document.getElementById(
+                "bnx-import-message"
+            );
+
+
+        if(!card || !finalForm){
+            return;
+        }
+
+
+        // ----------------------------------------------------
+        // Standard import finalization requires:
+        // action = final_import
+        // ----------------------------------------------------
+
+        let actionInput =
+            finalForm.querySelector(
+                'input[name="action"]'
+            );
+
+
+        if(!actionInput){
+
+            actionInput =
+                document.createElement(
+                    "input"
+                );
+
+            actionInput.type =
+                "hidden";
+
+            actionInput.name =
+                "action";
+
+            finalForm.appendChild(
+                actionInput
+            );
+        }
+
+
+        actionInput.value =
+            "final_import";
+
+
+        const safeCount = Number(
+            card.dataset.safeCount
+            || 0
+        );
+
+
+        const approvedCount = Number(
+            card.dataset.approvedCount
+            || 0
+        );
+
+
+        const reviewCount = Number(
+            card.dataset.reviewCount
+            || 0
+        );
+
+
+        const skippedCount = Number(
+            card.dataset.skippedCount
+            || 0
+        );
+
+
+        if(importButton){
+
+            importButton.textContent =
+                "Import changes →";
+
+
+            // Genuine ambiguous rows remain manual.
+            if(reviewCount > 0){
+
+                importButton.disabled =
+                    true;
+
+
+                if(message){
+
+                    message.textContent =
+                        (
+                            "Resolve the "
+                            + reviewCount
+                            + " item"
+                            + (
+                                reviewCount === 1
+                                ? ""
+                                : "s"
+                            )
+                            + " needing attention first."
+                        );
+                }
+
+            }else if(
+                safeCount > 0
+                || approvedCount > 0
+            ){
+
+                // Safe CREATE/UPDATE rows do NOT need
+                // a separate approval click anymore.
+                importButton.disabled =
+                    false;
+
+
+                if(message){
+
+                    message.textContent =
+                        (
+                            "Ready items will be approved "
+                            + "automatically when you import."
+                        );
+                }
+
+            }else if(skippedCount > 0){
+
+                /*
+                   Every change candidate was reviewed and excluded.
+                   Finalising records the completed review while
+                   apply_batch preserves all live Toolkit data.
+                */
+
+                importButton.disabled =
+                    false;
+
+                importButton.textContent =
+                    "Finish review →";
+
+
+                if(message){
+
+                    message.textContent =
+                        (
+                            "All reviewed items were skipped. "
+                            + "Finish the review without changing "
+                            + "Toolkit data."
+                        );
+                }
+
+            }else{
+
+                importButton.disabled =
+                    true;
+
+
+                if(message){
+
+                    message.textContent =
+                        "No Toolkit changes are waiting.";
+                }
+            }
+        }
+
+    }
+);
+</script>
+
+{% endblock %}

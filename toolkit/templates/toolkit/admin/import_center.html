@@ -1,0 +1,621 @@
+{% extends "admin_base.html" %}
+
+{% block title %}
+Import Toolkit Data | BharatNXT Wave
+{% endblock %}
+
+{% block content %}
+
+<!-- ADMIN_IMPORT_UX_V2 -->
+
+<style>
+.bnx-import-page{
+    max-width:1180px;
+    margin:0 auto;
+    padding-bottom:60px;
+}
+
+.bnx-import-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:24px;
+    margin-bottom:28px;
+}
+
+.bnx-eyebrow{
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.14em;
+    color:#667085;
+    margin-bottom:10px;
+}
+
+.bnx-import-title{
+    margin:0;
+    font-size:38px;
+    line-height:1.08;
+    letter-spacing:-.035em;
+}
+
+.bnx-import-sub{
+    max-width:650px;
+    margin:12px 0 0;
+    color:#667085;
+    font-size:15px;
+    line-height:1.65;
+}
+
+.bnx-history-link{
+    text-decoration:none;
+    padding:11px 16px;
+    border:1px solid #d0d5dd;
+    border-radius:10px;
+    color:#344054;
+    font-weight:700;
+    white-space:nowrap;
+}
+
+.bnx-steps{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin-bottom:24px;
+}
+
+.bnx-step{
+    border:1px solid #e4e7ec;
+    background:#fff;
+    border-radius:14px;
+    padding:15px 17px;
+}
+
+.bnx-step strong{
+    display:block;
+    font-size:13px;
+    margin-bottom:4px;
+}
+
+.bnx-step span{
+    color:#667085;
+    font-size:12px;
+}
+
+.bnx-upload-card{
+    background:#fff;
+    border:1px solid #e4e7ec;
+    border-radius:20px;
+    padding:26px;
+    box-shadow:
+        0 1px 2px rgba(16,24,40,.03);
+}
+
+.bnx-upload-heading{
+    font-size:20px;
+    margin:0 0 6px;
+}
+
+.bnx-upload-copy{
+    color:#667085;
+    margin:0 0 20px;
+    line-height:1.55;
+}
+
+.bnx-dropzone{
+    position:relative;
+    display:flex;
+    min-height:190px;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    border:2px dashed #cfd5df;
+    border-radius:18px;
+    padding:28px;
+    cursor:pointer;
+    background:#fafbfc;
+    transition:
+        border-color .18s ease,
+        background .18s ease,
+        transform .18s ease;
+}
+
+.bnx-dropzone:hover,
+.bnx-dropzone.dragging{
+    border-color:#1d4ed8;
+    background:#f7f9ff;
+}
+
+.bnx-drop-icon{
+    width:48px;
+    height:48px;
+    border-radius:14px;
+    background:#eef4ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:23px;
+    margin-bottom:13px;
+}
+
+.bnx-drop-title{
+    font-size:17px;
+    font-weight:800;
+    color:#101828;
+}
+
+.bnx-drop-help{
+    margin-top:7px;
+    color:#667085;
+    font-size:13px;
+}
+
+.bnx-file-name{
+    margin-top:11px;
+    font-size:13px;
+    font-weight:700;
+    color:#1d4ed8;
+}
+
+.bnx-file-input{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    opacity:0;
+    cursor:pointer;
+}
+
+.bnx-form-errors{
+    margin:14px 0 0;
+    color:#b42318;
+    font-size:13px;
+}
+
+.bnx-primary{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:46px;
+    border:0;
+    border-radius:11px;
+    padding:0 20px;
+    margin-top:18px;
+    font-weight:800;
+    font-size:14px;
+    cursor:pointer;
+    text-decoration:none;
+    background:#111827;
+    color:#fff;
+}
+
+.bnx-primary:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+}
+
+.bnx-safe-note{
+    margin-top:13px;
+    color:#667085;
+    font-size:12px;
+}
+
+.bnx-resume,
+.bnx-current{
+    margin-bottom:22px;
+    border-radius:18px;
+    padding:22px;
+}
+
+.bnx-resume{
+    background:#f0f6ff;
+    border:1px solid #c7d7fe;
+}
+
+.bnx-current{
+    background:#f6fef9;
+    border:1px solid #abefc6;
+}
+
+.bnx-status-label{
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.12em;
+    margin-bottom:8px;
+    color:#475467;
+}
+
+.bnx-status-title{
+    margin:0 0 7px;
+    font-size:20px;
+}
+
+.bnx-status-copy{
+    margin:0;
+    color:#667085;
+    line-height:1.5;
+}
+
+.bnx-status-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:16px;
+}
+
+.bnx-secondary{
+    display:inline-flex;
+    min-height:42px;
+    align-items:center;
+    justify-content:center;
+    padding:0 15px;
+    border:1px solid #d0d5dd;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:750;
+    font-size:13px;
+    color:#344054;
+    background:#fff;
+}
+
+.bnx-error{
+    padding:14px 16px;
+    margin-bottom:18px;
+    border-radius:12px;
+    background:#fef3f2;
+    border:1px solid #fecdca;
+    color:#b42318;
+}
+
+@media(max-width:760px){
+    .bnx-import-top{
+        flex-direction:column;
+    }
+
+    .bnx-steps{
+        grid-template-columns:1fr;
+    }
+
+    .bnx-import-title{
+        font-size:31px;
+    }
+}
+</style>
+
+
+<div class="bnx-import-page">
+
+    <div class="bnx-import-top">
+
+        <div>
+
+            <div class="bnx-eyebrow">
+                DATA MANAGEMENT
+            </div>
+
+            <h1 class="bnx-import-title">
+                Update the Toolkit
+            </h1>
+
+            <p class="bnx-import-sub">
+                Upload your Excel or CSV file.
+                BharatNXT will analyse it first,
+                show only the changes that matter,
+                and nothing goes live until you
+                approve the final import.
+            </p>
+
+        </div>
+
+        <a
+            href="{% url 'toolkit:import_history' %}"
+            class="bnx-history-link">
+            Source History
+        </a>
+
+    </div>
+
+
+    <div class="bnx-steps">
+
+        <div class="bnx-step">
+            <strong>1 · Upload</strong>
+            <span>Select the latest source file</span>
+        </div>
+
+        <div class="bnx-step">
+            <strong>2 · Review</strong>
+            <span>See only changes and exceptions</span>
+        </div>
+
+        <div class="bnx-step">
+            <strong>3 · Import</strong>
+            <span>Approve once and update Toolkit</span>
+        </div>
+
+    </div>
+
+
+    {% if import_error %}
+
+        <div class="bnx-error">
+            {{ import_error }}
+        </div>
+
+    {% endif %}
+
+
+    {% if current_batch %}
+
+        <section class="bnx-current">
+
+            <div class="bnx-status-label">
+                FILE ANALYSED
+            </div>
+
+            <h2 class="bnx-status-title">
+                Source #{{ current_batch.pk }}
+                is ready
+            </h2>
+
+            <p class="bnx-status-copy">
+                {{ current_batch.row_count }}
+                source rows were recorded.
+                Review the proposed Toolkit changes
+                before anything is imported.
+            </p>
+
+            <div class="bnx-status-actions">
+
+                {% if current_batch.status == "PREVIEWED" or current_batch.status == "VALIDATED" %}
+
+                    <a
+                        class="bnx-primary"
+                        style="margin-top:0;"
+                        href="{% url 'toolkit:import_extraction_review' current_batch.pk %}">
+                        Review changes →
+                    </a>
+
+                {% endif %}
+
+                <a
+                    class="bnx-secondary"
+                    href="{% url 'toolkit:import_history_detail' current_batch.pk %}">
+                    View source details
+                </a>
+
+            </div>
+
+        </section>
+
+    {% elif latest_review_batch %}
+
+        <section class="bnx-resume">
+
+            <div class="bnx-status-label">
+                REVIEW IN PROGRESS
+            </div>
+
+            <h2 class="bnx-status-title">
+                Finish Source #{{ latest_review_batch.pk }}
+            </h2>
+
+            <p class="bnx-status-copy">
+                {{ latest_review_stats.candidates }}
+                Service candidates ·
+                {{ latest_review_stats.merge_review }}
+                need your attention.
+            </p>
+
+            <div class="bnx-status-actions">
+
+                <a
+                    class="bnx-primary"
+                    style="margin-top:0;"
+                    href="{% url 'toolkit:import_extraction_review' latest_review_batch.pk %}">
+                    Continue review →
+                </a>
+
+            </div>
+
+        </section>
+
+    {% endif %}
+
+
+    <section class="bnx-upload-card">
+
+        <h2 class="bnx-upload-heading">
+            Upload source file
+        </h2>
+
+        <p class="bnx-upload-copy">
+            You can upload a new file at any time.
+            The file is analysed safely before
+            live Toolkit data is changed.
+        </p>
+
+
+        <form
+            method="post"
+            enctype="multipart/form-data"
+            id="bnx-upload-form">
+
+            {% csrf_token %}
+
+
+            <div
+                class="bnx-dropzone"
+                id="bnx-dropzone">
+
+                <div class="bnx-drop-icon">
+                    ↑
+                </div>
+
+                <div class="bnx-drop-title">
+                    Drop Excel or CSV here
+                </div>
+
+                <div class="bnx-drop-help">
+                    or click anywhere to choose a file
+                    · .xlsx / .csv · max 20 MB
+                </div>
+
+                <div
+                    class="bnx-file-name"
+                    id="bnx-file-name">
+                    No file selected
+                </div>
+
+                {{ form.file }}
+
+            </div>
+
+
+            {% if form.file.errors %}
+
+                <div class="bnx-form-errors">
+                    {{ form.file.errors }}
+                </div>
+
+            {% endif %}
+
+
+            <button
+                type="submit"
+                class="bnx-primary"
+                id="bnx-analyse-button"
+                disabled>
+                Analyse file →
+            </button>
+
+            <div class="bnx-safe-note">
+                This step does not import or overwrite
+                live Service Library data.
+            </div>
+
+        </form>
+
+    </section>
+
+</div>
+
+
+<script>
+(function(){
+
+    const input = document.getElementById(
+        "id_file"
+    );
+
+    const dropzone = document.getElementById(
+        "bnx-dropzone"
+    );
+
+    const filename = document.getElementById(
+        "bnx-file-name"
+    );
+
+    const button = document.getElementById(
+        "bnx-analyse-button"
+    );
+
+
+    if(!input || !dropzone){
+        return;
+    }
+
+
+    function refreshFile(){
+
+        if(
+            input.files
+            && input.files.length
+        ){
+
+            filename.textContent =
+                input.files[0].name;
+
+            button.disabled = false;
+
+        }else{
+
+            filename.textContent =
+                "No file selected";
+
+            button.disabled = true;
+        }
+    }
+
+
+    input.addEventListener(
+        "change",
+        refreshFile
+    );
+
+
+    ["dragenter", "dragover"].forEach(
+        eventName => {
+
+            dropzone.addEventListener(
+                eventName,
+                event => {
+
+                    event.preventDefault();
+
+                    dropzone.classList.add(
+                        "dragging"
+                    );
+                }
+            );
+        }
+    );
+
+
+    ["dragleave", "drop"].forEach(
+        eventName => {
+
+            dropzone.addEventListener(
+                eventName,
+                event => {
+
+                    event.preventDefault();
+
+                    dropzone.classList.remove(
+                        "dragging"
+                    );
+                }
+            );
+        }
+    );
+
+
+    dropzone.addEventListener(
+        "drop",
+        event => {
+
+            if(
+                event.dataTransfer
+                && event.dataTransfer.files
+                && event.dataTransfer.files.length
+            ){
+
+                try{
+
+                    input.files =
+                        event.dataTransfer.files;
+
+                    refreshFile();
+
+                }catch(error){
+
+                    // Browser file picker remains available.
+                }
+            }
+        }
+    );
+
+})();
+</script>
+
+{% endblock %}

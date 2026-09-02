@@ -1,0 +1,672 @@
+{% extends "admin_base.html" %}
+
+{% block title %}
+Source History | BharatNXT Wave
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+.history-page{
+    max-width:1500px;
+    margin:0 auto;
+}
+
+.history-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:22px;
+    margin-bottom:25px;
+}
+
+.history-title{
+    margin:6px 0 7px;
+    font-size:36px;
+    letter-spacing:-.035em;
+}
+
+.history-copy{
+    margin:0;
+    max-width:760px;
+    line-height:1.6;
+    opacity:.62;
+}
+
+.history-kpis{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    margin-bottom:17px;
+}
+
+.history-kpi{
+    padding:17px 18px;
+    background:#fff;
+    border:1px solid rgba(15,23,42,.09);
+    border-radius:14px;
+}
+
+.history-kpi small{
+    display:block;
+    margin-bottom:7px;
+    font-size:10px;
+    font-weight:750;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+    opacity:.48;
+}
+
+.history-kpi strong{
+    font-size:25px;
+}
+
+.history-kpi p{
+    margin:7px 0 0;
+    font-size:12px;
+    opacity:.55;
+}
+
+.latest-review{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    margin-bottom:17px;
+    padding:19px 20px;
+    background:linear-gradient(
+        135deg,
+        rgba(37,99,235,.055),
+        rgba(37,99,235,.015)
+    );
+    border:1px solid rgba(37,99,235,.16);
+    border-radius:15px;
+}
+
+.latest-review h3{
+    margin:3px 0 6px;
+    font-size:18px;
+}
+
+.latest-review p{
+    margin:0;
+    font-size:13px;
+    opacity:.62;
+}
+
+.history-filter-card{
+    margin-bottom:17px;
+    padding:15px;
+    background:#fff;
+    border:1px solid rgba(15,23,42,.09);
+    border-radius:14px;
+}
+
+.history-filters{
+    display:grid;
+    grid-template-columns:minmax(280px,1fr) 210px 210px auto;
+    gap:10px;
+    align-items:end;
+}
+
+.history-field label{
+    display:block;
+    margin-bottom:5px;
+    font-size:10px;
+    font-weight:750;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    opacity:.5;
+}
+
+.history-field input,
+.history-field select{
+    width:100%;
+    box-sizing:border-box;
+    height:43px;
+    padding:0 11px;
+    background:#fff;
+    border:1px solid rgba(15,23,42,.11);
+    border-radius:9px;
+    font:inherit;
+}
+
+.timeline-card{
+    background:#fff;
+    border:1px solid rgba(15,23,42,.09);
+    border-radius:16px;
+    overflow:hidden;
+}
+
+.timeline-head{
+    display:flex;
+    justify-content:space-between;
+    padding:18px 20px;
+    border-bottom:1px solid rgba(15,23,42,.08);
+}
+
+.timeline-head h2{
+    margin:0 0 4px;
+    font-size:18px;
+}
+
+.timeline-head p{
+    margin:0;
+    font-size:12px;
+    opacity:.55;
+}
+
+.source-event{
+    display:grid;
+    grid-template-columns:70px minmax(240px,1.5fr) 130px 145px 135px minmax(240px,1fr);
+    gap:15px;
+    align-items:center;
+    padding:17px 20px;
+    border-bottom:1px solid rgba(15,23,42,.07);
+}
+
+.source-event:last-child{
+    border-bottom:0;
+}
+
+.event-number{
+    font-size:15px;
+    font-weight:750;
+}
+
+.event-name{
+    font-size:14px;
+    font-weight:700;
+    overflow-wrap:anywhere;
+}
+
+.event-meta{
+    margin-top:4px;
+    font-size:11px;
+    opacity:.48;
+}
+
+.event-label{
+    display:block;
+    margin-bottom:4px;
+    font-size:9px;
+    font-weight:750;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    opacity:.42;
+}
+
+.event-value{
+    font-size:13px;
+}
+
+.event-actions{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.status-pill{
+    display:inline-flex;
+    padding:6px 9px;
+    border-radius:999px;
+    font-size:10px;
+    font-weight:750;
+}
+
+.status-review{
+    color:#1d4ed8;
+    background:rgba(37,99,235,.09);
+}
+
+.status-imported{
+    color:#15803d;
+    background:rgba(22,163,74,.10);
+}
+
+.status-neutral{
+    color:#475569;
+    background:rgba(15,23,42,.06);
+}
+
+.version-note{
+    display:inline-flex;
+    margin-top:6px;
+    padding:4px 7px;
+    border-radius:999px;
+    background:rgba(15,23,42,.05);
+    font-size:10px;
+}
+
+.event-button{
+    display:inline-flex;
+    align-items:center;
+    min-height:34px;
+    padding:0 10px;
+    border-radius:8px;
+    text-decoration:none;
+    font-size:11px;
+    font-weight:750;
+}
+
+.event-primary{
+    color:#fff;
+    background:#2563eb;
+}
+
+.event-secondary{
+    color:#1d4ed8;
+    background:rgba(37,99,235,.07);
+}
+
+.event-delete{
+    border:0;
+    background:transparent;
+    color:#b91c1c;
+    font-size:11px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+@media(max-width:1150px){
+    .history-kpis{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .source-event{
+        grid-template-columns:60px 1fr 120px 1fr;
+    }
+
+    .event-actions{
+        justify-content:flex-start;
+    }
+}
+
+@media(max-width:760px){
+    .history-head,
+    .latest-review{
+        flex-direction:column;
+    }
+
+    .history-kpis{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .history-filters{
+        grid-template-columns:1fr;
+    }
+
+    .source-event{
+        grid-template-columns:1fr;
+    }
+}
+
+</style>
+
+
+<div class="history-page">
+
+    <div class="history-head">
+
+        <div>
+
+            <div class="page-eyebrow">
+                TOOLKIT DATA
+            </div>
+
+            <h1 class="history-title">
+                Source & Import History
+            </h1>
+
+            <p class="history-copy">
+                Review source versions, continue pending
+                extractions and trace every file used to maintain
+                the BharatNXT Toolkit.
+            </p>
+
+        </div>
+
+        <a
+            href="{% url 'toolkit:import_center' %}"
+            class="primary-button">
+            Preview New Source
+        </a>
+
+    </div>
+
+
+    <div class="history-kpis">
+
+        <div class="history-kpi">
+            <small>Latest Source</small>
+            <strong>
+                {{ latest_source_rows }}
+            </strong>
+            <p>meaningful rows in the latest source</p>
+        </div>
+
+        <div class="history-kpi">
+            <small>Source Events</small>
+            <strong>{{ total_batches }}</strong>
+            <p>recorded previews and imports</p>
+        </div>
+
+        <div class="history-kpi">
+            <small>Unique Source Files</small>
+            <strong>{{ unique_source_count }}</strong>
+            <p>based on file fingerprint</p>
+        </div>
+
+        <div class="history-kpi">
+            <small>Duplicate Uploads</small>
+            <strong>{{ duplicate_count }}</strong>
+            <p>identical files detected automatically</p>
+        </div>
+
+    </div>
+
+
+    {% if latest_review_batch %}
+
+    <section class="latest-review">
+
+        <div>
+
+            <div class="page-eyebrow">
+                ACTIVE REVIEW
+            </div>
+
+            <h3>
+                Source #{{ latest_review_batch.pk }}
+                is waiting for review
+            </h3>
+
+            <p>
+                {{ latest_review_stats.source_rows }} source rows
+                · {{ latest_review_stats.candidates }} Service candidates
+                · {{ latest_review_stats.merge_review }} need manual review
+            </p>
+
+        </div>
+
+        <a
+            href="{% url 'toolkit:import_extraction_review' latest_review_batch.pk %}"
+            class="primary-button">
+            Continue Review →
+        </a>
+
+    </section>
+
+    {% endif %}
+
+
+    <section class="history-filter-card">
+
+        <form
+            method="get"
+            class="history-filters">
+
+            <div class="history-field">
+
+                <label>Search</label>
+
+                <input
+                    type="search"
+                    name="q"
+                    value="{{ query }}"
+                    placeholder="Filename or SHA-256..."
+                >
+
+            </div>
+
+
+            <div class="history-field">
+
+                <label>Source Type</label>
+
+                <select name="source">
+
+                    <option value="">
+                        All Sources
+                    </option>
+
+                    {% for value, label in source_choices %}
+
+                    <option
+                        value="{{ value }}"
+                        {% if source_filter == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="history-field">
+
+                <label>Status</label>
+
+                <select name="status">
+
+                    <option value="">
+                        All Statuses
+                    </option>
+
+                    {% for value, label in status_choices %}
+
+                    <option
+                        value="{{ value }}"
+                        {% if status_filter == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="secondary-button">
+                Apply
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <section class="timeline-card">
+
+        <div class="timeline-head">
+
+            <div>
+                <h2>Source Timeline</h2>
+                <p>
+                    Newest source events appear first.
+                </p>
+            </div>
+
+        </div>
+
+
+        {% for batch in batches %}
+
+        <div class="source-event">
+
+            <div>
+                <span class="event-label">Event</span>
+                <span class="event-number">
+                    #{{ batch.pk }}
+                </span>
+            </div>
+
+
+            <div>
+
+                <span class="event-label">
+                    Source
+                </span>
+
+                <div class="event-name">
+                    {{ batch.source_name }}
+                </div>
+
+                <div class="event-meta">
+                    {{ batch.get_source_type_display }}
+                    · {{ batch.sheet_count }} worksheets
+                </div>
+
+                {% if batch.metadata.duplicate_detected %}
+
+                    <span class="version-note">
+                        Identical to Source
+                        #{{ batch.metadata.duplicate_of_id }}
+                    </span>
+
+                {% elif batch.metadata.source_changed_since_previous %}
+
+                    <span class="version-note">
+                        Changed source
+                    </span>
+
+                {% else %}
+
+                    <span class="version-note">
+                        Original / first seen
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <div>
+                <span class="event-label">
+                    Meaningful Rows
+                </span>
+
+                <span class="event-value">
+                    {{ batch.row_count }}
+                </span>
+            </div>
+
+
+            <div>
+                <span class="event-label">
+                    Recorded
+                </span>
+
+                <span class="event-value">
+                    {{ batch.created_at|date:"d M Y, h:i A" }}
+                </span>
+            </div>
+
+
+            <div>
+
+                <span class="event-label">
+                    Status
+                </span>
+
+                {% if batch.status == "IMPORTED" %}
+
+                    {% if batch.has_toolkit_changes %}
+
+                        <span class="status-pill status-imported">
+                            Imported — Toolkit updated
+                        </span>
+
+                    {% else %}
+
+                        <span class="status-pill status-neutral">
+                            Completed — no Toolkit changes
+                        </span>
+
+                    {% endif %}
+
+                {% elif batch.status == "PREVIEWED" or batch.status == "VALIDATED" %}
+
+                    <span class="status-pill status-review">
+                        In Review
+                    </span>
+
+                {% else %}
+
+                    <span class="status-pill status-neutral">
+                        {{ batch.get_status_display }}
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="event-actions">
+
+                {% if batch.status == "PREVIEWED" or batch.status == "VALIDATED" %}
+
+                    <a
+                        href="{% url 'toolkit:import_extraction_review' batch.pk %}"
+                        class="event-button event-primary">
+                        Continue Review
+                    </a>
+
+                {% endif %}
+
+
+                <a
+                    href="{% url 'toolkit:import_history_detail' batch.pk %}"
+                    class="event-button event-secondary">
+                    Details
+                </a>
+
+
+                {% if batch.status != "IMPORTED" %}
+
+                <form
+                    method="post"
+                    action="{% url 'toolkit:import_source_delete' batch.pk %}"
+                    onsubmit="return confirm('Delete Source Event #{{ batch.pk }}? This cannot be undone.');">
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="event-delete">
+                        Delete
+                    </button>
+
+                </form>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <div style="
+            padding:30px;
+            text-align:center;
+            opacity:.55;
+        ">
+            No source history exists yet.
+        </div>
+
+        {% endfor %}
+
+    </section>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,339 @@
+{% extends "admin_base.html" %}
+
+{% block title %}
+No Changes Required | BharatNXT Wave
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+.duplicate-page{
+    max-width:1100px;
+    margin:0 auto;
+}
+
+.duplicate-hero{
+    padding:34px;
+    margin-top:22px;
+
+    border:1px solid rgba(22,163,74,.16);
+    border-radius:18px;
+
+    background:linear-gradient(
+        135deg,
+        rgba(22,163,74,.065),
+        rgba(22,163,74,.015)
+    );
+}
+
+.duplicate-icon{
+    width:48px;
+    height:48px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    margin-bottom:20px;
+
+    border-radius:50%;
+
+    background:rgba(22,163,74,.12);
+    color:#15803d;
+
+    font-size:22px;
+    font-weight:800;
+}
+
+.duplicate-title{
+    margin:5px 0 10px;
+
+    font-size:36px;
+    line-height:1.08;
+    letter-spacing:-.035em;
+}
+
+.duplicate-copy{
+    max-width:750px;
+
+    margin:0;
+
+    font-size:15px;
+    line-height:1.65;
+
+    opacity:.66;
+}
+
+.duplicate-summary{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+
+    gap:12px;
+
+    margin-top:26px;
+}
+
+.duplicate-stat{
+    padding:17px;
+
+    border:1px solid rgba(15,23,42,.08);
+    border-radius:13px;
+
+    background:#fff;
+}
+
+.duplicate-stat small{
+    display:block;
+
+    margin-bottom:7px;
+
+    font-size:10px;
+    font-weight:750;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+
+    opacity:.45;
+}
+
+.duplicate-stat strong{
+    font-size:24px;
+}
+
+.duplicate-explanation{
+    padding:20px;
+    margin-top:17px;
+
+    background:#fff;
+
+    border:1px solid rgba(15,23,42,.09);
+    border-radius:15px;
+}
+
+.duplicate-explanation h2{
+    margin:0 0 9px;
+
+    font-size:17px;
+}
+
+.duplicate-explanation p{
+    margin:0;
+
+    max-width:850px;
+
+    font-size:13px;
+    line-height:1.65;
+
+    opacity:.65;
+}
+
+.duplicate-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+
+    margin-top:20px;
+}
+
+.duplicate-delete{
+    min-height:42px;
+
+    padding:0 14px;
+
+    border:1px solid rgba(185,28,28,.18);
+    border-radius:9px;
+
+    background:#fff;
+    color:#b91c1c;
+
+    font-weight:700;
+
+    cursor:pointer;
+}
+
+@media(max-width:700px){
+
+    .duplicate-summary{
+        grid-template-columns:1fr;
+    }
+
+}
+
+</style>
+
+
+<div class="duplicate-page">
+
+    <div class="page-eyebrow">
+        TOOLKIT DATA / IMPORT
+    </div>
+
+
+    <section class="duplicate-hero">
+
+        <div class="duplicate-icon">
+            ✓
+        </div>
+
+
+        <div class="page-eyebrow">
+            NO ACTION REQUIRED
+        </div>
+
+
+        <h1 class="duplicate-title">
+            This file is already in the Toolkit
+        </h1>
+
+
+        <p class="duplicate-copy">
+
+            BharatNXT compared this uploaded file with
+            the source history and found that it is
+            identical to a source that has already been
+            imported.
+
+            Nothing needs to be reviewed or imported again.
+
+        </p>
+
+
+        <div class="duplicate-summary">
+
+
+            <div class="duplicate-stat">
+
+                <small>
+                    Meaningful Rows
+                </small>
+
+                <strong>
+                    {{ meaningful_rows }}
+                </strong>
+
+            </div>
+
+
+            <div class="duplicate-stat">
+
+                <small>
+                    Services Recognised
+                </small>
+
+                <strong>
+                    {{ recognized_candidates }}
+                </strong>
+
+            </div>
+
+
+            <div class="duplicate-stat">
+
+                <small>
+                    Changes to Apply
+                </small>
+
+                <strong>
+                    0
+                </strong>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <section class="duplicate-explanation">
+
+        <h2>
+            Why am I seeing this?
+        </h2>
+
+
+        <p>
+
+            Source #{{ batch.pk }} has the same file
+            fingerprint as
+
+            {% if duplicate_of %}
+
+                <strong>
+                    Source #{{ duplicate_of.pk }}
+                </strong>,
+
+                which has already been processed by the Toolkit.
+
+            {% else %}
+
+                an earlier Toolkit source.
+
+            {% endif %}
+
+            The Services recognised during extraction are therefore
+            not new changes. BharatNXT has stopped the import to
+            prevent duplicate Services, duplicate commercial data
+            and duplicate knowledge from being created.
+
+        </p>
+
+    </section>
+
+
+
+    <div class="duplicate-actions">
+
+
+        <a
+            href="{% url 'toolkit:import_history' %}"
+            class="primary-button">
+
+            View Source History
+
+        </a>
+
+
+        <a
+            href="{% url 'toolkit:import_center' %}"
+            class="secondary-button">
+
+            Upload a Different File
+
+        </a>
+
+
+        {% if batch.status != "IMPORTED" %}
+
+        <form
+            method="post"
+            action="{% url 'toolkit:import_source_delete' batch.pk %}"
+            onsubmit="
+                return confirm(
+                    'Delete this redundant preview? ' +
+                    'The already-imported original source will remain.'
+                );
+            ">
+
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                class="duplicate-delete">
+
+                Delete Redundant Preview
+
+            </button>
+
+        </form>
+
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+{% endblock %}

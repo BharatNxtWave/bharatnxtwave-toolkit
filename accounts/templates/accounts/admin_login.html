@@ -1,0 +1,127 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>BDE Open Admin Center | BharatNXT Wave</title>
+
+    <link rel="stylesheet"
+          href="{% static 'css/app.css' %}">
+</head>
+
+<body class="auth-page">
+
+    <main class="auth-shell">
+
+        <section class="auth-brand-panel">
+
+            <div class="auth-brand-mark">
+                BN
+            </div>
+
+            <div class="auth-brand-name">
+                BharatNXT Wave
+            </div>
+
+            <div class="auth-brand-label">
+                ADMIN CENTER
+            </div>
+
+            <div class="auth-brand-copy">
+                Manage employees, Toolkit data, imports, analytics and access controls.
+            </div>
+
+        </section>
+
+
+        <section class="auth-form-panel">
+
+            <div class="auth-form-container">
+
+                <div class="page-eyebrow">
+                    RESTRICTED ADMIN ACCESS
+                </div>
+
+                <h1 class="auth-title">
+                    Admin Center Sign In
+                </h1>
+
+                <p class="auth-description">
+                    Use an authorised BharatNXT Wave administrator account.
+                </p>
+
+
+                {% if form.non_field_errors %}
+
+                    <div class="auth-error">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+
+                {% endif %}
+
+
+                <form method="post"
+                      class="auth-form">
+
+                    {% csrf_token %}
+
+                    <div class="auth-field">
+
+                        <label for="{{ form.username.id_for_label }}">
+                            Username
+                        </label>
+
+                        {{ form.username }}
+
+                    </div>
+
+
+                    <div class="auth-field">
+
+                        <label for="{{ form.password.id_for_label }}">
+                            Password
+                        </label>
+
+                        {{ form.password }}
+
+                    </div>
+
+
+                    <button type="submit"
+                            class="primary-button auth-submit">
+                        Sign In
+                    </button>
+
+                </form>
+
+
+                <div class="auth-security-note">
+                    BDE employee account?
+                    <a href="{% url 'accounts:login' %}">
+                        BDE Workspace Sign In
+                    </a>
+                    <br>
+                    Access is restricted to authorised
+                    BharatNXT Wave personnel.
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- BNW_PASSWORD_VISIBILITY_V1 -->
+    <script src="{% static 'js/password_visibility.js' %}" defer></script>
+
+</body>
+
+</html>

@@ -1,0 +1,30 @@
+[Unit]
+Description=BharatNXT Wave Internal Toolkit
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+
+User=bharatnxt
+Group=www-data
+
+WorkingDirectory=/opt/bharatnxt-toolkit
+
+EnvironmentFile=/etc/bharatnxt-toolkit.env
+
+ExecStart=/opt/bharatnxt-toolkit/.venv/bin/gunicorn \
+    --workers 3 \
+    --bind 127.0.0.1:8000 \
+    --timeout 60 \
+    --access-logfile - \
+    --error-logfile - \
+    config.wsgi:application
+
+Restart=on-failure
+RestartSec=5
+
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

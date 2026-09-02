@@ -1,0 +1,156 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Admin Overview | BharatNXT Wave{% endblock %}
+
+{% block content %}
+
+<div class="page-eyebrow">
+    ADMIN CENTER
+</div>
+
+<h1 class="page-title">
+    Overview
+</h1>
+
+<p class="page-description">
+    Current status of employees, toolkit data and internal platform activity.
+</p>
+
+
+<div class="admin-overview-grid">
+
+    <div class="card stat-card">
+        <div class="stat-label">
+            TOTAL EMPLOYEES
+        </div>
+
+        <div class="stat-value">
+            {{ total_employees }}
+        </div>
+
+        <div class="overview-stat-meta">
+            {{ active_employees }} active
+        </div>
+    </div>
+
+
+    <div class="card stat-card">
+        <div class="stat-label">
+            TOOLKIT SERVICES
+        </div>
+
+        <div class="stat-value">
+            {{ total_services }}
+        </div>
+
+        <div class="overview-stat-meta">
+            {{ published_services }} available to BDEs
+        </div>
+    </div>
+
+
+    <div class="card stat-card">
+        <div class="stat-label">
+            ACTIVE SESSIONS
+        </div>
+
+        <div class="stat-value">
+            {{ active_sessions }}
+        </div>
+
+        <div class="overview-stat-meta">
+            Current recorded sessions
+        </div>
+    </div>
+
+</div>
+
+
+<div class="card overview-activity-card">
+
+    <div class="table-header">
+
+        <div>
+
+            <div class="table-title">
+                Recent Activity
+            </div>
+
+            <div class="table-subtitle">
+                Latest important platform events
+            </div>
+
+        </div>
+
+
+        <a
+            href="{% url 'accounts:activity_logs' %}"
+            class="secondary-button">
+            View All Activity
+        </a>
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table class="employee-table">
+
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Employee</th>
+                    <th>Activity</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for log in recent_activity %}
+
+                <tr>
+
+                    <td>
+                        {{ log.created_at|date:"d M Y, h:i A" }}
+                    </td>
+
+                    <td>
+                        {% if log.user %}
+                            {{ log.user.get_full_name|default:log.user.username }}
+                        {% else %}
+                            Unknown
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <span class="activity-type">
+                            {{ log.get_action_display }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {{ log.description }}
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="4">
+                        No activity has been recorded yet.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

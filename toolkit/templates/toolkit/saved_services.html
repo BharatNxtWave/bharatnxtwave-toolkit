@@ -1,0 +1,473 @@
+{% extends "base.html" %}
+
+{% block title %}
+Saved Services | BharatNXT Wave
+{% endblock %}
+
+{% block content %}
+
+<div class="bnx-collections-page">
+
+    <header class="bnx-collections-hero">
+
+        <div>
+
+            <div class="bde-eyebrow">
+                SAVED SERVICES
+            </div>
+
+            <h1>
+                Client Collections
+            </h1>
+
+            <p>
+                Organise saved schemes and services by client,
+                just like collections in Instagram or Pinterest.
+            </p>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="primary-button"
+            data-bnx-new-collection>
+
+            + New collection
+
+        </button>
+
+    </header>
+
+
+    <section class="bnx-collection-summary">
+
+        <div>
+            <strong>{{ collection_count }}</strong>
+            <span>client collections</span>
+        </div>
+
+        <div>
+            <strong>{{ unsorted_count }}</strong>
+            <span>unsorted services</span>
+        </div>
+
+    </section>
+
+
+    <section class="bnx-collections-section">
+
+        <div class="bnx-collections-heading">
+
+            <div>
+
+                <h2>
+                    Collections
+                </h2>
+
+                <p>
+                    One collection can represent one client.
+                </p>
+
+            </div>
+
+            <button
+                type="button"
+                class="bnx-text-action"
+                data-bnx-new-collection>
+
+                New collection
+
+            </button>
+
+        </div>
+
+
+        <div class="bnx-collection-grid">
+
+            {% for collection in collections %}
+
+                <a
+                    href="{% url 'toolkit:saved_collection_detail' collection.pk %}"
+                    class="bnx-collection-card">
+
+                    <div class="bnx-collection-cover">
+
+                        <span>
+                            {{ collection.name|slice:":1"|upper }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="bnx-collection-card-body">
+
+                        <strong>
+                            {{ collection.name }}
+                        </strong>
+
+                        {% if collection.note %}
+
+                            <p>
+                                {{ collection.note|truncatechars:65 }}
+                            </p>
+
+                        {% else %}
+
+                            <p>
+                                Client collection
+                            </p>
+
+                        {% endif %}
+
+
+                        <div class="bnx-collection-card-meta">
+
+                            <span>
+                                {{ collection.service_count }}
+                                service{{ collection.service_count|pluralize }}
+                            </span>
+
+                            <span>
+                                Updated
+                                {{ collection.updated_at|timesince }}
+                                ago
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="bnx-collection-arrow">
+                        →
+                    </div>
+
+                </a>
+
+            {% empty %}
+
+                <button
+                    type="button"
+                    class="bnx-collection-empty"
+                    data-bnx-new-collection>
+
+                    <span class="bnx-collection-empty-plus">
+                        +
+                    </span>
+
+                    <strong>
+                        Create your first client collection
+                    </strong>
+
+                    <small>
+                        Example: Deepak · Agriculture business
+                    </small>
+
+                </button>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+
+    {% if unsorted_items %}
+
+        <section class="bnx-unsorted-section">
+
+            <div class="bnx-collections-heading">
+
+                <div>
+
+                    <h2>
+                        Unsorted
+                    </h2>
+
+                    <p>
+                        Existing bookmarks not yet assigned
+                        to a client collection.
+                    </p>
+
+                </div>
+
+                <span class="bnx-count-pill">
+                    {{ unsorted_count }}
+                </span>
+
+            </div>
+
+
+            <div class="bnx-unsorted-list">
+
+                {% for item in unsorted_items %}
+
+                    <article class="bnx-unsorted-service">
+
+                        <div>
+
+                            <span class="bnx-service-code">
+                                {{ item.service.service_id }}
+                            </span>
+
+                            <h3>
+                                {{ item.service.title }}
+                            </h3>
+
+                            <p>
+                                {{ item.service.domain.name }}
+                                ·
+                                {{ item.service.category.name }}
+                            </p>
+
+                        </div>
+
+
+                        <div class="bnx-unsorted-actions">
+
+                            <a
+                                href="{% url 'toolkit:service_detail' item.service.slug %}"
+                                class="secondary-button">
+
+                                Details
+
+                            </a>
+
+                            <button
+                                type="button"
+                                class="primary-button"
+                                data-bnx-manage-saved
+                                data-service-id="{{ item.service.pk }}">
+
+                                Add to client
+
+                            </button>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+    {% endif %}
+
+
+</div>
+
+
+<div
+    class="bnx-create-collection-modal"
+    data-bnx-create-collection-modal
+    hidden>
+
+    <div
+        class="bnx-modal-backdrop"
+        data-bnx-close-new-collection>
+    </div>
+
+    <div
+        class="bnx-create-collection-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="bnx-create-title">
+
+        <div class="bnx-modal-handle"></div>
+
+        <header>
+
+            <div>
+
+                <small>
+                    NEW COLLECTION
+                </small>
+
+                <h2 id="bnx-create-title">
+                    Create client collection
+                </h2>
+
+            </div>
+
+            <button
+                type="button"
+                class="bnx-modal-close"
+                data-bnx-close-new-collection>
+
+                ×
+
+            </button>
+
+        </header>
+
+
+        <form
+            method="post"
+            action="{% url 'toolkit:saved_collection_create' %}">
+
+            {% csrf_token %}
+
+            <label>
+                Client / collection name
+
+                <input
+                    type="text"
+                    name="name"
+                    maxlength="150"
+                    placeholder="e.g. Deepak"
+                    required>
+            </label>
+
+
+            <label>
+                Note
+                <span>Optional</span>
+
+                <input
+                    type="text"
+                    name="note"
+                    maxlength="500"
+                    placeholder="e.g. Agriculture business">
+            </label>
+
+
+            <div class="bnx-modal-actions">
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    data-bnx-close-new-collection>
+
+                    Cancel
+
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-button">
+
+                    Create collection
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+(function () {
+
+    "use strict";
+
+    const modal =
+        document.querySelector(
+            "[data-bnx-create-collection-modal]"
+        );
+
+
+    if (!modal) {
+        return;
+    }
+
+
+    function openModal() {
+
+        modal.hidden = false;
+
+        document.body.classList.add(
+            "bnx-modal-open"
+        );
+
+
+        const input =
+            modal.querySelector(
+                'input[name="name"]'
+            );
+
+
+        if (input) {
+
+            setTimeout(
+                function () {
+                    input.focus();
+                },
+                30
+            );
+
+        }
+
+    }
+
+
+    function closeModal() {
+
+        modal.hidden = true;
+
+        document.body.classList.remove(
+            "bnx-modal-open"
+        );
+
+    }
+
+
+    document
+        .querySelectorAll(
+            "[data-bnx-new-collection]"
+        )
+        .forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    openModal
+                );
+
+            }
+        );
+
+
+    document
+        .querySelectorAll(
+            "[data-bnx-close-new-collection]"
+        )
+        .forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    closeModal
+                );
+
+            }
+        );
+
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Escape"
+                &&
+                !modal.hidden
+            ) {
+
+                closeModal();
+
+            }
+
+        }
+    );
+
+})();
+</script>
+
+{% endblock %}

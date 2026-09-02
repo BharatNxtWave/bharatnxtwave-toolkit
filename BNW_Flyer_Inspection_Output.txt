@@ -1,0 +1,2348 @@
+38 objects imported automatically (use -v 2 for details).
+
+
+================================================================================================
+BNW FLYER FEATURE — COMPLETE READ-ONLY IMPLEMENTATION INSPECTION
+================================================================================================
+Project: /mnt/d/BharatNXT Wave/BharatNXTwave Toolkit
+Python: 3.12.3 (main, Jun 19 2026, 12:46:00) [GCC 13.3.0]
+Django: 6.1
+Database vendor: sqlite
+Protection: SQLite query_only=ON + SQL write blocker
+Settings module: config.settings
+Root URL module: config.urls
+Database engine: django.db.backends.sqlite3
+SQLite database file: db.sqlite3
+SQLite database exists: True
+SQLite database size: 4050944 bytes
+SQLite backup parent writable: True
+
+RUNTIME / SECURITY SETTINGS
+DEBUG: True
+MEDIA_ROOT: ''
+MEDIA_URL: '/'
+FILE_UPLOAD_MAX_MEMORY_SIZE: 2621440
+DATA_UPLOAD_MAX_MEMORY_SIZE: 2621440
+FILE_UPLOAD_PERMISSIONS: 420
+FILE_UPLOAD_DIRECTORY_PERMISSIONS: None
+X_FRAME_OPTIONS: 'DENY'
+CSRF_COOKIE_SECURE: False
+SESSION_COOKIE_SECURE: False
+SECURE_CONTENT_TYPE_NOSNIFF: True
+ROOT_URLCONF: 'config.urls'
+DEFAULT STORAGE BACKEND: django.core.files.storage.FileSystemStorage
+DEFAULT STORAGE OPTION NAMES: []
+RELEVANT MIDDLEWARE:
+ - accounts.network_security.OfficeNetworkMiddleware
+ - django.middleware.security.SecurityMiddleware
+ - django.middleware.csrf.CsrfViewMiddleware
+ - django.contrib.auth.middleware.AuthenticationMiddleware
+ - django.middleware.clickjacking.XFrameOptionsMiddleware
+
+UPLOAD / PREVIEW DEPENDENCIES
+PIL NOT INSTALLED
+pypdf NOT INSTALLED
+fitz NOT INSTALLED
+magic NOT INSTALLED
+clamd NOT INSTALLED
+clamscan executable: NOT INSTALLED
+Project directory writable: True
+Free disk space: 156.48 GB
+
+USER / ADMIN PERMISSION STRUCTURE
+User model: accounts.User
+role | type: CharField | choices: [('BDE', 'BDE'), ('DATA_ADMIN', 'Data Admin'), ('SECURITY_ADMIN', 'Security Admin'), ('IT_ADMIN', 'IT Admin'), ('SUPER_ADMIN', 'Super Admin')]
+is_staff | type: BooleanField | choices: []
+is_superuser | type: BooleanField | choices: []
+is_active | type: BooleanField | choices: []
+
+SERVICE / FLYER DATA STRUCTURE
+Total services: 165
+Blank service IDs: 0
+Duplicate service IDs: NONE
+Service.service_id unique: True
+Existing ServiceSource kinds: [('OFFICIAL_PORTAL', 'Official Portal'), ('APPLICATION', 'Application Link'), ('FLYER', 'Flyer'), ('REFERENCE', 'Reference'), ('OTHER', 'Other')]
+ServiceFlyer model: NOT PRESENT
+Existing flyer/file fields: NONE
+
+MIGRATION STATE
+Toolkit migrations on disk: ['0001_initial', '0002_importbatch_savedservice_searchevent', '0003_service_effective_from_service_pitch_until', '0004_workbook_import_architecture_v1', '0005_final_import_knowledge_architecture', '0006_saved_client_collections_v1']
+Toolkit migrations applied: ['0001_initial', '0002_importbatch_savedservice_searchevent', '0003_service_effective_from_service_pitch_until', '0004_workbook_import_architecture_v1', '0005_final_import_knowledge_architecture', '0006_saved_client_collections_v1']
+Toolkit leaf migrations: [('toolkit', '0006_saved_client_collections_v1')]
+
+EXACT SOURCE CHECKPOINTS
+toolkit/models.py | lines: 1980 | sha256: 451e117ded0d257f60db78e92aeadb0976be911bb85f6dc727a3816596d325c1 | checkpoint: MATCH
+toolkit/urls.py | lines: 167 | sha256: 25c3f54e20b5593518f0fd0e3220edc7fcd2c41224d97296aeb94bee8db5e690 | checkpoint: MATCH
+toolkit/views.py | lines: 4229 | sha256: a3da10aefc7245945dae0baecc53c95105b0d86cd88825947353001efdfd7a65 | checkpoint: MATCH
+toolkit/templates/toolkit/service_detail.html | lines: 2034 | sha256: 0d96bd708e8634e95020335448f4c9e1139b528d72fb324952c2bd1cf08aaf9e | checkpoint: MATCH
+static/js/bde_workspace.js | lines: 1103 | sha256: 6ff2ee259cc653627a9e3632c80a9c0250bb94707dd7eb094725846d8523e528 | checkpoint: MATCH
+static/css/bde_workspace.css | lines: 2473 | sha256: f034c6fbe9a1f48c14051045b08193055d980c665486177caecf750095847be8 | checkpoint: MATCH
+templates/base.html | lines: 1443 | sha256: bc325becf54433bd709c6e28d0a2380c3f5240c85815c4d32d68dfe842e78d0a | checkpoint: MISMATCH
+.gitignore | lines: 25 | sha256: 5077c67aa0f66bcc4947e0b8718315217290517d7af742375f1374b97bb42a32 | checkpoint: recorded
+toolkit/admin_views.py | lines: 845 | sha256: beece98ca2ed6f63ffc34440152d571fb514cae6d14771728405cbb6978ea961 | checkpoint: recorded
+toolkit/import_views.py | lines: 2140 | sha256: ef233aa3a745bca550a2d05d780a41518f4ee5a66d5a43a8a9411d029aaa39e5 | checkpoint: recorded
+toolkit/forms.py | lines: 200 | sha256: 37eab0fc788ab44726287da4bc00279225c602fdc464e13ebf39a89b8afc9d46 | checkpoint: recorded
+accounts/models.py | lines: 175 | sha256: e8f112cb31f812024c805b5bfe44a2a8336d146834edc6882fb3a226c80ec253 | checkpoint: recorded
+accounts/activity.py | lines: 33 | sha256: af27f8802db4170dab2acbe9ff18707f23332acd0e1b6078772fd9c33299c83d | checkpoint: recorded
+accounts/decorators.py | MISSING
+accounts/permissions.py | MISSING
+config/settings.py | lines: 322 | sha256: 8e72ce5943dbe09cee03e49094609ea69400ac2d7d43a7c8c1e419e96c4cb9d3 | checkpoint: recorded
+config/urls.py | lines: 9 | sha256: 4d9b95aae524ba4856404a20e626b17e12dcb10cc91246198fcafc7b19aa5a4b | checkpoint: recorded
+
+RELEVANT URL CONTRACT
+admin/toolkit/servicedomain/ | name=toolkit_servicedomain_changelist | view=django.contrib.admin.options.changelist_view
+admin/toolkit/servicedomain/add/ | name=toolkit_servicedomain_add | view=django.contrib.admin.options.add_view
+admin/toolkit/servicedomain/<path:object_id>/history/ | name=toolkit_servicedomain_history | view=django.contrib.admin.options.history_view
+admin/toolkit/servicedomain/<path:object_id>/delete/ | name=toolkit_servicedomain_delete | view=django.contrib.admin.options.delete_view
+admin/toolkit/servicedomain/<path:object_id>/change/ | name=toolkit_servicedomain_change | view=django.contrib.admin.options.change_view
+admin/toolkit/servicedomain/<path:object_id>/ | name= | view=django.views.generic.base.view
+admin/toolkit/category/ | name=toolkit_category_changelist | view=django.contrib.admin.options.changelist_view
+admin/toolkit/category/add/ | name=toolkit_category_add | view=django.contrib.admin.options.add_view
+admin/toolkit/category/<path:object_id>/history/ | name=toolkit_category_history | view=django.contrib.admin.options.history_view
+admin/toolkit/category/<path:object_id>/delete/ | name=toolkit_category_delete | view=django.contrib.admin.options.delete_view
+admin/toolkit/category/<path:object_id>/change/ | name=toolkit_category_change | view=django.contrib.admin.options.change_view
+admin/toolkit/category/<path:object_id>/ | name= | view=django.views.generic.base.view
+admin/toolkit/service/ | name=toolkit_service_changelist | view=django.contrib.admin.options.changelist_view
+admin/toolkit/service/add/ | name=toolkit_service_add | view=django.contrib.admin.options.add_view
+admin/toolkit/service/<path:object_id>/history/ | name=toolkit_service_history | view=django.contrib.admin.options.history_view
+admin/toolkit/service/<path:object_id>/delete/ | name=toolkit_service_delete | view=django.contrib.admin.options.delete_view
+admin/toolkit/service/<path:object_id>/change/ | name=toolkit_service_change | view=django.contrib.admin.options.change_view
+admin/toolkit/service/<path:object_id>/ | name= | view=django.views.generic.base.view
+admin/toolkit/eligibilityrule/ | name=toolkit_eligibilityrule_changelist | view=django.contrib.admin.options.changelist_view
+admin/toolkit/eligibilityrule/add/ | name=toolkit_eligibilityrule_add | view=django.contrib.admin.options.add_view
+admin/toolkit/eligibilityrule/<path:object_id>/history/ | name=toolkit_eligibilityrule_history | view=django.contrib.admin.options.history_view
+admin/toolkit/eligibilityrule/<path:object_id>/delete/ | name=toolkit_eligibilityrule_delete | view=django.contrib.admin.options.delete_view
+admin/toolkit/eligibilityrule/<path:object_id>/change/ | name=toolkit_eligibilityrule_change | view=django.contrib.admin.options.change_view
+admin/toolkit/eligibilityrule/<path:object_id>/ | name= | view=django.views.generic.base.view
+admin/toolkit/documentrequirement/ | name=toolkit_documentrequirement_changelist | view=django.contrib.admin.options.changelist_view
+admin/toolkit/documentrequirement/add/ | name=toolkit_documentrequirement_add | view=django.contrib.admin.options.add_view
+admin/toolkit/documentrequirement/<path:object_id>/history/ | name=toolkit_documentrequirement_history | view=django.contrib.admin.options.history_view
+admin/toolkit/documentrequirement/<path:object_id>/delete/ | name=toolkit_documentrequirement_delete | view=django.contrib.admin.options.delete_view
+admin/toolkit/documentrequirement/<path:object_id>/change/ | name=toolkit_documentrequirement_change | view=django.contrib.admin.options.change_view
+admin/toolkit/documentrequirement/<path:object_id>/ | name= | view=django.views.generic.base.view
+admin/toolkit/processstep/ | name=toolkit_processstep_changelist | view=django.contrib.admin.options.changelist_view
+admin/toolkit/processstep/add/ | name=toolkit_processstep_add | view=django.contrib.admin.options.add_view
+admin/toolkit/processstep/<path:object_id>/history/ | name=toolkit_processstep_history | view=django.contrib.admin.options.history_view
+admin/toolkit/processstep/<path:object_id>/delete/ | name=toolkit_processstep_delete | view=django.contrib.admin.options.delete_view
+admin/toolkit/processstep/<path:object_id>/change/ | name=toolkit_processstep_change | view=django.contrib.admin.options.change_view
+admin/toolkit/processstep/<path:object_id>/ | name= | view=django.views.generic.base.view
+admin/toolkit/servicesource/ | name=toolkit_servicesource_changelist | view=django.contrib.admin.options.changelist_view
+admin/toolkit/servicesource/add/ | name=toolkit_servicesource_add | view=django.contrib.admin.options.add_view
+admin/toolkit/servicesource/<path:object_id>/history/ | name=toolkit_servicesource_history | view=django.contrib.admin.options.history_view
+admin/toolkit/servicesource/<path:object_id>/delete/ | name=toolkit_servicesource_delete | view=django.contrib.admin.options.delete_view
+admin/toolkit/servicesource/<path:object_id>/change/ | name=toolkit_servicesource_change | view=django.contrib.admin.options.change_view
+admin/toolkit/servicesource/<path:object_id>/ | name= | view=django.views.generic.base.view
+admin/toolkit/relatedservice/ | name=toolkit_relatedservice_changelist | view=django.contrib.admin.options.changelist_view
+admin/toolkit/relatedservice/add/ | name=toolkit_relatedservice_add | view=django.contrib.admin.options.add_view
+admin/toolkit/relatedservice/<path:object_id>/history/ | name=toolkit_relatedservice_history | view=django.contrib.admin.options.history_view
+admin/toolkit/relatedservice/<path:object_id>/delete/ | name=toolkit_relatedservice_delete | view=django.contrib.admin.options.delete_view
+admin/toolkit/relatedservice/<path:object_id>/change/ | name=toolkit_relatedservice_change | view=django.contrib.admin.options.change_view
+admin/toolkit/relatedservice/<path:object_id>/ | name= | view=django.views.generic.base.view
+admin/^(?P<app_label>auth|accounts|toolkit)/$ | name=app_list | view=django.contrib.admin.sites.app_index
+admin-center/ | name=admin_overview | view=dashboard.views.admin_overview
+admin-center/bde-analytics/ | name=bde_analytics | view=dashboard.views.bde_analytics
+toolkit/ | name=home | view=toolkit.views.toolkit_home
+toolkit/search/suggestions/ | name=search_suggestions | view=toolkit.views.search_suggestions
+toolkit/library/ | name=service_library | view=toolkit.views.service_library
+toolkit/library/quick/<int:service_id>/ | name=service_quick_view | view=toolkit.views.service_quick_view
+toolkit/recent/ | name=recent_services | view=toolkit.views.recent_services
+toolkit/service/<slug:slug>/ | name=service_detail | view=toolkit.views.service_detail
+toolkit/saved/ | name=saved_services | view=toolkit.views.saved_services
+toolkit/saved/collection/create/ | name=saved_collection_create | view=toolkit.views.saved_collection_create
+toolkit/saved/collection/<int:collection_id>/ | name=saved_collection_detail | view=toolkit.views.saved_collection_detail
+toolkit/saved/collection/<int:collection_id>/rename/ | name=saved_collection_rename | view=toolkit.views.saved_collection_rename
+toolkit/saved/collection/<int:collection_id>/delete/ | name=saved_collection_delete | view=toolkit.views.saved_collection_delete
+toolkit/saved/collection/<int:collection_id>/item/<int:item_id>/remove/ | name=saved_collection_remove_item | view=toolkit.views.saved_collection_remove_item
+toolkit/service/<int:service_id>/collections/ | name=saved_service_collection_state | view=toolkit.views.saved_service_collection_state
+toolkit/service/<int:service_id>/collections/action/ | name=saved_service_collection_action | view=toolkit.views.saved_service_collection_action
+toolkit/matcher/ | name=client_matcher | view=toolkit.matcher_views.client_matcher
+toolkit/service/<int:service_id>/save/ | name=toggle_saved_service | view=toolkit.views.toggle_saved_service
+admin-center/toolkit/ | name=admin_service_list | view=toolkit.admin_views.service_management_list
+admin-center/toolkit/pitch-windows/ | name=pitch_windows | view=toolkit.admin_views.pitch_window_list
+admin-center/toolkit/add/ | name=admin_service_create | view=toolkit.admin_views.service_create
+admin-center/toolkit/<int:service_id>/edit/ | name=admin_service_edit | view=toolkit.admin_views.service_edit
+admin-center/toolkit/<int:service_id>/verify/ | name=admin_service_verify | view=toolkit.admin_views.service_verify
+admin-center/import/ | name=import_center | view=toolkit.import_views.import_center
+admin-center/import/<int:batch_id>/review/ | name=import_extraction_review | view=toolkit.import_views.import_extraction_review
+admin-center/import/<int:batch_id>/review/<int:row_id>/decision/ | name=import_extraction_row_decision | view=toolkit.import_views.import_extraction_row_decision
+admin-center/import/<int:batch_id>/review/approve-safe/ | name=import_bulk_safe_approve | view=toolkit.import_views.import_bulk_safe_approve
+admin-center/import/<int:batch_id>/finalize/ | name=reconciliation_finalize | view=toolkit.reconciliation_views.reconciliation_finalize
+admin-center/import/history/ | name=import_history | view=toolkit.import_views.import_history
+admin-center/import/history/<int:batch_id>/ | name=import_history_detail | view=toolkit.import_views.import_history_detail
+admin-center/import/history/<int:batch_id>/delete/ | name=import_source_delete | view=toolkit.import_views.import_source_delete
+admin-center/database-map/ | name=database_map | view=toolkit.database_map_views.database_map
+
+------------------------------------------------------------------------------------------------
+USER MODEL SOURCE: accounts.models.User
+------------------------------------------------------------------------------------------------
+    1: class User(AbstractUser):
+    2:     ROLE_CHOICES = [
+    3:         ("BDE", "BDE"),
+    4:         ("DATA_ADMIN", "Data Admin"),
+    5:         ("SECURITY_ADMIN", "Security Admin"),
+    6:         ("IT_ADMIN", "IT Admin"),
+    7:         ("SUPER_ADMIN", "Super Admin"),
+    8:     ]
+    9: 
+   10:     employee_id = models.CharField(
+   11:         max_length=30,
+   12:         unique=True,
+   13:         null=True,
+   14:         blank=True
+   15:     )
+   16: 
+   17:     role = models.CharField(
+   18:         max_length=30,
+   19:         choices=ROLE_CHOICES,
+   20:         default="BDE",
+   21:     )
+   22: 
+   23:     department = models.CharField(
+   24:         max_length=100,
+   25:         blank=True
+   26:     )
+   27: 
+   28:     is_account_active = models.BooleanField(
+   29:         default=True
+   30:     )
+   31: 
+   32:     created_at = models.DateTimeField(
+   33:         auto_now_add=True
+   34:     )
+   35: 
+   36:     updated_at = models.DateTimeField(
+   37:         auto_now=True
+   38:     )
+   39: 
+   40:     def __str__(self):
+   41:         if self.employee_id:
+   42:             return f"{self.employee_id} - {self.username}"
+   43: 
+   44:         return self.username
+
+------------------------------------------------------------------------------------------------
+FUNCTION: accounts.activity.log_activity
+------------------------------------------------------------------------------------------------
+    1: def log_activity(
+    2:     request,
+    3:     action,
+    4:     description,
+    5:     target_type="",
+    6:     target_id="",
+    7:     metadata=None,
+    8: ):
+    9:     user = None
+   10: 
+   11:     if (
+   12:         hasattr(request, "user")
+   13:         and request.user.is_authenticated
+   14:     ):
+   15:         user = request.user
+   16: 
+   17:     ActivityLog.objects.create(
+   18:         user=user,
+   19:         action=action,
+   20:         description=description,
+   21:         target_type=target_type,
+   22:         target_id=str(target_id) if target_id else "",
+   23:         ip_address=get_request_ip(request) or None,
+   24:         user_agent=request.META.get(
+   25:             "HTTP_USER_AGENT",
+   26:             ""
+   27:         ),
+   28:         metadata=metadata or {},
+   29:     )
+
+accounts.decorators: MODULE NOT FOUND
+
+accounts.permissions: MODULE NOT FOUND
+
+------------------------------------------------------------------------------------------------
+toolkit.admin_views imports and permission helpers
+------------------------------------------------------------------------------------------------
+    1: from django.contrib.auth.decorators import user_passes_test
+    2: from django.db.models import Q
+    3: from django.shortcuts import get_object_or_404, redirect, render
+    4: from django.utils import timezone
+    5: 
+    6: from accounts.activity import log_activity
+    7: 
+    8: from .forms import ServiceManagementForm
+    9: from .models import Service, ServiceDomain
+   10: 
+   11: 
+   12: def can_manage_toolkit(user):
+   13:     return (
+   14:         user.is_authenticated
+   15:         and (
+   16:             user.is_superuser
+   17:             or user.role in {
+   18:                 "SUPER_ADMIN",
+   19:                 "DATA_ADMIN",
+   20:             }
+   21:         )
+   22:     )
+   23: 
+   24: 
+   25: @user_passes_test(can_manage_toolkit)
+   26: def service_management_list(request):
+   27:     services = (
+   28:         Service.objects
+   29:         .select_related(
+   30:             "domain",
+   31:             "category",
+   32:             "verified_by",
+   33:         )
+   34:         .all()
+   35:     )
+   36: 
+   37:     query = request.GET.get("q", "").strip()
+   38:     status = request.GET.get("status", "").strip()
+   39:     domain = request.GET.get("domain", "").strip()
+   40: 
+   41:     if query:
+   42:         services = services.filter(
+   43:             Q(title__icontains=query)
+   44:             | Q(service_id__icontains=query)
+   45:             | Q(category__name__icontains=query)
+   46:             | Q(domain__name__icontains=query)
+   47:         )
+   48: 
+   49:     valid_statuses = {
+   50:         value
+   51:         for value, label
+   52:         in Service.STATUS_CHOICES
+   53:     }
+   54: 
+   55:     if status in valid_statuses:
+   56:         services = services.filter(status=status)
+   57: 
+   58:     if domain:
+   59:         services = services.filter(
+   60:             domain__slug=domain
+   61:         )
+   62: 
+   63:     context = {
+   64:         "services": services.order_by("title")[:250],
+   65:         "query": query,
+   66:         "selected_status": status,
+   67:         "selected_domain": domain,
+   68:         "status_choices": Service.STATUS_CHOICES,
+   69:         "domains": (
+   70:             ServiceDomain.objects
+   71:             .filter(is_active=True)
+   72:             .order_by("display_order", "name")
+   73:         ),
+   74:     }
+   75: 
+   76:     return render(
+   77:         request,
+   78:         "toolkit/admin/service_list.html",
+   79:         context
+   80:     )
+   81: 
+   82: 
+   83: @user_passes_test(can_manage_toolkit)
+   84: def service_create(request):
+   85:     if request.method == "POST":
+   86:         form = ServiceManagementForm(
+   87:             request.POST
+   88:         )
+   89: 
+   90:         if form.is_valid():
+   91:             service = form.save(commit=False)
+   92:             service.created_by = request.user
+   93:             service.save()
+   94: 
+   95:             log_activity(
+   96:                 request,
+   97:                 "IMPORT",
+   98:                 f"Created toolkit service: {service.title}.",
+   99:                 target_type="service",
+  100:                 target_id=service.pk,
+  101:                 metadata={
+  102:                     "operation": "manual_create",
+  103:                     "service_id": service.service_id,
+  104:                 },
+  105:             )
+  106: 
+  107:             return redirect(
+  108:                 "toolkit:admin_service_list"
+  109:             )
+  110: 
+  111:     else:
+  112:         form = ServiceManagementForm()
+  113: 
+  114:     return render(
+  115:         request,
+  116:         "toolkit/admin/service_form.html",
+  117:         {
+  118:             "form": form,
+  119:             "page_mode": "create",
+  120:             "service": None,
+  121:         }
+  122:     )
+  123: 
+  124: 
+  125: @user_passes_test(can_manage_toolkit)
+  126: def service_edit(request, service_id):
+  127:     service = get_object_or_404(
+  128:         Service,
+  129:         pk=service_id
+  130:     )
+  131: 
+  132:     if request.method == "POST":
+  133:         form = ServiceManagementForm(
+  134:             request.POST,
+  135:             instance=service
+  136:         )
+  137: 
+  138:         if form.is_valid():
+  139:             service = form.save()
+  140: 
+  141:             log_activity(
+  142:                 request,
+  143:                 "IMPORT",
+  144:                 f"Updated toolkit service: {service.title}.",
+  145:                 target_type="service",
+  146:                 target_id=service.pk,
+  147:                 metadata={
+  148:                     "operation": "manual_update",
+  149:                     "service_id": service.service_id,
+  150:                 },
+  151:             )
+  152: 
+  153:             return redirect(
+  154:                 "toolkit:admin_service_list"
+  155:             )
+  156: 
+  157:     else:
+  158:         form = ServiceManagementForm(
+  159:             instance=service
+  160:         )
+  161: 
+  162:     return render(
+  163:         request,
+  164:         "toolkit/admin/service_form.html",
+  165:         {
+  166:             "form": form,
+  167:             "page_mode": "edit",
+  168:             "service": service,
+  169:         }
+  170:     )
+  171: 
+  172: 
+  173: @user_passes_test(can_manage_toolkit)
+  174: def service_verify(request, service_id):
+  175:     service = get_object_or_404(
+  176:         Service,
+  177:         pk=service_id
+  178:     )
+  179: 
+  180:     if request.method != "POST":
+  181:         return redirect(
+  182:             "toolkit:admin_service_list"
+  183:         )
+  184: 
+  185:     service.last_verified_at = timezone.now()
+  186:     service.verified_by = request.user
+  187: 
+  188:     service.save(
+  189:         update_fields=[
+  190:             "last_verified_at",
+  191:             "verified_by",
+  192:         ]
+  193:     )
+  194: 
+  195:     log_activity(
+  196:         request,
+  197:         "IMPORT",
+  198:         f"Verified toolkit service: {service.title}.",
+  199:         target_type="service",
+  200:         target_id=service.pk,
+  201:         metadata={
+  202:             "operation": "verify",
+  203:             "service_id": service.service_id,
+  204:         },
+  205:     )
+  206: 
+  207:     return redirect(
+  208:         "toolkit:admin_service_list"
+  209:     )
+  210: 
+  211: 
+  212: # =========================================================
+  213: # PITCH WINDOW MANAGEMENT / MONITORING
+  214: # =========================================================
+  215: 
+  216: def can_view_pitch_windows(user):
+  217:     return (
+  218:         user.is_authenticated
+  219:         and (
+  220:             user.is_superuser
+
+------------------------------------------------------------------------------------------------
+toolkit.import_views imports and permission helpers
+------------------------------------------------------------------------------------------------
+    1: import csv
+    2: import hashlib
+    3: import io
+    4: import zipfile
+    5: from pathlib import Path, PurePosixPath
+    6: 
+    7: from django.contrib.auth.decorators import user_passes_test
+    8: from django.db.models import Q, Sum
+    9: from django.shortcuts import get_object_or_404, render
+   10: from django.utils import timezone
+   11: from django.utils.dateparse import parse_datetime
+   12: 
+   13: from openpyxl import load_workbook
+   14: 
+   15: from accounts.activity import log_activity
+   16: 
+   17: from .import_forms import ToolkitImportUploadForm
+   18: from .models import ImportBatch
+   19: from .intelligence.ingestion import analyse_file
+   20: from .intelligence.staging import stage_analysis
+   21: 
+   22: 
+   23: MAX_PREVIEW_ROWS = 8
+   24: MAX_PREVIEW_COLUMNS = 30
+   25: 
+   26: MAX_XLSX_UNCOMPRESSED_BYTES = (
+   27:     250 * 1024 * 1024
+   28: )
+   29: 
+   30: MAX_XLSX_COMPRESSION_RATIO = 200
+   31: 
+   32: 
+   33: def can_import_toolkit(user):
+   34:     return (
+   35:         user.is_authenticated
+   36:         and (
+   37:             user.is_superuser
+   38:             or user.role in {
+   39:                 "SUPER_ADMIN",
+   40:                 "DATA_ADMIN",
+   41:             }
+   42:         )
+   43:     )
+   44: 
+   45: 
+   46: def normalize_value(value):
+   47:     if value is None:
+   48:         return ""
+   49: 
+   50:     return str(value).strip()
+   51: 
+   52: 
+   53: # =========================================================
+   54: # FILE FINGERPRINT
+   55: # =========================================================
+   56: 
+   57: def calculate_sha256(uploaded_file):
+   58:     digest = hashlib.sha256()
+   59: 
+   60:     uploaded_file.seek(0)
+   61: 
+   62:     for chunk in uploaded_file.chunks():
+   63:         digest.update(chunk)
+   64: 
+   65:     uploaded_file.seek(0)
+   66: 
+   67:     return digest.hexdigest()
+   68: 
+   69: 
+   70: # =========================================================
+   71: # CLIENT-REPORTED FILE MODIFICATION DATE
+   72: #
+   73: # This comes from browser File.lastModified.
+   74: # It is useful operational metadata but is not treated as
+   75: # a cryptographically trusted timestamp.
+   76: # =========================================================
+   77: 
+   78: def parse_source_modified_at(value):
+   79:     if not value:
+   80:         return None
+   81: 
+   82:     parsed = parse_datetime(value)
+   83: 
+   84:     if parsed is None:
+   85:         return None
+   86: 
+   87:     if timezone.is_naive(parsed):
+   88:         parsed = timezone.make_aware(parsed)
+   89: 
+   90:     return parsed
+   91: 
+   92: 
+   93: # =========================================================
+   94: # XLSX SECURITY VALIDATION
+   95: # =========================================================
+   96: 
+   97: def validate_xlsx_structure(uploaded_file):
+   98:     uploaded_file.seek(0)
+   99: 
+  100:     if not zipfile.is_zipfile(uploaded_file):
+  101:         uploaded_file.seek(0)
+  102: 
+  103:         raise ValueError(
+  104:             "The Excel file is not a valid XLSX archive."
+  105:         )
+  106: 
+  107:     uploaded_file.seek(0)
+  108: 
+  109:     with zipfile.ZipFile(uploaded_file) as archive:
+  110:         infos = archive.infolist()
+  111: 
+  112:         names = {
+  113:             info.filename
+  114:             for info in infos
+  115:         }
+  116: 
+  117:         required_files = {
+  118:             "[Content_Types].xml",
+  119:             "xl/workbook.xml",
+  120:         }
+  121: 
+  122:         if not required_files.issubset(names):
+  123:             raise ValueError(
+  124:                 "The file does not contain a valid XLSX workbook."
+  125:             )
+  126: 
+  127:         # XLSX only. Macro-enabled content is not accepted.
+  128:         if any(
+  129:             name.lower().endswith(
+  130:                 "vbaproject.bin"
+  131:             )
+  132:             for name in names
+  133:         ):
+  134:             raise ValueError(
+  135:                 "Macro-enabled Excel files are not permitted."
+  136:             )
+  137: 
+  138:         total_compressed = 0
+  139:         total_uncompressed = 0
+  140: 
+  141:         for info in infos:
+  142:             path = PurePosixPath(
+  143:                 info.filename
+  144:             )
+  145: 
+  146:             if (
+  147:                 info.filename.startswith("/")
+  148:                 or ".." in path.parts
+  149:             ):
+  150:                 raise ValueError(
+  151:                     "Unsafe XLSX archive structure detected."
+  152:                 )
+  153: 
+  154:             if info.flag_bits & 0x1:
+  155:                 raise ValueError(
+  156:                     "Encrypted XLSX archives are not supported."
+  157:                 )
+  158: 
+  159:             total_compressed += (
+  160:                 info.compress_size
+  161:             )
+  162: 
+  163:             total_uncompressed += (
+  164:                 info.file_size
+  165:             )
+  166: 
+  167:         if (
+  168:             total_uncompressed
+  169:             > MAX_XLSX_UNCOMPRESSED_BYTES
+  170:         ):
+  171:             raise ValueError(
+  172:                 "The expanded Excel workbook is too large."
+  173:             )
+  174: 
+  175:         if (
+  176:             total_compressed > 0
+  177:             and (
+  178:                 total_uncompressed
+  179:                 / total_compressed
+  180:             )
+  181:             > MAX_XLSX_COMPRESSION_RATIO
+  182:         ):
+  183:             raise ValueError(
+  184:                 "Unsafe Excel compression ratio detected."
+  185:             )
+  186: 
+  187:     uploaded_file.seek(0)
+  188: 
+  189: 
+  190: # =========================================================
+  191: # CSV SECURITY VALIDATION + PREVIEW
+  192: # =========================================================
+  193: 
+  194: def preview_csv(uploaded_file):
+  195:     uploaded_file.seek(0)
+  196: 
+  197:     raw = uploaded_file.read()
+  198: 
+  199:     uploaded_file.seek(0)
+  200: 
+  201:     if b"\x00" in raw:
+  202:         raise ValueError(
+  203:             "Binary content detected in CSV file."
+  204:         )
+  205: 
+  206:     text = None
+  207: 
+  208:     for encoding in (
+  209:         "utf-8-sig",
+  210:         "utf-8",
+  211:         "cp1252",
+  212:     ):
+  213:         try:
+  214:             text = raw.decode(encoding)
+  215:             break
+  216: 
+  217:         except UnicodeDecodeError:
+  218:             continue
+  219: 
+  220:     if text is None:
+  221:         raise ValueError(
+  222:             "CSV encoding could not be read."
+  223:         )
+  224: 
+  225:     csv.field_size_limit(
+  226:         1_000_000
+  227:     )
+  228: 
+  229:     stream = io.StringIO(text)
+  230: 
+  231:     reader = csv.reader(stream)
+  232: 
+  233:     first_row = next(
+  234:         reader,
+  235:         None
+  236:     )
+  237: 
+  238:     if first_row is None:
+  239:         return {
+  240:             "sheets": [
+  241:                 {
+  242:                     "name": "CSV",
+  243:                     "headers": [],
+  244:                     "preview_rows": [],
+  245:                     "total_rows": 0,
+  246:                     "total_columns": 0,
+  247:                 }
+  248:             ]
+  249:         }
+  250: 
+  251:     headers = [
+  252:         normalize_value(value)
+  253:         for value
+  254:         in first_row[
+  255:             :MAX_PREVIEW_COLUMNS
+  256:         ]
+  257:     ]
+  258: 
+  259:     preview_rows = []
+
+------------------------------------------------------------------------------------------------
+FUNCTION: toolkit.admin_views.service_management_list
+------------------------------------------------------------------------------------------------
+    1: @user_passes_test(can_manage_toolkit)
+    2: def service_management_list(request):
+    3:     services = (
+    4:         Service.objects
+    5:         .select_related(
+    6:             "domain",
+    7:             "category",
+    8:             "verified_by",
+    9:         )
+   10:         .all()
+   11:     )
+   12: 
+   13:     query = request.GET.get("q", "").strip()
+   14:     status = request.GET.get("status", "").strip()
+   15:     domain = request.GET.get("domain", "").strip()
+   16: 
+   17:     if query:
+   18:         services = services.filter(
+   19:             Q(title__icontains=query)
+   20:             | Q(service_id__icontains=query)
+   21:             | Q(category__name__icontains=query)
+   22:             | Q(domain__name__icontains=query)
+   23:         )
+   24: 
+   25:     valid_statuses = {
+   26:         value
+   27:         for value, label
+   28:         in Service.STATUS_CHOICES
+   29:     }
+   30: 
+   31:     if status in valid_statuses:
+   32:         services = services.filter(status=status)
+   33: 
+   34:     if domain:
+   35:         services = services.filter(
+   36:             domain__slug=domain
+   37:         )
+   38: 
+   39:     context = {
+   40:         "services": services.order_by("title")[:250],
+   41:         "query": query,
+   42:         "selected_status": status,
+   43:         "selected_domain": domain,
+   44:         "status_choices": Service.STATUS_CHOICES,
+   45:         "domains": (
+   46:             ServiceDomain.objects
+   47:             .filter(is_active=True)
+   48:             .order_by("display_order", "name")
+   49:         ),
+   50:     }
+   51: 
+   52:     return render(
+   53:         request,
+   54:         "toolkit/admin/service_list.html",
+   55:         context
+   56:     )
+
+------------------------------------------------------------------------------------------------
+FUNCTION: toolkit.admin_views.service_create
+------------------------------------------------------------------------------------------------
+    1: @user_passes_test(can_manage_toolkit)
+    2: def service_create(request):
+    3:     if request.method == "POST":
+    4:         form = ServiceManagementForm(
+    5:             request.POST
+    6:         )
+    7: 
+    8:         if form.is_valid():
+    9:             service = form.save(commit=False)
+   10:             service.created_by = request.user
+   11:             service.save()
+   12: 
+   13:             log_activity(
+   14:                 request,
+   15:                 "IMPORT",
+   16:                 f"Created toolkit service: {service.title}.",
+   17:                 target_type="service",
+   18:                 target_id=service.pk,
+   19:                 metadata={
+   20:                     "operation": "manual_create",
+   21:                     "service_id": service.service_id,
+   22:                 },
+   23:             )
+   24: 
+   25:             return redirect(
+   26:                 "toolkit:admin_service_list"
+   27:             )
+   28: 
+   29:     else:
+   30:         form = ServiceManagementForm()
+   31: 
+   32:     return render(
+   33:         request,
+   34:         "toolkit/admin/service_form.html",
+   35:         {
+   36:             "form": form,
+   37:             "page_mode": "create",
+   38:             "service": None,
+   39:         }
+   40:     )
+
+------------------------------------------------------------------------------------------------
+FUNCTION: toolkit.admin_views.service_edit
+------------------------------------------------------------------------------------------------
+    1: @user_passes_test(can_manage_toolkit)
+    2: def service_edit(request, service_id):
+    3:     service = get_object_or_404(
+    4:         Service,
+    5:         pk=service_id
+    6:     )
+    7: 
+    8:     if request.method == "POST":
+    9:         form = ServiceManagementForm(
+   10:             request.POST,
+   11:             instance=service
+   12:         )
+   13: 
+   14:         if form.is_valid():
+   15:             service = form.save()
+   16: 
+   17:             log_activity(
+   18:                 request,
+   19:                 "IMPORT",
+   20:                 f"Updated toolkit service: {service.title}.",
+   21:                 target_type="service",
+   22:                 target_id=service.pk,
+   23:                 metadata={
+   24:                     "operation": "manual_update",
+   25:                     "service_id": service.service_id,
+   26:                 },
+   27:             )
+   28: 
+   29:             return redirect(
+   30:                 "toolkit:admin_service_list"
+   31:             )
+   32: 
+   33:     else:
+   34:         form = ServiceManagementForm(
+   35:             instance=service
+   36:         )
+   37: 
+   38:     return render(
+   39:         request,
+   40:         "toolkit/admin/service_form.html",
+   41:         {
+   42:             "form": form,
+   43:             "page_mode": "edit",
+   44:             "service": service,
+   45:         }
+   46:     )
+
+------------------------------------------------------------------------------------------------
+FUNCTION: toolkit.admin_views.service_verify
+------------------------------------------------------------------------------------------------
+    1: @user_passes_test(can_manage_toolkit)
+    2: def service_verify(request, service_id):
+    3:     service = get_object_or_404(
+    4:         Service,
+    5:         pk=service_id
+    6:     )
+    7: 
+    8:     if request.method != "POST":
+    9:         return redirect(
+   10:             "toolkit:admin_service_list"
+   11:         )
+   12: 
+   13:     service.last_verified_at = timezone.now()
+   14:     service.verified_by = request.user
+   15: 
+   16:     service.save(
+   17:         update_fields=[
+   18:             "last_verified_at",
+   19:             "verified_by",
+   20:         ]
+   21:     )
+   22: 
+   23:     log_activity(
+   24:         request,
+   25:         "IMPORT",
+   26:         f"Verified toolkit service: {service.title}.",
+   27:         target_type="service",
+   28:         target_id=service.pk,
+   29:         metadata={
+   30:             "operation": "verify",
+   31:             "service_id": service.service_id,
+   32:         },
+   33:     )
+   34: 
+   35:     return redirect(
+   36:         "toolkit:admin_service_list"
+   37:     )
+
+------------------------------------------------------------------------------------------------
+FUNCTION: toolkit.import_views.import_center
+------------------------------------------------------------------------------------------------
+    1: @user_passes_test(can_import_toolkit)
+    2: def import_center(request):
+    3:     preview = None
+    4:     import_error = None
+    5:     uploaded_name = None
+    6: 
+    7:     current_batch = None
+    8:     duplicate_batch = None
+    9:     analysis = None
+   10:     staging_result = None
+   11: 
+   12:     latest_review_batch = (
+   13:         ImportBatch.objects
+   14:         .filter(
+   15:             status__in=[
+   16:                 "PREVIEWED",
+   17:                 "VALIDATED",
+   18:             ],
+   19:             rows__isnull=False,
+   20:         )
+   21:         .exclude(
+   22:             metadata__duplicate_detected=True
+   23:         )
+   24:         .distinct()
+   25:         .order_by("-created_at")
+   26:         .first()
+   27:     )
+   28: 
+   29:     latest_review_stats = (
+   30:         _extraction_review_stats(
+   31:             latest_review_batch
+   32:         )
+   33:     )
+   34: 
+   35:     if request.method == "POST":
+   36:         form = ToolkitImportUploadForm(
+   37:             request.POST,
+   38:             request.FILES
+   39:         )
+   40: 
+   41:         if form.is_valid():
+   42:             uploaded_file = (
+   43:                 form.cleaned_data["file"]
+   44:             )
+   45: 
+   46:             uploaded_name = (
+   47:                 uploaded_file.name
+   48:             )
+   49: 
+   50:             extension = (
+   51:                 Path(uploaded_file.name)
+   52:                 .suffix
+   53:                 .lower()
+   54:             )
+   55: 
+   56:             source_type = (
+   57:                 "CSV"
+   58:                 if extension == ".csv"
+   59:                 else "XLSX"
+   60:             )
+   61: 
+   62:             try:
+   63:                 file_sha256 = calculate_sha256(
+   64:                     uploaded_file
+   65:                 )
+   66: 
+   67:                 # Identical content, even if renamed.
+   68:                 duplicate_batch = (
+   69:                     ImportBatch.objects
+   70:                     .filter(
+   71:                         file_sha256=file_sha256
+   72:                     )
+   73:                     .order_by(
+   74:                         "-created_at"
+   75:                     )
+   76:                     .first()
+   77:                 )
+   78: 
+   79:                 # Compare current version against the most
+   80:                 # recent source with the same filename.
+   81:                 previous_same_name = (
+   82:                     ImportBatch.objects
+   83:                     .filter(
+   84:                         source_type=source_type,
+   85:                         source_name=uploaded_name,
+   86:                     )
+   87:                     .order_by(
+   88:                         "-created_at"
+   89:                     )
+   90:                     .first()
+   91:                 )
+   92: 
+   93:                 if extension == ".csv":
+   94:                     preview = preview_csv(
+   95:                         uploaded_file
+   96:                     )
+   97: 
+   98:                 elif extension == ".xlsx":
+   99:                     preview = preview_excel(
+  100:                         uploaded_file
+  101:                     )
+  102: 
+  103:                 else:
+  104:                     raise ValueError(
+  105:                         "Unsupported file format."
+  106:                     )
+  107: 
+  108:                 analysis = analyse_file(
+  109:                     uploaded_file,
+  110:                     uploaded_name,
+  111:                 )
+  112: 
+  113:                 sheets = preview.get(
+  114:                     "sheets",
+  115:                     []
+  116:                 )
+  117: 
+  118:                 total_rows = sum(
+  119:                     sheet.get(
+  120:                         "total_rows",
+  121:                         0
+  122:                     )
+  123:                     for sheet in sheets
+  124:                 )
+  125: 
+  126:                 source_modified_at = (
+  127:                     parse_source_modified_at(
+  128:                         request.POST.get(
+  129:                             "source_modified_at"
+  130:                         )
+  131:                     )
+  132:                 )
+  133: 
+  134:                 metadata = {
+  135:                     "operation": "preview",
+  136:                     "preview_only": True,
+  137: 
+  138:                     "sheet_names": [
+  139:                         sheet.get(
+  140:                             "name",
+  141:                             ""
+  142:                         )
+  143:                         for sheet in sheets
+  144:                     ],
+  145: 
+  146:                     "sheets": [
+  147:                         {
+  148:                             "name": sheet.get(
+  149:                                 "name",
+  150:                                 ""
+  151:                             ),
+  152:                             "rows": sheet.get(
+  153:                                 "total_rows",
+  154:                                 0
+  155:                             ),
+  156:                             "columns": sheet.get(
+  157:                                 "total_columns",
+  158:                                 0
+  159:                             ),
+  160:                         }
+  161:                         for sheet in sheets
+  162:                     ],
+  163: 
+  164:                     "duplicate_detected": (
+  165:                         duplicate_batch
+  166:                         is not None
+  167:                     ),
+  168: 
+  169:                     "duplicate_of_id": (
+  170:                         duplicate_batch.pk
+  171:                         if duplicate_batch
+  172:                         else None
+  173:                     ),
+  174: 
+  175:                     "previous_same_name_id": (
+  176:                         previous_same_name.pk
+  177:                         if previous_same_name
+  178:                         else None
+  179:                     ),
+  180: 
+  181:                     "source_changed_since_previous": (
+  182:                         bool(
+  183:                             previous_same_name
+  184:                             and (
+  185:                                 previous_same_name.file_sha256
+  186:                                 != file_sha256
+  187:                             )
+  188:                         )
+  189:                     ),
+  190:                 }
+  191: 
+  192:                 current_batch = (
+  193:                     ImportBatch.objects.create(
+  194:                         source_type=source_type,
+  195: 
+  196:                         source_name=(
+  197:                             uploaded_name
+  198:                         ),
+  199: 
+  200:                         source_modified_at=(
+  201:                             source_modified_at
+  202:                         ),
+  203: 
+  204:                         file_sha256=file_sha256,
+  205: 
+  206:                         sheet_count=len(
+  207:                             sheets
+  208:                         ),
+  209: 
+  210:                         row_count=total_rows,
+  211: 
+  212:                         status="PREVIEWED",
+  213: 
+  214:                         imported_by=(
+  215:                             request.user
+  216:                         ),
+  217: 
+  218:                         metadata=metadata,
+  219:                     )
+  220:                 )
+  221: 
+  222:                 staging_result = stage_analysis(
+  223:                     current_batch,
+  224:                     analysis,
+  225:                     uploaded_file,
+  226:                     uploaded_name,
+  227:                 )
+  228: 
+  229:                 meaningful_rows = (
+  230:                     staging_result.get(
+  231:                         "source_rows"
+  232:                     )
+  233:                     if staging_result
+  234:                     else None
+  235:                 )
+  236: 
+  237:                 if meaningful_rows is not None:
+  238: 
+  239:                     metadata = dict(
+  240:                         current_batch.metadata
+  241:                         or {}
+  242:                     )
+  243: 
+  244:                     if (
+  245:                         current_batch.row_count
+  246:                         != meaningful_rows
+  247:                     ):
+  248:                         metadata[
+  249:                             "preview_dimension_row_count"
+  250:                         ] = current_batch.row_count
+  251: 
+  252:                     metadata[
+  253:                         "meaningful_source_row_count"
+  254:                     ] = meaningful_rows
+  255: 
+  256:                     current_batch.row_count = (
+  257:                         meaningful_rows
+  258:                     )
+  259: 
+  260:                     current_batch.metadata = (
+  261:                         metadata
+  262:                     )
+  263: 
+  264:                     current_batch.save(
+  265:                         update_fields=[
+  266:                             "row_count",
+  267:                             "metadata",
+  268:                         ]
+  269:                     )
+  270: 
+  271:                 latest_review_batch = (
+  272:                     current_batch
+  273:                 )
+  274: 
+  275:                 latest_review_stats = (
+  276:                     _extraction_review_stats(
+  277:                         current_batch
+  278:                     )
+  279:                 )
+  280: 
+  281:                 # Do NOT put confidential filenames,
+  282:                 # row contents or cell contents into the
+  283:                 # generic ActivityLog.
+  284:                 log_activity(
+  285:                     request,
+  286:                     "IMPORT",
+  287:                     "Previewed toolkit source file.",
+  288:                     target_type=(
+  289:                         "import_batch"
+  290:                     ),
+  291:                     target_id=(
+  292:                         current_batch.pk
+  293:                     ),
+  294:                     metadata={
+  295:                         "operation": (
+  296:                             "preview"
+  297:                         ),
+  298:                         "batch_id": (
+  299:                             current_batch.pk
+  300:                         ),
+  301:                         "source_type": (
+  302:                             source_type
+  303:                         ),
+  304:                         "sheet_count": (
+  305:                             len(sheets)
+  306:                         ),
+  307:                         "row_count": (
+  308:                             total_rows
+  309:                         ),
+  310:                         "duplicate_detected": (
+  311:                             duplicate_batch
+  312:                             is not None
+  313:                         ),
+  314:                     },
+  315:                 )
+  316: 
+  317:             except Exception as exc:
+  318:                 import_error = str(
+  319:                     exc
+  320:                 ) or (
+  321:                     "The source file could "
+  322:                     "not be read."
+  323:                 )
+  324: 
+  325:     else:
+  326:         form = ToolkitImportUploadForm()
+  327: 
+  328:     return render(
+  329:         request,
+  330:         "toolkit/admin/import_center.html",
+  331:         {
+  332:             "form": form,
+  333:             "preview": preview,
+  334:             "import_error": import_error,
+  335:             "uploaded_name": uploaded_name,
+  336:             "current_batch": current_batch,
+  337:             "duplicate_batch": duplicate_batch,
+  338:             "analysis": analysis,
+  339:             "staging_result": staging_result,
+  340:             "latest_review_batch": latest_review_batch,
+  341:             "latest_review_stats": latest_review_stats,
+  342:         }
+  343:     )
+
+------------------------------------------------------------------------------------------------
+FUNCTION: toolkit.import_views.import_extraction_review
+------------------------------------------------------------------------------------------------
+    1: @user_passes_test(can_import_toolkit)
+    2: def import_extraction_review(
+    3:     request,
+    4:     batch_id,
+    5: ):
+    6: 
+    7:     batch = get_object_or_404(
+    8:         ImportBatch.objects,
+    9:         pk=batch_id,
+   10:     )
+   11: 
+   12:     batch_metadata = (
+   13:         batch.metadata
+   14:         if isinstance(
+   15:             batch.metadata,
+   16:             dict,
+   17:         )
+   18:         else {}
+   19:     )
+   20: 
+   21:     if batch_metadata.get(
+   22:         "duplicate_detected"
+   23:     ):
+   24: 
+   25:         duplicate_of = None
+   26: 
+   27:         duplicate_of_id = (
+   28:             batch_metadata.get(
+   29:                 "duplicate_of_id"
+   30:             )
+   31:         )
+   32: 
+   33:         if duplicate_of_id:
+   34: 
+   35:             duplicate_of = (
+   36:                 ImportBatch.objects
+   37:                 .filter(
+   38:                     pk=duplicate_of_id
+   39:                 )
+   40:                 .first()
+   41:             )
+   42: 
+   43:         recognized_candidates = (
+   44:             batch.rows
+   45:             .exclude(
+   46:                 candidate_action="UNDECIDED"
+   47:             )
+   48:             .count()
+   49:         )
+   50: 
+   51:         return render(
+   52:             request,
+   53:             "toolkit/admin/extraction_duplicate.html",
+   54:             {
+   55:                 "batch":
+   56:                     batch,
+   57: 
+   58:                 "duplicate_of":
+   59:                     duplicate_of,
+   60: 
+   61:                 "recognized_candidates":
+   62:                     recognized_candidates,
+   63: 
+   64:                 "meaningful_rows":
+   65:                     batch.rows.count(),
+   66:             },
+   67:         )
+   68: 
+   69:     all_rows = (
+   70:         batch.rows
+   71:         .select_related(
+   72:             "matched_service",
+   73:             "matched_service__category",
+   74:             "matched_service__domain",
+   75:         )
+   76:         .order_by(
+   77:             "sheet_name",
+   78:             "source_row_number",
+   79:         )
+   80:     )
+   81: 
+   82:     candidates = list(
+   83:         all_rows.exclude(
+   84:             candidate_action="UNDECIDED"
+   85:         )
+   86:     )
+   87: 
+   88:     categories = list(
+   89:         _ReviewCategory.objects
+   90:         .select_related(
+   91:             "domain"
+   92:         )
+   93:         .order_by(
+   94:             "domain__name",
+   95:             "name",
+   96:         )
+   97:     )
+   98: 
+   99:     category_slug_map = {}
+  100: 
+  101:     for category in categories:
+  102: 
+  103:         category_slug_map.setdefault(
+  104:             category.slug,
+  105:             category.pk,
+  106:         )
+  107: 
+  108:     approved = 0
+  109:     skipped = 0
+  110: 
+  111:     for row in candidates:
+  112: 
+  113:         raw = (
+  114:             row.raw_data
+  115:             if isinstance(
+  116:                 row.raw_data,
+  117:                 dict,
+  118:             )
+  119:             else {}
+  120:         )
+  121: 
+  122:         candidate = (
+  123:             raw.get("candidate", {})
+  124:             if isinstance(
+  125:                 raw.get(
+  126:                     "candidate",
+  127:                     {},
+  128:                 ),
+  129:                 dict,
+  130:             )
+  131:             else {}
+  132:         )
+  133: 
+  134:         proposal = (
+  135:             candidate.get(
+  136:                 "proposal",
+  137:                 {},
+  138:             )
+  139:             if isinstance(
+  140:                 candidate.get(
+  141:                     "proposal",
+  142:                     {},
+  143:                 ),
+  144:                 dict,
+  145:             )
+  146:             else {}
+  147:         )
+  148: 
+  149:         review = (
+  150:             raw.get(
+  151:                 "review",
+  152:                 {},
+  153:             )
+  154:             if isinstance(
+  155:                 raw.get(
+  156:                     "review",
+  157:                     {},
+  158:                 ),
+  159:                 dict,
+  160:             )
+  161:             else {}
+  162:         )
+  163: 
+  164:         row.review_meta = review
+  165: 
+  166:         row.review_decision = (
+  167:             review.get(
+  168:                 "decision"
+  169:             )
+  170:             or "PENDING"
+  171:         )
+  172: 
+  173:         if (
+  174:             row.review_decision
+  175:             == "APPROVED"
+  176:         ):
+  177:             approved += 1
+  178: 
+  179:         if (
+  180:             row.candidate_action
+  181:             == "SKIP"
+  182:         ):
+  183:             skipped += 1
+  184: 
+  185:         proposed_slug = str(
+  186:             proposal.get(
+  187:                 "category_slug",
+  188:                 "",
+  189:             )
+  190:             or ""
+  191:         )
+  192: 
+  193:         row.selected_category_id = (
+  194:             review.get(
+  195:                 "category_id"
+  196:             )
+  197:             or category_slug_map.get(
+  198:                 proposed_slug
+  199:             )
+  200:         )
+  201: 
+  202:         row.display_category_name = (
+  203:             review.get(
+  204:                 "category_name"
+  205:             )
+  206:             or proposed_slug
+  207:             or "Needs Review"
+  208:         )
+  209: 
+  210:         row.display_service_kind = (
+  211:             review.get(
+  212:                 "service_kind"
+  213:             )
+  214:             or proposal.get(
+  215:                 "service_kind"
+  216:             )
+  217:             or "OTHER"
+  218:         )
+  219: 
+  220:         try:
+  221: 
+  222:             internal_signal = float(
+  223:                 proposal.get(
+  224:                     "confidence",
+  225:                     0,
+  226:                 )
+  227:                 or 0
+  228:             )
+  229: 
+  230:         except (
+  231:             TypeError,
+  232:             ValueError,
+  233:         ):
+  234: 
+  235:             internal_signal = 0
+  236: 
+  237:         # Internal only.
+  238:         # Numeric value is never displayed.
+  239:         row.is_clear_suggestion = (
+  240:             internal_signal >= 0.8
+  241:         )
+  242: 
+  243:     stats = {
+  244: 
+  245:         "source_rows":
+  246:             all_rows.count(),
+  247: 
+  248:         "candidates":
+  249:             len(candidates),
+  250: 
+  251:         "create":
+  252:             sum(
+  253:                 row.candidate_action
+  254:                 == "CREATE"
+  255:                 for row in candidates
+  256:             ),
+  257: 
+  258:         "update":
+  259:             sum(
+  260:                 row.candidate_action
+  261:                 == "UPDATE"
+  262:                 for row in candidates
+  263:             ),
+  264: 
+  265:         "merge_review":
+  266:             sum(
+  267:                 row.candidate_action
+  268:                 == "MERGE_REVIEW"
+  269:                 for row in candidates
+  270:             ),
+  271: 
+  272:         "approved":
+  273:             approved,
+  274: 
+  275:         "skipped":
+  276:             skipped,
+  277: 
+  278:         "knowledge_rows":
+  279:             all_rows.filter(
+  280:                 candidate_action="UNDECIDED"
+  281:             ).count(),
+  282:     }
+  283: 
+  284:     return render(
+  285:         request,
+  286:         "toolkit/admin/extraction_review.html",
+  287:         {
+  288:             "batch":
+  289:                 batch,
+  290: 
+  291:             "rows":
+  292:                 candidates,
+  293: 
+  294:             "stats":
+  295:                 stats,
+  296: 
+  297:             "categories":
+  298:                 categories,
+  299: 
+  300:             "service_kind_choices":
+  301:                 _ReviewService
+  302:                 .SERVICE_KIND_CHOICES,
+  303:         },
+  304:     )
+
+------------------------------------------------------------------------------------------------
+FUNCTION: toolkit.import_views.import_history
+------------------------------------------------------------------------------------------------
+    1: @user_passes_test(can_import_toolkit)
+    2: def import_history(request):
+    3: 
+    4:     source_filter = request.GET.get(
+    5:         "source",
+    6:         "",
+    7:     ).strip()
+    8: 
+    9:     status_filter = request.GET.get(
+   10:         "status",
+   11:         "",
+   12:     ).strip()
+   13: 
+   14:     query = request.GET.get(
+   15:         "q",
+   16:         "",
+   17:     ).strip()
+   18: 
+   19:     batches = (
+   20:         ImportBatch.objects
+   21:         .select_related(
+   22:             "imported_by"
+   23:         )
+   24:         .all()
+   25:     )
+   26: 
+   27:     valid_sources = {
+   28:         value
+   29:         for value, label
+   30:         in ImportBatch.SOURCE_CHOICES
+   31:     }
+   32: 
+   33:     valid_statuses = {
+   34:         value
+   35:         for value, label
+   36:         in ImportBatch.STATUS_CHOICES
+   37:     }
+   38: 
+   39:     if source_filter in valid_sources:
+   40: 
+   41:         batches = batches.filter(
+   42:             source_type=source_filter
+   43:         )
+   44: 
+   45:     if status_filter in valid_statuses:
+   46: 
+   47:         batches = batches.filter(
+   48:             status=status_filter
+   49:         )
+   50: 
+   51:     if query:
+   52: 
+   53:         batches = batches.filter(
+   54:             Q(
+   55:                 source_name__icontains=query
+   56:             )
+   57:             | Q(
+   58:                 file_sha256__icontains=query
+   59:             )
+   60:         )
+   61: 
+   62:     all_batches = (
+   63:         ImportBatch.objects.all()
+   64:     )
+   65: 
+   66:     latest_batch = (
+   67:         all_batches
+   68:         .order_by("-created_at")
+   69:         .first()
+   70:     )
+   71: 
+   72:     latest_review_batch = (
+   73:         all_batches
+   74:         .filter(
+   75:             status__in=[
+   76:                 "PREVIEWED",
+   77:                 "VALIDATED",
+   78:             ],
+   79:             rows__isnull=False,
+   80:         )
+   81:         .exclude(
+   82:             metadata__duplicate_detected=True
+   83:         )
+   84:         .distinct()
+   85:         .order_by("-created_at")
+   86:         .first()
+   87:     )
+   88: 
+   89:     latest_review_stats = (
+   90:         _extraction_review_stats(
+   91:             latest_review_batch
+   92:         )
+   93:     )
+   94: 
+   95:     duplicate_count = sum(
+   96:         1
+   97:         for metadata
+   98:         in all_batches.values_list(
+   99:             "metadata",
+  100:             flat=True,
+  101:         )
+  102:         if (
+  103:             isinstance(
+  104:                 metadata,
+  105:                 dict,
+  106:             )
+  107:             and metadata.get(
+  108:                 "duplicate_detected"
+  109:             )
+  110:         )
+  111:     )
+  112: 
+  113:     unique_source_count = (
+  114:         all_batches
+  115:         .exclude(
+  116:             file_sha256=""
+  117:         )
+  118:         .values(
+  119:             "file_sha256"
+  120:         )
+  121:         .distinct()
+  122:         .count()
+  123:     )
+  124: 
+  125:     historical_rows_processed = (
+  126:         all_batches.aggregate(
+  127:             total=Sum("row_count")
+  128:         )["total"]
+  129:         or 0
+  130:     )
+  131: 
+  132:     context = {
+  133: 
+  134:         "batches":
+  135:             batches.order_by(
+  136:                 "-created_at"
+  137:             )[:250],
+  138: 
+  139:         "source_filter":
+  140:             source_filter,
+  141: 
+  142:         "status_filter":
+  143:             status_filter,
+  144: 
+  145:         "query":
+  146:             query,
+  147: 
+  148:         "source_choices":
+  149:             ImportBatch.SOURCE_CHOICES,
+  150: 
+  151:         "status_choices":
+  152:             ImportBatch.STATUS_CHOICES,
+  153: 
+  154:         "total_batches":
+  155:             all_batches.count(),
+  156: 
+  157:         "duplicate_count":
+  158:             duplicate_count,
+  159: 
+  160:         "unique_source_count":
+  161:             unique_source_count,
+  162: 
+  163:         "latest_batch":
+  164:             latest_batch,
+  165: 
+  166:         "latest_source_rows":
+  167:             (
+  168:                 latest_batch.row_count
+  169:                 if latest_batch
+  170:                 else 0
+  171:             ),
+  172: 
+  173:         "latest_review_batch":
+  174:             latest_review_batch,
+  175: 
+  176:         "latest_review_stats":
+  177:             latest_review_stats,
+  178: 
+  179:         # Audit metric only.
+  180:         # Not presented as current Toolkit data.
+  181:         "historical_rows_processed":
+  182:             historical_rows_processed,
+  183:     }
+  184: 
+  185:     return render(
+  186:         request,
+  187:         "toolkit/admin/import_history.html",
+  188:         context,
+  189:     )
+
+------------------------------------------------------------------------------------------------
+FILE SOURCE: config/urls.py | SHA256: 4d9b95aae524ba4856404a20e626b17e12dcb10cc91246198fcafc7b19aa5a4b
+------------------------------------------------------------------------------------------------
+    1: from django.contrib import admin
+    2: from django.urls import include, path
+    3: 
+    4: urlpatterns = [
+    5:     path("admin/", admin.site.urls),
+    6:     path("", include("dashboard.urls")),
+    7:     path("", include("accounts.urls")),
+    8:     path("", include("toolkit.urls")),
+    9: ]
+
+------------------------------------------------------------------------------------------------
+FILE SOURCE: .gitignore | SHA256: 5077c67aa0f66bcc4947e0b8718315217290517d7af742375f1374b97bb42a32
+------------------------------------------------------------------------------------------------
+    1: .venv/
+    2: __pycache__/
+    3: *.py[cod]
+    4: 
+    5: .env
+    6: .env.*
+    7: !*.env.example
+    8: 
+    9: db.sqlite3
+   10: 
+   11: *.log
+   12: 
+   13: staticfiles/
+   14: 
+   15: media/
+   16: 
+   17: .DS_Store
+   18: Thumbs.db
+   19: 
+   20: backups/
+   21: *.dump
+   22: *.sqlite3
+   23: 
+   24: # Confidential BharatNXT source files
+   25: confidential_source/
+
+ADMIN TEMPLATE STRUCTURE
+templates/admin_base.html | lines: 497 | sha256: fa74f1c52857b2447f3813142b507fc252561252de731634e105022d74ea2cc4 | checkpoint: recorded
+
+------------------------------------------------------------------------------------------------
+FILE SOURCE: templates/admin_base.html | SHA256: fa74f1c52857b2447f3813142b507fc252561252de731634e105022d74ea2cc4
+------------------------------------------------------------------------------------------------
+    1: {% load static %}
+    2: 
+    3: <!DOCTYPE html>
+    4: <html lang="en">
+    5: 
+    6: <head>
+    7:     <meta charset="UTF-8">
+    8:     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    9: 
+   10:     <title>{% block title %}BharatNXT Wave Internal{% endblock %}</title>
+   11: 
+   12:     <link rel="stylesheet" href="{% static 'css/app.css' %}?v=20260818_shell_recovery_v1">
+   13: <link rel="stylesheet" href="{% static 'css/ui_stability.css' %}?v=20260818_shell_recovery_v1">
+   14: 
+   15: 
+   16: <style id="BNX_GLOBAL_SHELL_RECOVERY_V1">
+   17: 
+   18: /* =========================================================
+   19:    GLOBAL SOFTWARE SHELL RECOVERY
+   20: 
+   21:    The application's intended architecture is:
+   22: 
+   23:    FIXED SIDEBAR
+   24:    +
+   25:    MAIN AREA BESIDE IT
+   26: 
+   27:    Do not change sidebar widths here.
+   28:    Existing expanded/collapsed width rules remain authoritative.
+   29: ========================================================= */
+   30: 
+   31: 
+   32: /* ---------------------------------------------------------
+   33:    SIDEBAR MUST NEVER ENTER NORMAL DOCUMENT FLOW
+   34: --------------------------------------------------------- */
+   35: 
+   36: .sidebar,
+   37: body.bnx-sidebar-collapsed .sidebar {
+   38: 
+   39:     position:
+   40:         fixed !important;
+   41: 
+   42:     top:
+   43:         0 !important;
+   44: 
+   45:     left:
+   46:         0 !important;
+   47: 
+   48:     bottom:
+   49:         0 !important;
+   50: 
+   51:     margin-top:
+   52:         0 !important;
+   53: 
+   54:     margin-bottom:
+   55:         0 !important;
+   56: 
+   57: }
+   58: 
+   59: 
+   60: /* ---------------------------------------------------------
+   61:    MAIN APPLICATION MUST START AT TOP OF VIEWPORT
+   62: --------------------------------------------------------- */
+   63: 
+   64: .main-area,
+   65: body.bnx-sidebar-collapsed .main-area {
+   66: 
+   67:     margin-top:
+   68:         0 !important;
+   69: 
+   70:     min-height:
+   71:         100vh !important;
+   72: 
+   73: }
+   74: 
+   75: 
+   76: /* ---------------------------------------------------------
+   77:    SHARED APPLICATION SHELL
+   78: --------------------------------------------------------- */
+   79: 
+   80: .app-shell {
+   81: 
+   82:     min-height:
+   83:         100vh !important;
+   84: 
+   85: }
+   86: 
+   87: 
+   88: /* ---------------------------------------------------------
+   89:    TOPBAR MUST REMAIN AT TOP OF MAIN AREA
+   90: --------------------------------------------------------- */
+   91: 
+   92: .main-area > .topbar {
+   93: 
+   94:     top:
+   95:         0 !important;
+   96: 
+   97:     margin-top:
+   98:         0 !important;
+   99: 
+  100: }
+  101: 
+  102: 
+  103: /* ---------------------------------------------------------
+  104:    BDE VARIANTS USE THE SAME GEOMETRY
+  105: --------------------------------------------------------- */
+  106: 
+  107: .bde-sidebar,
+  108: body.bnx-sidebar-collapsed .bde-sidebar {
+  109: 
+  110:     position:
+  111:         fixed !important;
+  112: 
+  113:     top:
+  114:         0 !important;
+  115: 
+  116:     left:
+  117:         0 !important;
+  118: 
+  119:     bottom:
+  120:         0 !important;
+  121: 
+  122: }
+  123: 
+  124: 
+  125: .bde-main-area,
+  126: body.bnx-sidebar-collapsed .bde-main-area {
+  127: 
+  128:     margin-top:
+  129:         0 !important;
+  130: 
+  131:     min-height:
+  132:         100vh !important;
+  133: 
+  134: }
+  135: 
+  136: </style>
+  137: 
+  138: 
+  139: </head>
+  140: 
+  141: <body>
+  142: 
+  143: <div class="app-shell">
+  144: 
+  145:     <!-- SIDEBAR -->
+  146:     <aside class="sidebar">
+  147: 
+  148:         <!-- BRAND -->
+  149:         <div class="brand">
+  150: 
+  151:             <div class="brand-mark">
+  152:                 BN
+  153:             </div>
+  154: 
+  155:             <div class="brand-text">
+  156:                 <div class="brand-name">
+  157:                     BharatNXT Wave
+  158:                 </div>
+  159: 
+  160:                 <div class="brand-subtitle">
+  161:                     ADMIN CENTER
+  162:                 </div>
+  163:             </div>
+  164: 
+  165:         </div>
+  166: 
+  167: 
+  168:         <!-- ADMIN CENTER NAVIGATION -->
+  169:         <nav class="navigation">
+  170: 
+  171:             <div class="nav-section-label">
+  172:                 ADMIN CENTER
+  173:             </div>
+  174: 
+  175:             <a href="{% url 'dashboard:admin_overview' %}"
+  176:                class="nav-item {% if request.path == '/admin-center/' %}active{% endif %}">
+  177:                 <span class="nav-icon">⌂</span>
+  178:                 <span>Overview</span>
+  179:             </a>
+  180: 
+  181:             {% if request.user.is_superuser or request.user.role == "SUPER_ADMIN" or request.user.role == "IT_ADMIN" or request.user.role == "SECURITY_ADMIN" %}
+  182: 
+  183:                 <a href="{% url 'dashboard:bde_analytics' %}"
+  184:                    class="nav-item {% if '/bde-analytics/' in request.path %}active{% endif %}">
+  185: 
+  186:                     <span class="nav-icon">⌁</span>
+  187:                     <span>BDE Analytics</span>
+  188: 
+  189:                 </a>
+  190: 
+  191:             {% endif %}
+  192: 
+  193: 
+  194: 
+  195:             {% if request.user.is_superuser or request.user.role == "SUPER_ADMIN" or request.user.role == "IT_ADMIN" %}
+  196: 
+  197:             <a href="{% url 'accounts:employee_list' %}"
+  198:                class="nav-item {% if '/employees/' in request.path %}active{% endif %}">
+  199:                 <span class="nav-icon">♙</span>
+  200:                 <span>Employees</span>
+  201:             </a>
+  202: 
+  203:             {% endif %}
+  204: 
+  205: 
+  206:             {% if request.user.is_superuser or request.user.role == "SUPER_ADMIN" or request.user.role == "DATA_ADMIN" %}
+  207: 
+  208:             <a href="{% url 'toolkit:admin_service_list' %}"
+  209:                class="nav-item {% if '/admin-center/toolkit/' in request.path %}active{% endif %}">
+  210:                 <span class="nav-icon">◫</span>
+  211:                 <span>Toolkit Management</span>
+  212:             </a>
+  213: 
+  214:                 {% if request.user.is_superuser or request.user.role == "SUPER_ADMIN" or request.user.role == "DATA_ADMIN" or request.user.role == "IT_ADMIN" %}
+  215: 
+  216:                     <a
+  217:                         href="{% url 'toolkit:pitch_windows' %}"
+  218:                         class="nav-item {% if '/pitch-windows/' in request.path %}active{% endif %}">
+  219: 
+  220:                         <span class="nav-icon">◷</span>
+  221:                         <span>Pitch Windows</span>
+  222: 
+  223:                     </a>
+  224: 
+  225:                 {% endif %}
+  226: 
+  227: 
+  228:             <a href="{% url 'toolkit:import_center' %}"
+  229:                class="nav-item {% if '/admin-center/import/' in request.path %}active{% endif %}">
+  230:                 <span class="nav-icon">⇧</span>
+  231:                 <span>Import Data</span>
+  232:             </a>
+  233: 
+  234:                 <a
+  235:                     href="{% url 'toolkit:import_history' %}"
+  236:                     class="nav-item {% if '/import/history/' in request.path %}active{% endif %}">
+  237: 
+  238:                     <span class="nav-icon">↻</span>
+  239:                     <span>Source History</span>
+  240: 
+  241:                 </a>
+  242: <a
+  243:                     href="{% url 'toolkit:database_map' %}"
+  244:                     class="nav-item {% if '/import/history/' in request.path %}active{% endif %}">
+  245: 
+  246:                     <span class="nav-icon">↻</span>
+  247:                     <span>Database Map</span>
+  248: 
+  249:                 </a>
+  250: 
+  251: 
+  252:             {% endif %}
+  253: 
+  254: 
+  255:             {% if request.user.is_superuser or request.user.role == "SUPER_ADMIN" or request.user.role == "IT_ADMIN" or request.user.role == "SECURITY_ADMIN" %}
+  256: 
+  257:             <a href="{% url 'accounts:activity_logs' %}"
+  258:                class="nav-item {% if '/activity-logs/' in request.path %}active{% endif %}">
+  259:                 <span class="nav-icon">◉</span>
+  260:                 <span>Activity Logs</span>
+  261:             </a>
+  262: 
+  263:             {% endif %}
+  264: 
+  265:         </nav>
+  266: 
+  267: 
+  268:         <!-- SIDEBAR BOTTOM -->
+  269:         <div class="sidebar-bottom">
+  270: 
+  271:             <div class="nav-section-label">
+  272:                 SYSTEM
+  273:             </div>
+  274: 
+  275:             {% if request.user.is_superuser %}
+  276: 
+  277:             <a href="/admin/" class="nav-item">
+  278:                 <span class="nav-icon">⚙</span>
+  279:                 <span>Developer Admin</span>
+  280:             </a>
+  281: 
+  282:             {% endif %}
+  283: 
+  284:         </div>
+  285: 
+  286:     
+  287:     <!-- SIDEBAR ACCOUNT ACTIONS -->
+  288:     <div class="sidebar-account-actions">
+  289: 
+  290:         <form
+  291:             method="post"
+  292:             action="{% url 'accounts:logout' %}"
+  293:             class="sidebar-logout-form">
+  294: 
+  295:             {% csrf_token %}
+  296: 
+  297:             <button
+  298:                 type="submit"
+  299:                 class="sidebar-logout-button">
+  300: 
+  301:                 <span
+  302:                     class="sidebar-logout-icon"
+  303:                     aria-hidden="true">
+  304: 
+  305:                     <svg
+  306:                         viewBox="0 0 24 24"
+  307:                         fill="none">
+  308: 
+  309:                         <path
+  310:                             d="M10 5H6.5C5.7 5 5 5.7 5 6.5V17.5C5 18.3 5.7 19 6.5 19H10">
+  311:                         </path>
+  312: 
+  313:                         <path
+  314:                             d="M14 8L18 12L14 16">
+  315:                         </path>
+  316: 
+  317:                         <path
+  318:                             d="M18 12H9">
+  319:                         </path>
+  320: 
+  321:                     </svg>
+  322: 
+  323:                 </span>
+  324: 
+  325:                 <span>
+  326:                     Sign Out
+  327:                 </span>
+  328: 
+  329:             </button>
+  330: 
+  331:         </form>
+  332: 
+  333:     </div>
+  334: 
+  335: </aside>
+  336: 
+  337: 
+  338:     <!-- MAIN APPLICATION AREA -->
+  339:     <main class="main-area">
+  340: 
+  341: 
+  342:         <!-- TOP NAVIGATION BAR -->
+  343:         <header class="topbar">
+  344: 
+  345: 
+  346:             <!-- TOP RIGHT -->
+  347:             <div class="topbar-actions">
+  348: 
+  349:                 <!-- USER PROFILE -->
+  350:                 <div class="user-profile">
+  351: 
+  352:                     <div class="user-avatar">
+  353: 
+  354:                         {{ request.user.username|slice:":1"|upper }}
+  355: 
+  356:                     </div>
+  357: 
+  358: 
+  359:                     <div class="user-info">
+  360: 
+  361:                         <div class="user-name">
+  362: 
+  363:                             {{ request.user.username }}
+  364: 
+  365:                         </div>
+  366: 
+  367:                         <div class="user-role">
+  368: 
+  369:                             {{ request.user.get_role_display }}
+  370: 
+  371:                         </div>
+  372: 
+  373:                     </div>
+  374: 
+  375:                 </div>
+  376: 
+  377:             </div>
+  378: 
+  379:         
+  380:             
+  381: 
+  382: </header>
+  383: 
+  384: 
+  385:         <!-- MAIN PAGE CONTENT -->
+  386:         
+  387:         <!-- =================================================
+  388:              GLOBAL HUMAN FEEDBACK
+  389:         ================================================== -->
+  390: 
+  391:         {% if messages %}
+  392: 
+  393:             <div
+  394:                 class="bn-feedback-stack"
+  395:                 aria-live="polite"
+  396:                 aria-atomic="true">
+  397: 
+  398:                 {% for message in messages %}
+  399: 
+  400:                     <div
+  401:                         class="bn-feedback-toast {{ message.tags|default:'info' }}"
+  402:                         data-feedback-type="{{ message.tags|default:'info' }}"
+  403:                         role="status">
+  404: 
+  405: 
+  406:                         <div
+  407:                             class="bn-feedback-icon"
+  408:                             aria-hidden="true">
+  409: 
+  410:                             {% if "success" in message.tags %}
+  411:                                 ✓
+  412:                             {% elif "error" in message.tags %}
+  413:                                 !
+  414:                             {% elif "warning" in message.tags %}
+  415:                                 !
+  416:                             {% else %}
+  417:                                 i
+  418:                             {% endif %}
+  419: 
+  420:                         </div>
+  421: 
+  422: 
+  423:                         <div class="bn-feedback-copy">
+  424: 
+  425:                             {% if "success" in message.tags %}
+  426: 
+  427:                                 <strong>
+  428:                                     Done
+  429:                                 </strong>
+  430: 
+  431:                             {% elif "error" in message.tags %}
+  432: 
+  433:                                 <strong>
+  434:                                     Something went wrong
+  435:                                 </strong>
+  436: 
+  437:                             {% elif "warning" in message.tags %}
+  438: 
+  439:                                 <strong>
+  440:                                     Please check
+  441:                                 </strong>
+  442: 
+  443:                             {% else %}
+  444: 
+  445:                                 <strong>
+  446:                                     Update
+  447:                                 </strong>
+  448: 
+  449:                             {% endif %}
+  450: 
+  451: 
+  452:                             <span>
+  453:                                 {{ message }}
+  454:                             </span>
+  455: 
+  456:                         </div>
+  457: 
+  458: 
+  459:                         <button
+  460:                             type="button"
+  461:                             class="bn-feedback-close"
+  462:                             aria-label="Dismiss notification">
+  463: 
+  464:                             ×
+  465: 
+  466:                         </button>
+  467: 
+  468:                     </div>
+  469: 
+  470:                 {% endfor %}
+  471: 
+  472:             </div>
+  473: 
+  474:         {% endif %}
+  475: 
+  476: 
+  477: <section class="content">
+  478: 
+  479:             {% block content %}
+  480: 
+  481:             {% endblock %}
+  482: 
+  483:         </section>
+  484: 
+  485: 
+  486:     </main>
+  487: 
+  488: </div>
+  489: 
+  490:     <script src="{% static 'js/session_location.js' %}"></script>
+  491: 
+  492: 
+  493:     <script src="{% static 'js/ui_feedback.js' %}"></script>
+  494: 
+  495: </body>
+  496: 
+  497: </html>
+toolkit/templates/toolkit/admin/extraction_duplicate.html | lines: 339 | sha256: 67898e90f9eeaadd624e33a5912b1e2bab203fbda7d2f122bbce7d9345d96b02 | checkpoint: recorded
+toolkit/templates/toolkit/admin/extraction_review.html | lines: 2656 | sha256: 0f458d48399cba24425d25ecae94e1bef7796dd6e78cf9816c40feb0a1e4d2f7 | checkpoint: recorded
+toolkit/templates/toolkit/admin/import_center.html | lines: 621 | sha256: 7e865331bfa365258705314b04b89eaf80174087ebb38e7923a1a82fde46ea70 | checkpoint: recorded
+toolkit/templates/toolkit/admin/import_history.html | lines: 662 | sha256: 32301e6ba4adf70bbac9c3d4dc51da633f86c4f2b7a6500e2c903039fc4b8854 | checkpoint: recorded
+toolkit/templates/toolkit/admin/import_history_detail.html | lines: 424 | sha256: 6da84dfa4b803c9eee4b7e967d9a68d0558548c8477a8397af03131ef93531a1 | checkpoint: recorded
+toolkit/templates/toolkit/admin/pitch_windows.html | lines: 888 | sha256: 2939574451c6306248cd177bdcdf6d96ce3c57852655aaa529f856187dbbed98 | checkpoint: recorded
+toolkit/templates/toolkit/admin/service_form.html | lines: 321 | sha256: 5640b5c857b986c5b96a98adf1b20dc8fde3adf3d96eb570b4cf7cd830d2fc53 | checkpoint: recorded
+toolkit/templates/toolkit/admin/service_list.html | lines: 244 | sha256: 7ffdb1c04c76cc7641c5a68a4d6ff7dd62ac9c1d0304df16b42e96c02fcc1516 | checkpoint: recorded
+
+FINAL READ-ONLY VERDICT
+Database mutation statements allowed by the inspector: 0
+Project-file write operations in the inspector: 0
+Settings source and storage credential values printed: 0
+================================================================================================

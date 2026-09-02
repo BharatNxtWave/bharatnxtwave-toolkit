@@ -1,0 +1,65 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Edit Employee | BharatNXT Wave Admin Center{% endblock %}
+
+{% block content %}
+
+<div class="page-eyebrow">
+    ADMINISTRATION
+</div>
+
+<h1 class="page-title">
+    Edit Employee
+</h1>
+
+<p class="page-description">
+    Update employee information, role and account access.
+</p>
+
+
+<div class="card employee-form-card">
+
+    <div class="employee-form-heading">
+        {{ employee.get_full_name|default:employee.username }}
+    </div>
+
+    <div class="employee-form-meta">
+        {{ employee.username }}
+        {% if employee.employee_id %}
+            · {{ employee.employee_id }}
+        {% endif %}
+    </div>
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <div class="form-actions">
+
+            <button type="submit" class="primary-button">
+                Save Changes
+            </button>
+
+            <a href="{% url 'accounts:employee_list' %}"
+               class="secondary-button">
+                Cancel
+            </a>
+
+            {% if employee.pk != request.user.pk %}
+
+            <a href="{% url 'accounts:employee_password_reset' employee.pk %}"
+               class="secondary-button">
+                Reset Password
+            </a>
+
+            {% endif %}
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

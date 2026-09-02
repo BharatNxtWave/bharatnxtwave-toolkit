@@ -1,0 +1,505 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}BharatNXT Wave Internal{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/app.css' %}?v=20260818_shell_recovery_v1">
+<link rel="stylesheet" href="{% static 'css/ui_stability.css' %}?v=20260818_shell_recovery_v1">
+
+
+<style id="BNX_GLOBAL_SHELL_RECOVERY_V1">
+
+/* =========================================================
+   GLOBAL SOFTWARE SHELL RECOVERY
+
+   The application's intended architecture is:
+
+   FIXED SIDEBAR
+   +
+   MAIN AREA BESIDE IT
+
+   Do not change sidebar widths here.
+   Existing expanded/collapsed width rules remain authoritative.
+========================================================= */
+
+
+/* ---------------------------------------------------------
+   SIDEBAR MUST NEVER ENTER NORMAL DOCUMENT FLOW
+--------------------------------------------------------- */
+
+.sidebar,
+body.bnx-sidebar-collapsed .sidebar {
+
+    position:
+        fixed !important;
+
+    top:
+        0 !important;
+
+    left:
+        0 !important;
+
+    bottom:
+        0 !important;
+
+    margin-top:
+        0 !important;
+
+    margin-bottom:
+        0 !important;
+
+}
+
+
+/* ---------------------------------------------------------
+   MAIN APPLICATION MUST START AT TOP OF VIEWPORT
+--------------------------------------------------------- */
+
+.main-area,
+body.bnx-sidebar-collapsed .main-area {
+
+    margin-top:
+        0 !important;
+
+    min-height:
+        100vh !important;
+
+}
+
+
+/* ---------------------------------------------------------
+   SHARED APPLICATION SHELL
+--------------------------------------------------------- */
+
+.app-shell {
+
+    min-height:
+        100vh !important;
+
+}
+
+
+/* ---------------------------------------------------------
+   TOPBAR MUST REMAIN AT TOP OF MAIN AREA
+--------------------------------------------------------- */
+
+.main-area > .topbar {
+
+    top:
+        0 !important;
+
+    margin-top:
+        0 !important;
+
+}
+
+
+/* ---------------------------------------------------------
+   BDE VARIANTS USE THE SAME GEOMETRY
+--------------------------------------------------------- */
+
+.bde-sidebar,
+body.bnx-sidebar-collapsed .bde-sidebar {
+
+    position:
+        fixed !important;
+
+    top:
+        0 !important;
+
+    left:
+        0 !important;
+
+    bottom:
+        0 !important;
+
+}
+
+
+.bde-main-area,
+body.bnx-sidebar-collapsed .bde-main-area {
+
+    margin-top:
+        0 !important;
+
+    min-height:
+        100vh !important;
+
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <!-- BRAND -->
+        <div class="brand">
+
+            <div class="brand-mark">
+                BN
+            </div>
+
+            <div class="brand-text">
+                <div class="brand-name">
+                    BharatNXT Wave
+                </div>
+
+                <div class="brand-subtitle">
+                    ADMIN CENTER
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- ADMIN CENTER NAVIGATION -->
+        <nav class="navigation">
+
+            <div class="nav-section-label">
+                ADMIN CENTER
+            </div>
+
+            <a href="{% url 'dashboard:admin_overview' %}"
+               class="nav-item {% if request.path == '/admin-center/' %}active{% endif %}">
+                <span class="nav-icon">⌂</span>
+                <span>Overview</span>
+            </a>
+
+            {% if request.user.is_authenticated %}
+
+                <a href="{% url 'dashboard:bde_analytics' %}"
+                   class="nav-item {% if '/bde-analytics/' in request.path %}active{% endif %}">
+
+                    <span class="nav-icon">⌁</span>
+                    <span>BDE Analytics</span>
+
+                </a>
+
+            {% endif %}
+
+
+
+            {% if request.user.is_authenticated %}
+
+            <a href="{% url 'accounts:employee_list' %}"
+               class="nav-item {% if '/employees/' in request.path %}active{% endif %}">
+                <span class="nav-icon">♙</span>
+                <span>Employees</span>
+            </a>
+
+            {% endif %}
+
+
+            {% if request.user.is_authenticated %}
+
+            <!-- BNW_FLYER_MANAGER_NAV_V1 -->
+            <a href="{% url 'toolkit:admin_service_list' %}"
+               class="nav-item {% if request.resolver_match.url_name == 'admin_service_list' or request.resolver_match.url_name == 'admin_service_create' or request.resolver_match.url_name == 'admin_service_edit' %}active{% endif %}">
+                <span class="nav-icon">◫</span>
+                <span>Toolkit Management</span>
+            </a>
+
+            <a href="{% url 'toolkit:flyer_manager' %}"
+               class="nav-item {% if '/admin-center/toolkit/flyers/' in request.path %}active{% endif %}">
+                <span class="nav-icon">▤</span>
+                <span>Flyer Manager</span>
+            </a>
+
+                {% if request.user.is_authenticated %}
+
+                    <a
+                        href="{% url 'toolkit:pitch_windows' %}"
+                        class="nav-item {% if '/pitch-windows/' in request.path %}active{% endif %}">
+
+                        <span class="nav-icon">◷</span>
+                        <span>Pitch Windows</span>
+
+                    </a>
+
+                {% endif %}
+
+
+            <a href="{% url 'toolkit:import_center' %}"
+               class="nav-item {% if '/admin-center/import/' in request.path and '/admin-center/import/history/' not in request.path %}active{% endif %}">
+                <span class="nav-icon">⇧</span>
+                <span>Import Data</span>
+            </a>
+
+                <a
+                    href="{% url 'toolkit:import_history' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'import_history' or request.resolver_match.url_name == 'import_history_detail' %}active{% endif %}">
+
+                    <span class="nav-icon">↻</span>
+                    <span>Source History</span>
+
+                </a>
+<a
+                    href="{% url 'toolkit:database_map' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'database_map' %}active{% endif %}">
+
+                    <span class="nav-icon">↻</span>
+                    <span>Database Map</span>
+
+                </a>
+
+
+            {% endif %}
+
+
+            {% if request.user.is_authenticated %}
+
+            <a href="{% url 'accounts:activity_logs' %}"
+               class="nav-item {% if '/activity-logs/' in request.path %}active{% endif %}">
+                <span class="nav-icon">◉</span>
+                <span>Activity Logs</span>
+            </a>
+
+            {% endif %}
+
+        </nav>
+
+
+        <!-- SIDEBAR BOTTOM -->
+        <div class="sidebar-bottom">
+
+            <div class="nav-section-label">
+                SYSTEM
+            </div>
+
+            {% if request.user.is_superuser %}
+
+            <a href="/admin/" class="nav-item">
+                <span class="nav-icon">⚙</span>
+                <span>Developer Admin</span>
+            </a>
+
+            {% endif %}
+
+        </div>
+
+    
+    <!-- SIDEBAR ACCOUNT ACTIONS -->
+    <div class="sidebar-account-actions">
+
+        <form
+            method="post"
+            action="{% url 'accounts:logout' %}"
+            class="sidebar-logout-form">
+
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                class="sidebar-logout-button">
+
+                <span
+                    class="sidebar-logout-icon"
+                    aria-hidden="true">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none">
+
+                        <path
+                            d="M10 5H6.5C5.7 5 5 5.7 5 6.5V17.5C5 18.3 5.7 19 6.5 19H10">
+                        </path>
+
+                        <path
+                            d="M14 8L18 12L14 16">
+                        </path>
+
+                        <path
+                            d="M18 12H9">
+                        </path>
+
+                    </svg>
+
+                </span>
+
+                <span>
+                    Sign Out
+                </span>
+
+            </button>
+
+        </form>
+
+    </div>
+
+</aside>
+
+
+    <!-- MAIN APPLICATION AREA -->
+    <main class="main-area">
+
+
+        <!-- TOP NAVIGATION BAR -->
+        <header class="topbar">
+
+
+            <!-- TOP RIGHT -->
+            <div class="topbar-actions">
+
+                <!-- USER PROFILE -->
+                <div class="user-profile">
+
+                    <div class="user-avatar">
+
+                        {{ request.user.username|slice:":1"|upper }}
+
+                    </div>
+
+
+                    <div class="user-info">
+
+                        <div class="user-name">
+
+                            {{ request.user.username }}
+
+                        </div>
+
+                        <div class="user-role">
+
+                            {{ request.user.get_role_display }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        
+            
+
+</header>
+
+
+        <!-- MAIN PAGE CONTENT -->
+        
+        <!-- =================================================
+             GLOBAL HUMAN FEEDBACK
+        ================================================== -->
+
+        {% if messages %}
+
+            <div
+                class="bn-feedback-stack"
+                aria-live="polite"
+                aria-atomic="true">
+
+                {% for message in messages %}
+
+                    <div
+                        class="bn-feedback-toast {{ message.tags|default:'info' }}"
+                        data-feedback-type="{{ message.tags|default:'info' }}"
+                        role="status">
+
+
+                        <div
+                            class="bn-feedback-icon"
+                            aria-hidden="true">
+
+                            {% if "success" in message.tags %}
+                                ✓
+                            {% elif "error" in message.tags %}
+                                !
+                            {% elif "warning" in message.tags %}
+                                !
+                            {% else %}
+                                i
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="bn-feedback-copy">
+
+                            {% if "success" in message.tags %}
+
+                                <strong>
+                                    Done
+                                </strong>
+
+                            {% elif "error" in message.tags %}
+
+                                <strong>
+                                    Something went wrong
+                                </strong>
+
+                            {% elif "warning" in message.tags %}
+
+                                <strong>
+                                    Please check
+                                </strong>
+
+                            {% else %}
+
+                                <strong>
+                                    Update
+                                </strong>
+
+                            {% endif %}
+
+
+                            <span>
+                                {{ message }}
+                            </span>
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            class="bn-feedback-close"
+                            aria-label="Dismiss notification">
+
+                            ×
+
+                        </button>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+
+<section class="content">
+
+            {% block content %}
+
+            {% endblock %}
+
+        </section>
+
+
+    </main>
+
+</div>
+
+    <script src="{% static 'js/session_location.js' %}"></script>
+
+
+    <script src="{% static 'js/ui_feedback.js' %}"></script>
+
+    <!-- BNW_SIDEBAR_ACTIVE_STATE_V1 -->
+</body>
+
+</html>

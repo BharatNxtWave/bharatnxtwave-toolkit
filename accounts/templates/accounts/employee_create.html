@@ -1,0 +1,42 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Add Employee | BharatNXT Wave Admin Center{% endblock %}
+
+{% block content %}
+
+<div class="page-eyebrow">
+    ADMINISTRATION
+</div>
+
+<h1 class="page-title">
+    Add Employee
+</h1>
+
+<p class="page-description">
+    Create a new internal employee account and assign the appropriate access role.
+</p>
+
+<div class="card employee-form-card">
+
+    <form method="post">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <div class="form-actions">
+
+            <button type="submit" class="primary-button">
+                Create Employee
+            </button>
+
+            <a href="{% url 'accounts:employee_list' %}" class="secondary-button">
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

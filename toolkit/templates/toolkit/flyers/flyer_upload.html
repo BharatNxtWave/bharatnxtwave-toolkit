@@ -1,0 +1,220 @@
+{% extends "admin_base.html" %}
+{% load static %}
+
+{% block title %}Update Flyer | BharatNXT Wave{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/service_flyers.css' %}">
+
+<div class="bnx-flyer-admin-page" data-flyer-upload-page>
+
+    <a href="{% url 'toolkit:flyer_manager' %}" class="bnx-flyer-back">
+        ← Flyer Manager
+    </a>
+
+    <header class="bnx-flyer-destination">
+        <span>UPDATING FLYER FOR</span>
+        <h1>{{ service.title }}</h1>
+        <div>
+            <span>Permanent Service ID</span>
+            <code>{{ service.service_id }}</code>
+        </div>
+        <p>
+            The destination is locked. The selected file can only be saved to
+            this exact service record.
+        </p>
+    </header>
+
+    {% if form.non_field_errors %}
+        <div class="bnx-flyer-form-alert error">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    <form
+        method="post"
+        enctype="multipart/form-data"
+        class="bnx-flyer-upload-form"
+        data-flyer-upload-form>
+
+        {% csrf_token %}
+        {{ form.service_confirmation }}
+
+        <div class="bnx-flyer-upload-grid">
+
+            <section class="bnx-flyer-preview-column">
+                <header>
+                    <span>Current flyer</span>
+                    {% if current_flyer %}
+                        <strong>Version {{ current_flyer.version }}</strong>
+                    {% endif %}
+                </header>
+
+                <div class="bnx-flyer-preview-stage current">
+                    {% if current_flyer %}
+                        {% if current_flyer.file_kind == "IMAGE" %}
+                            <img
+                                src="{% url 'toolkit:flyer_version_preview' service.pk current_flyer.pk %}"
+                                alt="Current official flyer for {{ service.title }}">
+                        {% else %}
+                            <iframe
+                                src="{% url 'toolkit:flyer_version_preview' service.pk current_flyer.pk %}#page=1&zoom=page-width"
+                                title="Current official flyer for {{ service.title }}">
+                            </iframe>
+                        {% endif %}
+                    {% else %}
+                        <div class="bnx-flyer-preview-empty">
+                            <strong>No current flyer</strong>
+                            <span>The first approved upload will appear here.</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if current_flyer %}
+                    <div class="bnx-flyer-current-meta">
+                        <strong>{{ current_flyer.original_filename }}</strong>
+                        <span>
+                            {{ current_flyer.file_size|filesizeformat }} ·
+                            uploaded {{ current_flyer.uploaded_at|date:"d M Y, g:i A" }}
+                        </span>
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="bnx-flyer-preview-column new">
+                <header>
+                    <span>Newly selected flyer</span>
+                    <strong data-new-flyer-state>Nothing selected</strong>
+                </header>
+
+                <div class="bnx-flyer-preview-stage new" data-new-flyer-preview>
+                    <div class="bnx-flyer-preview-empty">
+                        <strong>Live preview appears here</strong>
+                        <span>Select a file below. Nothing is saved yet.</span>
+                    </div>
+                </div>
+
+                <div class="bnx-flyer-new-meta" data-new-flyer-meta hidden></div>
+            </section>
+
+        </div>
+
+        <section class="bnx-flyer-form-fields">
+            <div>
+                <label for="{{ form.flyer.id_for_label }}">
+                    {{ form.flyer.label }}
+                </label>
+                {{ form.flyer }}
+                <small>{{ form.flyer.help_text }}</small>
+                {% if form.flyer.errors %}
+                    <div class="bnx-flyer-field-errors">{{ form.flyer.errors }}</div>
+                {% endif %}
+            </div>
+
+            <button
+                type="button"
+                class="bnx-flyer-remove-file"
+                data-remove-flyer
+                hidden>
+                Remove and choose another
+            </button>
+
+            <div>
+                <label for="{{ form.update_note.id_for_label }}">
+                    {{ form.update_note.label }}
+                </label>
+                {{ form.update_note }}
+                {% if form.update_note.errors %}
+                    <div class="bnx-flyer-field-errors">
+                        {{ form.update_note.errors }}
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <div class="bnx-flyer-browser-error" data-flyer-browser-error hidden></div>
+
+        <footer class="bnx-flyer-confirm-bar">
+            <p>
+                Selecting a file changes nothing. Storage and database updates
+                happen only after this confirmation.
+            </p>
+            <button type="submit" data-flyer-submit disabled>
+                Confirm and save to {{ service.service_id }}
+            </button>
+        </footer>
+
+    </form>
+
+    <section class="bnx-flyer-history">
+        <header>
+            <div>
+                <span>AUDIT HISTORY</span>
+                <h2>Flyer versions</h2>
+            </div>
+            <p>Previous files are preserved and can be restored safely.</p>
+        </header>
+
+        <div class="bnx-flyer-history-list">
+            {% for flyer in flyer_history %}
+                <article>
+                    <div>
+                        <strong>Version {{ flyer.version }}</strong>
+                        {% if flyer.is_current %}
+                            <span class="bnx-flyer-current-badge">Current</span>
+                        {% elif flyer.restored_from_id %}
+                            <span>Restored version</span>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <strong>{{ flyer.original_filename }}</strong>
+                        <small>
+                            {{ flyer.file_size|filesizeformat }} ·
+                            {{ flyer.uploaded_at|date:"d M Y, g:i A" }} ·
+                            {{ flyer.uploaded_by_label|default:"Unknown user" }}
+                        </small>
+                        {% if flyer.update_note %}
+                            <p>{{ flyer.update_note }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="bnx-flyer-history-actions">
+                        <a
+                            href="{% url 'toolkit:flyer_version_preview' service.pk flyer.pk %}"
+                            target="_blank"
+                            rel="noopener">
+                            Preview
+                        </a>
+                        <a href="{% url 'toolkit:flyer_version_download' service.pk flyer.pk %}">
+                            Download
+                        </a>
+
+                        {% if not flyer.is_current %}
+                            <form
+                                method="post"
+                                action="{% url 'toolkit:flyer_restore' service.pk flyer.pk %}"
+                                data-flyer-restore-form>
+                                {% csrf_token %}
+                                <button type="submit">
+                                    Restore this version
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </article>
+            {% empty %}
+                <div class="bnx-flyer-empty">
+                    <strong>No flyer history yet.</strong>
+                    <span>The first successful upload will create version 1.</span>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+</div>
+
+<script src="{% static 'js/service_flyers.js' %}" defer></script>
+
+{% endblock %}

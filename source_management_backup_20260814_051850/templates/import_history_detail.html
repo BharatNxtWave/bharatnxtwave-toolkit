@@ -1,0 +1,393 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Source Event #{{ batch.pk }} | BharatNXT Wave{% endblock %}
+
+{% block content %}
+
+<div class="page-eyebrow">
+    TOOLKIT DATA / SOURCE HISTORY
+</div>
+
+
+<div class="dashboard-title-row">
+
+    <div>
+
+        <h1 class="page-title">
+            Source Event #{{ batch.pk }}
+        </h1>
+
+        <p class="page-description">
+            Metadata and integrity information for this toolkit source event.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{% url 'toolkit:import_history' %}"
+        class="secondary-button">
+
+        ← Source History
+
+    </a>
+
+</div>
+
+
+<div class="import-detail-grid">
+
+
+    <section class="card import-detail-card">
+
+        <div class="dashboard-card-heading">
+
+            <div>
+
+                <div class="table-title">
+                    Source
+                </div>
+
+                <div class="table-subtitle">
+                    File/source identity
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="import-detail-list">
+
+
+            <div class="import-detail-row">
+
+                <span>Source Type</span>
+
+                <strong>
+                    {{ batch.get_source_type_display }}
+                </strong>
+
+            </div>
+
+
+            <div class="import-detail-row">
+
+                <span>Source Name</span>
+
+                <strong>
+                    {{ batch.source_name }}
+                </strong>
+
+            </div>
+
+
+            <div class="import-detail-row">
+
+                <span>Source Modified</span>
+
+                <strong>
+
+                    {% if batch.source_modified_at %}
+
+                        {{ batch.source_modified_at|date:"d M Y, h:i:s A" }}
+
+                    {% else %}
+
+                        Not available
+
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+
+            <div class="import-detail-row">
+
+                <span>Recorded At</span>
+
+                <strong>
+                    {{ batch.created_at|date:"d M Y, h:i:s A" }}
+                </strong>
+
+            </div>
+
+
+            <div class="import-detail-row">
+
+                <span>Recorded By</span>
+
+                <strong>
+
+                    {% if batch.imported_by %}
+
+                        {% if batch.imported_by.get_full_name %}
+                            {{ batch.imported_by.get_full_name }}
+                        {% else %}
+                            {{ batch.imported_by.username }}
+                        {% endif %}
+
+                    {% else %}
+
+                        Deleted / unavailable user
+
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="card import-detail-card">
+
+        <div class="dashboard-card-heading">
+
+            <div>
+
+                <div class="table-title">
+                    Dataset Structure
+                </div>
+
+                <div class="table-subtitle">
+                    Source size and worksheet metadata
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="import-detail-list">
+
+
+            <div class="import-detail-row">
+
+                <span>Worksheets</span>
+
+                <strong>
+                    {{ batch.sheet_count }}
+                </strong>
+
+            </div>
+
+
+            <div class="import-detail-row">
+
+                <span>Data Rows</span>
+
+                <strong>
+                    {{ batch.row_count }}
+                </strong>
+
+            </div>
+
+
+            <div class="import-detail-row">
+
+                <span>Status</span>
+
+                <strong>
+                    {{ batch.get_status_display }}
+                </strong>
+
+            </div>
+
+
+            <div class="import-detail-row">
+
+                <span>Raw Source Retained</span>
+
+                <strong>
+                    No
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<section class="card import-integrity-card">
+
+    <div class="dashboard-card-heading">
+
+        <div>
+
+            <div class="table-title">
+                Integrity & Version Detection
+            </div>
+
+            <div class="table-subtitle">
+                SHA-256 identifies whether source content changed
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="import-hash-block">
+
+        <span>
+            SHA-256
+        </span>
+
+        <code>
+            {{ batch.file_sha256 }}
+        </code>
+
+    </div>
+
+
+    <div class="import-version-summary">
+
+        {% if batch.metadata.duplicate_detected %}
+
+            <div class="import-version-message duplicate">
+
+                <strong>
+                    Identical source detected
+                </strong>
+
+                <span>
+                    This exact source content was seen previously.
+                </span>
+
+                {% if duplicate_of %}
+
+                    <a href="{% url 'toolkit:import_history_detail' duplicate_of.pk %}">
+                        View previous event #{{ duplicate_of.pk }}
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+
+        {% elif batch.metadata.source_changed_since_previous %}
+
+            <div class="import-version-message changed">
+
+                <strong>
+                    Source content changed
+                </strong>
+
+                <span>
+                    A source with this filename existed previously, but its SHA-256 fingerprint is different.
+                </span>
+
+                {% if previous_same_name %}
+
+                    <a href="{% url 'toolkit:import_history_detail' previous_same_name.pk %}">
+                        Compare with event #{{ previous_same_name.pk }}
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+
+        {% else %}
+
+            <div class="import-version-message first">
+
+                <strong>
+                    First recorded version
+                </strong>
+
+                <span>
+                    No earlier identical source was recorded.
+                </span>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+
+<section class="card import-sheet-card">
+
+    <div class="dashboard-card-heading">
+
+        <div>
+
+            <div class="table-title">
+                Worksheets
+            </div>
+
+            <div class="table-subtitle">
+                Structural metadata only — no confidential cell data stored here
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="admin-analytics-table-wrap">
+
+        <table class="admin-analytics-table">
+
+            <thead>
+
+                <tr>
+                    <th>Worksheet</th>
+                    <th>Rows</th>
+                    <th>Columns</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for sheet in batch.metadata.sheets %}
+
+                    <tr>
+
+                        <td>
+                            {{ sheet.name }}
+                        </td>
+
+                        <td>
+                            {{ sheet.rows }}
+                        </td>
+
+                        <td>
+                            {{ sheet.columns }}
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+
+                        <td colspan="3">
+                            Worksheet metadata unavailable.
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+{% endblock %}

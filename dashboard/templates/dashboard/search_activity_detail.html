@@ -1,0 +1,713 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+BDE Activity | BharatNXT Wave
+{% endblock %}
+
+
+{% block content %}
+
+<div class="search-console-page">
+
+
+<!-- =====================================================
+     HEADER
+====================================================== -->
+
+<header class="search-console-header">
+
+    <div>
+
+        <div class="page-eyebrow">
+            DAILY BDE ACTIVITY
+        </div>
+
+        <h1>
+            BDE Activity
+        </h1>
+
+        <p>
+            {{ selected_date|date:"l, d M Y" }}
+            ·
+            See what the BDE did in the Toolkit on this day
+        </p>
+
+    </div>
+
+
+    <a
+        href="{% url 'dashboard:home' %}"
+        class="secondary-button">
+
+        ← Dashboard
+
+    </a>
+
+</header>
+
+
+
+<!-- =====================================================
+     DAY NAVIGATION
+====================================================== -->
+
+<div class="search-console-daynav">
+
+    <a
+        href="?date={{ previous_date|date:'Y-m-d' }}">
+
+        ← {{ previous_date|date:"d M" }}
+
+    </a>
+
+
+    <div>
+
+        <span>
+            SELECTED DAY
+        </span>
+
+        <strong>
+            {{ selected_date|date:"d M Y" }}
+        </strong>
+
+    </div>
+
+
+    {% if next_date <= today %}
+
+        <a
+            href="?date={{ next_date|date:'Y-m-d' }}">
+
+            {{ next_date|date:"d M" }} →
+
+        </a>
+
+    {% else %}
+
+        <span class="disabled">
+            Next →
+        </span>
+
+    {% endif %}
+
+</div>
+
+
+
+<!-- =====================================================
+     COMPACT DATA STRIP
+====================================================== -->
+
+<div class="search-console-strip">
+
+    <div>
+
+        <strong>
+            {{ total_events }}
+        </strong>
+
+        <span>
+            total actions
+        </span>
+
+    </div>
+
+
+    <div>
+
+        <strong>
+            {{ total_searches }}
+        </strong>
+
+        <span>
+            Toolkit searches
+        </span>
+
+    </div>
+
+
+    <div>
+
+        <strong>
+            {{ matcher_count }}
+        </strong>
+
+        <span>
+            client service checks
+        </span>
+
+    </div>
+
+
+    <div>
+
+        <strong class="{% if zero_result_searches %}danger{% endif %}">
+            {{ zero_result_searches }}
+        </strong>
+
+        <span>
+            searches with no result
+        </span>
+
+    </div>
+
+
+    <div>
+
+        <strong>
+            {{ total_results }}
+        </strong>
+
+        <span>
+            results shown
+        </span>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     DAY TIMELINE
+====================================================== -->
+
+<section class="search-console-timeline">
+
+    <div class="search-console-timeline-heading">
+
+        <strong>
+            When the Toolkit Was Used
+        </strong>
+
+        <span>
+            See what time the BDE used the Toolkit during the day
+        </span>
+
+    </div>
+
+
+    <div class="search-time-scale">
+
+        <span>00:00</span>
+        <span>06:00</span>
+        <span>12:00</span>
+        <span>18:00</span>
+        <span>24:00</span>
+
+    </div>
+
+
+    <div class="search-time-line">
+
+        <div class="search-time-grid q1"></div>
+        <div class="search-time-grid q2"></div>
+        <div class="search-time-grid q3"></div>
+
+
+        {% for event in events %}
+
+            <button
+                type="button"
+
+                class="search-time-event event-{{ event.event_type|lower }}"
+
+                data-left="{{ event.timeline_pct }}"
+
+                title="{{ event.console_time }} · {{ event.get_event_type_display }}">
+
+                <span>
+                </span>
+
+            </button>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% if not events %}
+
+        <div class="search-console-no-events">
+            No activity recorded for this date.
+        </div>
+
+    {% endif %}
+
+</section>
+
+
+
+<!-- =====================================================
+     INVESTIGATION BODY
+====================================================== -->
+
+<div class="search-console-grid">
+
+
+<!-- ACTIVITY STREAM -->
+
+<main class="search-event-stream">
+
+    <div class="search-stream-heading">
+
+        <div>
+
+            <strong>
+                What the BDE Did
+            </strong>
+
+            <span>
+                Actions are shown in the order they happened
+            </span>
+
+        </div>
+
+
+        <span class="search-real-data">
+            ● REAL DATA
+        </span>
+
+    </div>
+
+
+    {% for event in events %}
+
+        <article class="search-stream-event">
+
+
+            <div class="search-stream-time">
+
+                {{ event.console_time }}
+
+            </div>
+
+
+            <div class="search-stream-marker event-{{ event.event_type|lower }}">
+            </div>
+
+
+            <div class="search-stream-content">
+
+
+                <div class="search-stream-event-head">
+
+
+                    {% if event.event_type == "SEARCH" %}
+
+                        <span class="search-stream-type search">
+                            TOOLKIT SEARCH
+                        </span>
+
+
+                    {% elif event.event_type == "CLIENT_MATCH" %}
+
+                        <span class="search-stream-type matcher">
+                            CLIENT SERVICE CHECK
+                        </span>
+
+
+                    {% elif event.event_type == "FILTER" %}
+
+                        <span class="search-stream-type filter">
+                            FILTER
+                        </span>
+
+
+                    {% elif event.event_type == "SUGGESTION_CLICK" %}
+
+                        <span class="search-stream-type suggestion">
+                            SUGGESTION
+                        </span>
+
+
+                    {% else %}
+
+                        <span class="search-stream-type">
+                            {{ event.get_event_type_display }}
+                        </span>
+
+                    {% endif %}
+
+
+                    <strong>
+                        {{ event.result_count }}
+                        result{{ event.result_count|pluralize }}
+                    </strong>
+
+                </div>
+
+
+
+                {% if event.event_type == "SEARCH" %}
+
+                    <h3>
+
+                        {% if event.query %}
+
+                            “{{ event.query }}”
+
+                        {% else %}
+
+                            Toolkit search
+
+                        {% endif %}
+
+                    </h3>
+
+
+                    {% if event.result_count > 0 %}
+
+                        <div class="search-stream-outcome success">
+
+                            Results found successfully
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="search-stream-outcome gap">
+
+                            Search gap — no Toolkit result found
+
+                        </div>
+
+                    {% endif %}
+
+
+
+                {% elif event.event_type == "CLIENT_MATCH" %}
+
+                    <h3>
+                        Checked services for a client
+                    </h3>
+
+
+                    <div class="search-stream-metrics">
+
+
+                        {% if event.filters.criteria_count != None %}
+
+                            <span>
+
+                                <strong>
+                                    {{ event.filters.criteria_count }}
+                                </strong>
+
+                                company details used
+
+                            </span>
+
+                        {% endif %}
+
+
+                        {% if event.filters.high_count != None %}
+
+                            <span>
+
+                                <strong>
+                                    {{ event.filters.high_count }}
+                                </strong>
+
+                                good match
+
+                            </span>
+
+                        {% endif %}
+
+
+                        {% if event.filters.possible_count != None %}
+
+                            <span>
+
+                                <strong>
+                                    {{ event.filters.possible_count }}
+                                </strong>
+
+                                needs checking
+
+                            </span>
+
+                        {% endif %}
+
+
+                        {% if event.filters.not_eligible_count != None %}
+
+                            <span>
+
+                                <strong>
+                                    {{ event.filters.not_eligible_count }}
+                                </strong>
+
+                                not suitable
+
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="search-stream-privacy">
+
+                        Client-identifying profile data is not retained
+                        in the activity log.
+
+                    </div>
+
+
+
+                {% elif event.event_type == "FILTER" %}
+
+                    <h3>
+                        Toolkit filters applied
+                    </h3>
+
+
+                    <div class="search-stream-filter-list">
+
+                        {% if event.filters.sector %}
+
+                            <span>
+                                Sector · {{ event.filters.sector }}
+                            </span>
+
+                        {% endif %}
+
+
+                        {% if event.filters.service_kind %}
+
+                            <span>
+                                Type · {{ event.filters.service_kind }}
+                            </span>
+
+                        {% endif %}
+
+
+                        {% if event.filters.deadline %}
+
+                            <span>
+                                Deadline · {{ event.filters.deadline }}
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                {% else %}
+
+                    <h3>
+                        {{ event.get_event_type_display }}
+                    </h3>
+
+                {% endif %}
+
+
+
+                {% if event.selected_service %}
+
+                    <div class="search-stream-selected">
+
+                        <span>
+                            SERVICE
+                        </span>
+
+                        <a
+                            href="{% url 'toolkit:service_detail' event.selected_service.slug %}">
+
+                            {{ event.selected_service.title }}
+                            →
+
+                        </a>
+
+                    </div>
+
+                {% endif %}
+
+
+            </div>
+
+        </article>
+
+
+    {% empty %}
+
+        <div class="search-stream-empty">
+
+            <strong>
+                No recorded activity
+            </strong>
+
+            <p>
+                There are no Toolkit Toolkit searches, client service checks,
+                filters or suggestion events on this date.
+            </p>
+
+        </div>
+
+    {% endfor %}
+
+</main>
+
+
+
+<!-- DAY INTELLIGENCE -->
+
+<aside class="search-day-intelligence">
+
+    <div class="search-intelligence-title">
+
+        <strong>
+            Day Summary
+        </strong>
+
+        <span>
+            Quick summary of today's Toolkit usage
+        </span>
+
+    </div>
+
+
+    <div class="search-intelligence-primary">
+
+        <span>
+            TOTAL ACTIONS
+        </span>
+
+        <strong>
+            {{ total_events }}
+        </strong>
+
+    </div>
+
+
+    <div class="search-intelligence-row">
+
+        <span>
+            Searches
+        </span>
+
+        <strong>
+            {{ total_searches }}
+        </strong>
+
+    </div>
+
+
+    <div class="search-intelligence-row">
+
+        <span>
+            Client service checks
+        </span>
+
+        <strong>
+            {{ matcher_count }}
+        </strong>
+
+    </div>
+
+
+    <div class="search-intelligence-row">
+
+        <span>
+            Filter actions
+        </span>
+
+        <strong>
+            {{ filter_count }}
+        </strong>
+
+    </div>
+
+
+    <div class="search-intelligence-row">
+
+        <span>
+            Searches with no result
+        </span>
+
+        <strong class="{% if zero_result_searches %}danger{% endif %}">
+
+            {{ zero_result_searches }}
+
+        </strong>
+
+    </div>
+
+
+    <div class="search-intelligence-section">
+
+        <span>
+            BUSIEST TIME
+        </span>
+
+        <strong>
+            {{ peak_period }}
+        </strong>
+
+    </div>
+
+
+    <div class="search-intelligence-section">
+
+        <span>
+            MOST USED TOOL
+        </span>
+
+        <strong>
+            {{ most_used_feature }}
+        </strong>
+
+    </div>
+
+
+    <div class="search-intelligence-section">
+
+        <span>
+            SEARCHES THAT FOUND RESULTS
+        </span>
+
+
+        {% if total_searches %}
+
+            <strong>
+
+                {{ successful_searches }}
+                /
+                {{ total_searches }}
+
+            </strong>
+
+        {% else %}
+
+            <strong>
+                —
+            </strong>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="search-intelligence-note">
+
+        This view intentionally uses privacy-safe activity
+        metadata only.
+
+    </div>
+
+</aside>
+
+
+</div>
+
+
+</div>
+
+
+<script src="{% static 'js/search_activity_console.js' %}"></script>
+
+{% endblock %}

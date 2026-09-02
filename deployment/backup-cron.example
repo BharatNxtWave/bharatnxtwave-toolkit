@@ -1,0 +1,4 @@
+# BharatNXT Wave database backup
+# Example: every night at 11:30 PM.
+
+30 23 * * * /opt/bharatnxt-toolkit/deployment/backup_database.sh >> /var/log/bharatnxt-backup.log 2>&1

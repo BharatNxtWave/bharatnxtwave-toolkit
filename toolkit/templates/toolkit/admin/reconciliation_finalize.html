@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1">
+
+<title>
+    Final Import | BharatNXT Wave
+</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+:root{
+    --bg:#f5f7fa;
+    --card:#ffffff;
+    --text:#111318;
+    --muted:#6f7682;
+    --line:#e5e8ed;
+
+    --blue:#1768ff;
+    --blue-soft:#edf4ff;
+
+    --green:#11834f;
+    --green-soft:#edf9f2;
+    --green-line:#c9ead8;
+
+    --amber:#946900;
+    --amber-soft:#fff7dc;
+
+    --red:#b4232d;
+    --red-soft:#fff0f1;
+
+    --shadow:
+        0 12px 35px rgba(
+            17,
+            24,
+            39,
+            .05
+        );
+}
+
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+a{
+    color:inherit;
+}
+
+.page{
+    width:min(
+        1120px,
+        calc(100% - 40px)
+    );
+
+    margin:
+        34px auto
+        80px;
+}
+
+
+/* =========================================================
+   TOP NAV
+   ========================================================= */
+
+.topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:20px;
+
+    margin-bottom:22px;
+}
+
+.brand{
+    font-size:18px;
+    font-weight:800;
+
+    letter-spacing:-.02em;
+}
+
+.breadcrumb{
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    color:var(--muted);
+
+    font-size:13px;
+}
+
+.breadcrumb a{
+    text-decoration:none;
+}
+
+.breadcrumb a:hover{
+    color:var(--text);
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero{
+    background:var(--card);
+
+    border:
+        1px solid
+        var(--line);
+
+    border-radius:24px;
+
+    padding:34px;
+
+    box-shadow:
+        var(--shadow);
+}
+
+.hero-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+
+    gap:30px;
+}
+
+.eyebrow{
+    color:var(--blue);
+
+    font-size:12px;
+    font-weight:800;
+
+    letter-spacing:.11em;
+    text-transform:uppercase;
+
+    margin-bottom:11px;
+}
+
+h1{
+    margin:0;
+
+    font-size:
+        clamp(
+            38px,
+            5vw,
+            58px
+        );
+
+    line-height:.98;
+
+    letter-spacing:-.055em;
+}
+
+.hero-copy{
+    margin:
+        18px 0 0;
+
+    max-width:700px;
+
+    color:var(--muted);
+
+    font-size:16px;
+    line-height:1.65;
+}
+
+.ready-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+
+    padding:
+        9px 13px;
+
+    border-radius:999px;
+
+    background:
+        var(--green-soft);
+
+    color:
+        var(--green);
+
+    border:
+        1px solid
+        var(--green-line);
+
+    font-size:13px;
+    font-weight:750;
+
+    white-space:nowrap;
+}
+
+.ready-dot{
+    width:8px;
+    height:8px;
+
+    border-radius:50%;
+
+    background:
+        var(--green);
+}
+
+
+/* =========================================================
+   SUMMARY
+   ========================================================= */
+
+.summary{
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0,1fr)
+        );
+
+    gap:12px;
+
+    margin-top:28px;
+}
+
+.stat{
+    background:#f8f9fb;
+
+    border:
+        1px solid
+        #edf0f3;
+
+    border-radius:16px;
+
+    padding:20px;
+}
+
+.stat-number{
+    display:block;
+
+    font-size:32px;
+    font-weight:850;
+
+    letter-spacing:-.045em;
+}
+
+.stat-label{
+    display:block;
+
+    margin-top:5px;
+
+    color:var(--muted);
+
+    font-size:13px;
+    font-weight:650;
+}
+
+.stat.approved{
+    background:
+        var(--green-soft);
+
+    border-color:
+        var(--green-line);
+}
+
+.stat.approved
+.stat-number{
+    color:
+        var(--green);
+}
+
+
+/* =========================================================
+   ACTION LINKS
+   ========================================================= */
+
+.secondary-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+
+    margin-top:22px;
+}
+
+.secondary-button{
+    min-height:42px;
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:
+        0 15px;
+
+    border:
+        1px solid
+        var(--line);
+
+    border-radius:10px;
+
+    background:#fff;
+
+    color:var(--text);
+
+    text-decoration:none;
+
+    font-size:14px;
+    font-weight:700;
+}
+
+.secondary-button:hover{
+    background:#f7f8fa;
+}
+
+
+/* =========================================================
+   READY PANEL
+   ========================================================= */
+
+.ready-panel{
+    margin-top:18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f0fbf5 0%,
+            #ffffff 70%
+        );
+
+    border:
+        1px solid
+        var(--green-line);
+
+    border-radius:24px;
+
+    padding:30px;
+
+    box-shadow:
+        var(--shadow);
+}
+
+.ready-header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+
+    gap:30px;
+}
+
+.ready-title{
+    display:flex;
+    gap:14px;
+}
+
+.ready-icon{
+    width:42px;
+    height:42px;
+
+    flex:0 0 42px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:
+        var(--green);
+
+    color:#fff;
+
+    font-size:20px;
+    font-weight:800;
+}
+
+h2{
+    margin:0;
+
+    font-size:27px;
+
+    letter-spacing:-.035em;
+}
+
+.ready-subtitle{
+    margin:
+        7px 0 0;
+
+    color:var(--muted);
+
+    font-size:14px;
+    line-height:1.55;
+}
+
+
+/* =========================================================
+   WHAT WILL HAPPEN
+   ========================================================= */
+
+.steps{
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0,1fr)
+        );
+
+    gap:12px;
+
+    margin-top:26px;
+}
+
+.step{
+    padding:18px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .85
+        );
+
+    border:
+        1px solid
+        #e5eee9;
+
+    border-radius:15px;
+}
+
+.step-number{
+    width:27px;
+    height:27px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:
+        var(--blue-soft);
+
+    color:
+        var(--blue);
+
+    font-size:12px;
+    font-weight:800;
+
+    margin-bottom:12px;
+}
+
+.step strong{
+    display:block;
+
+    font-size:14px;
+
+    margin-bottom:5px;
+}
+
+.step span{
+    color:
+        var(--muted);
+
+    font-size:13px;
+    line-height:1.5;
+}
+
+
+/* =========================================================
+   FINAL CTA
+   ========================================================= */
+
+.final-action{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:20px;
+
+    margin-top:25px;
+
+    padding-top:24px;
+
+    border-top:
+        1px solid
+        var(--green-line);
+}
+
+.final-note{
+    color:
+        var(--muted);
+
+    font-size:13px;
+    line-height:1.55;
+
+    max-width:590px;
+}
+
+.final-note strong{
+    color:
+        var(--text);
+}
+
+.final-button{
+    min-height:50px;
+
+    padding:
+        0 24px;
+
+    border:0;
+
+    border-radius:12px;
+
+    background:
+        var(--text);
+
+    color:#fff;
+
+    font-size:15px;
+    font-weight:800;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 9px 20px
+        rgba(
+            17,
+            19,
+            24,
+            .14
+        );
+
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease;
+}
+
+.final-button:hover{
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 12px 25px
+        rgba(
+            17,
+            19,
+            24,
+            .18
+        );
+}
+
+.final-button:disabled{
+    opacity:.35;
+    cursor:not-allowed;
+    transform:none;
+    box-shadow:none;
+}
+
+
+/* =========================================================
+   PENDING
+   ========================================================= */
+
+.pending-panel{
+    margin-top:18px;
+
+    background:#fff;
+
+    border:
+        1px solid
+        #eadca7;
+
+    border-radius:22px;
+
+    padding:28px;
+}
+
+.pending-status{
+    display:inline-flex;
+
+    padding:
+        6px 10px;
+
+    border-radius:999px;
+
+    background:
+        var(--amber-soft);
+
+    color:
+        var(--amber);
+
+    font-size:12px;
+    font-weight:800;
+
+    margin-bottom:12px;
+}
+
+
+/* =========================================================
+   IMPORTED
+   ========================================================= */
+
+.completed-panel{
+    margin-top:18px;
+
+    background:
+        var(--green-soft);
+
+    border:
+        1px solid
+        var(--green-line);
+
+    border-radius:22px;
+
+    padding:28px;
+}
+
+.completed-panel h2{
+    color:
+        var(--green);
+}
+
+.rollback-panel{
+    margin-top:14px;
+
+    background:#fff;
+
+    border:
+        1px solid
+        var(--line);
+
+    border-radius:20px;
+
+    padding:24px;
+}
+
+.rollback-button{
+    min-height:43px;
+
+    margin-top:16px;
+
+    padding:
+        0 16px;
+
+    border:
+        1px solid
+        #efcbd0;
+
+    border-radius:10px;
+
+    background:
+        var(--red-soft);
+
+    color:
+        var(--red);
+
+    font-size:14px;
+    font-weight:750;
+
+    cursor:pointer;
+}
+
+
+/* =========================================================
+   MESSAGES
+   ========================================================= */
+
+.message{
+    padding:
+        13px 15px;
+
+    margin-bottom:12px;
+
+    border-radius:11px;
+
+    border:
+        1px solid
+        var(--line);
+
+    background:#fff;
+
+    font-size:14px;
+    font-weight:650;
+}
+
+.message.success{
+    background:
+        var(--green-soft);
+
+    border-color:
+        var(--green-line);
+
+    color:
+        var(--green);
+}
+
+.message.error{
+    background:
+        var(--red-soft);
+
+    border-color:
+        #f1cdd0;
+
+    color:
+        var(--red);
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media(
+    max-width:760px
+){
+
+    .page{
+        width:
+            calc(
+                100% - 22px
+            );
+
+        margin-top:16px;
+    }
+
+    .hero{
+        padding:24px;
+    }
+
+    .hero-top,
+    .ready-header,
+    .final-action{
+        flex-direction:column;
+    }
+
+    .summary,
+    .steps{
+        grid-template-columns:1fr;
+    }
+
+    .final-button{
+        width:100%;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="page">
+
+
+    <div class="topbar">
+
+        <div class="brand">
+            BharatNXT Wave
+        </div>
+
+        <div class="breadcrumb">
+
+            <a
+                href="{% url 'toolkit:import_center' %}">
+                Import Center
+            </a>
+
+            <span>›</span>
+
+            <span>
+                Source #{{ batch.pk }}
+            </span>
+
+            <span>›</span>
+
+            <strong>
+                Final Import
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    {% for message in messages %}
+
+        <div
+            class="message {{ message.tags }}">
+
+            {{ message }}
+
+        </div>
+
+    {% endfor %}
+
+
+    <section class="hero">
+
+        <div class="hero-top">
+
+            <div>
+
+                <div class="eyebrow">
+                    Final Review
+                </div>
+
+                <h1>
+                    Ready to update
+                    the Toolkit.
+                </h1>
+
+                <p class="hero-copy">
+                    BharatNXT found only the information
+                    that is genuinely new.
+                    Review decisions are complete and
+                    your existing Service classifications
+                    will remain unchanged.
+                </p>
+
+            </div>
+
+
+            {% if preview.pending_changes == 0 and batch.status == "PREVIEWED" %}
+
+                <div class="ready-badge">
+
+                    <span class="ready-dot"></span>
+
+                    Ready to import
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="summary">
+
+            <div class="stat">
+
+                <span class="stat-number">
+                    {{ preview.delta_counts.NO_CHANGE|default:0 }}
+                </span>
+
+                <span class="stat-label">
+                    Already up to date
+                </span>
+
+            </div>
+
+
+            <div class="stat approved">
+
+                <span class="stat-number">
+                    {{ preview.approved }}
+                </span>
+
+                <span class="stat-label">
+                    Approved additions
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <span class="stat-number">
+                    {{ preview.pending_changes }}
+                </span>
+
+                <span class="stat-label">
+                    Still needs review
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="secondary-actions">
+
+            <a
+                class="secondary-button"
+                href="{% url 'toolkit:import_extraction_review' batch.pk %}">
+                ← Review changes
+            </a>
+
+            <a
+                class="secondary-button"
+                href="{% url 'toolkit:import_history' %}">
+                View source history
+            </a>
+
+        </div>
+
+    </section>
+
+
+
+    {% if batch.status == "PREVIEWED" or batch.status == "VALIDATED" %}
+
+
+        {% if preview.pending_changes == 0 %}
+
+
+            <section class="ready-panel">
+
+                <div class="ready-header">
+
+                    <div class="ready-title">
+
+                        <div class="ready-icon">
+                            ✓
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Everything is ready
+                            </h2>
+
+                            <p class="ready-subtitle">
+                                {{ preview.approved }}
+                                approved addition{{ preview.approved|pluralize }}
+                                will be added to existing Services.
+                                No existing category or Service type
+                                will be changed.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="steps">
+
+                    <div class="step">
+
+                        <div class="step-number">
+                            1
+                        </div>
+
+                        <strong>
+                            Backup created automatically
+                        </strong>
+
+                        <span>
+                            A database backup is created
+                            before any approved change is applied.
+                        </span>
+
+                    </div>
+
+
+                    <div class="step">
+
+                        <div class="step-number">
+                            2
+                        </div>
+
+                        <strong>
+                            Approved information added
+                        </strong>
+
+                        <span>
+                            Only the additions you approved
+                            will be written to the Toolkit.
+                        </span>
+
+                    </div>
+
+
+                    <div class="step">
+
+                        <div class="step-number">
+                            3
+                        </div>
+
+                        <strong>
+                            Rollback remains available
+                        </strong>
+
+                        <span>
+                            Every applied change is recorded
+                            so the import can be reversed
+                            if required.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="final-action">
+
+                    <div class="final-note">
+
+                        <strong>
+                            Safe to continue.
+                        </strong>
+
+                        This will update existing Toolkit
+                        information only.
+                        It will not create duplicate Services.
+
+                    </div>
+
+
+                    <form
+                        method="post"
+
+                        onsubmit="
+                            return confirm(
+                                'Import the approved additions into the Toolkit now?'
+                            );
+                        ">
+
+                        {% csrf_token %}
+
+                        <input
+                            type="hidden"
+                            name="action"
+                            value="final_import">
+
+                        <button
+                            class="final-button"
+                            type="submit">
+
+                            Import approved changes →
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </section>
+
+
+        {% else %}
+
+
+            <section class="pending-panel">
+
+                <div class="pending-status">
+                    Review required
+                </div>
+
+                <h2>
+                    Decisions are still pending
+                </h2>
+
+                <p class="hero-copy">
+                    {{ preview.pending_changes }}
+                    change{{ preview.pending_changes|pluralize }}
+                    still need to be approved or skipped
+                    before Final Import can continue.
+                </p>
+
+                <div class="secondary-actions">
+
+                    <a
+                        class="secondary-button"
+                        href="{% url 'toolkit:import_extraction_review' batch.pk %}">
+
+                        Continue review →
+
+                    </a>
+
+                </div>
+
+            </section>
+
+
+        {% endif %}
+
+
+
+    {% elif batch.status == "IMPORTED" %}
+
+
+        <section class="completed-panel">
+
+            <h2>
+                ✓ Import completed successfully
+            </h2>
+
+            <p class="hero-copy">
+                The approved information is now available
+                in the BharatNXT Toolkit.
+                {{ active_changes }}
+                audited change{{ active_changes|pluralize }}
+                were recorded for this import.
+            </p>
+
+        </section>
+
+
+        <section class="rollback-panel">
+
+            <h2>
+                Need to undo this import?
+            </h2>
+
+            <p class="hero-copy">
+                Rollback reverses only the changes
+                recorded by this import.
+            </p>
+
+            <form
+                method="post"
+
+                onsubmit="
+                    return confirm(
+                        'Rollback this import and reverse its recorded changes?'
+                    );
+                ">
+
+                {% csrf_token %}
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="rollback">
+
+                <button
+                    class="rollback-button"
+                    type="submit">
+
+                    Rollback this import
+
+                </button>
+
+            </form>
+
+        </section>
+
+
+
+    {% elif batch.status == "ROLLED_BACK" %}
+
+
+        <section class="completed-panel">
+
+            <h2>
+                Import rolled back
+            </h2>
+
+            <p class="hero-copy">
+                The audited changes created by this
+                reconciliation import have been reversed.
+            </p>
+
+        </section>
+
+
+    {% endif %}
+
+
+</div>
+
+</body>
+</html>

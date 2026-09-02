@@ -1,0 +1,28 @@
+.venv/
+__pycache__/
+*.py[cod]
+
+.env
+.env.*
+!*.env.example
+
+db.sqlite3
+
+*.log
+
+staticfiles/
+
+media/
+
+# Private authenticated scheme flyer storage
+private_uploads/
+
+.DS_Store
+Thumbs.db
+
+backups/
+*.dump
+*.sqlite3
+
+# Confidential BharatNXT source files
+confidential_source/

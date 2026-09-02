@@ -1,0 +1,391 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ collection.name }} | Saved Services
+{% endblock %}
+
+{% block content %}
+
+<div class="bnx-collection-detail-page">
+
+    <a
+        href="{% url 'toolkit:saved_services' %}"
+        class="bnx-back-link">
+
+        ← Client Collections
+
+    </a>
+
+
+    <header class="bnx-collection-detail-hero">
+
+        <div class="bnx-collection-detail-avatar">
+
+            {{ collection.name|slice:":1"|upper }}
+
+        </div>
+
+
+        <div class="bnx-collection-detail-copy">
+
+            <div class="bde-eyebrow">
+                CLIENT COLLECTION
+            </div>
+
+            <h1>
+                {{ collection.name }}
+            </h1>
+
+            {% if collection.note %}
+
+                <p>
+                    {{ collection.note }}
+                </p>
+
+            {% else %}
+
+                <p>
+                    Saved services for this client.
+                </p>
+
+            {% endif %}
+
+
+            <div class="bnx-detail-meta">
+
+                <span>
+                    {{ service_count }}
+                    saved service{{ service_count|pluralize }}
+                </span>
+
+                <span>
+                    Updated
+                    {{ collection.updated_at|timesince }}
+                    ago
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="bnx-detail-actions">
+
+            <button
+                type="button"
+                class="secondary-button"
+                data-bnx-edit-collection>
+
+                Edit
+
+            </button>
+
+            <a
+                href="{% url 'toolkit:home' %}"
+                class="primary-button">
+
+                + Find services
+
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <section class="bnx-collection-service-list">
+
+        {% for item in items %}
+
+            <article class="bnx-client-service-card">
+
+                <div class="bnx-client-service-copy">
+
+                    <div class="bnx-client-service-topline">
+
+                        <span>
+                            {{ item.saved_service.service.service_id }}
+                        </span>
+
+                        <span class="bnx-service-kind-pill">
+                            {{ item.saved_service.service.get_service_kind_display }}
+                        </span>
+
+                    </div>
+
+
+                    <h2>
+                        {{ item.saved_service.service.title }}
+                    </h2>
+
+
+                    <p class="bnx-client-service-path">
+
+                        {{ item.saved_service.service.domain.name }}
+                        ·
+                        {{ item.saved_service.service.category.name }}
+
+                    </p>
+
+
+                    {% if item.saved_service.service.bde_summary %}
+
+                        <p class="bnx-client-service-summary">
+
+                            {{ item.saved_service.service.bde_summary|truncatechars:210 }}
+
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="bnx-client-service-actions">
+
+                    <a
+                        href="{% url 'toolkit:service_detail' item.saved_service.service.slug %}"
+                        class="primary-button">
+
+                        Details
+
+                    </a>
+
+
+                    <form
+                        method="post"
+                        action="{% url 'toolkit:saved_collection_remove_item' collection.pk item.pk %}">
+
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="bnx-remove-from-collection">
+
+                            Remove
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </article>
+
+        {% empty %}
+
+            <div class="bnx-client-collection-empty">
+
+                <div>⌑</div>
+
+                <h3>
+                    No services in this collection yet
+                </h3>
+
+                <p>
+                    Search the Toolkit and use the bookmark
+                    button to add relevant services for
+                    {{ collection.name }}.
+                </p>
+
+                <a
+                    href="{% url 'toolkit:home' %}"
+                    class="primary-button">
+
+                    Find services
+
+                </a>
+
+            </div>
+
+        {% endfor %}
+
+    </section>
+
+</div>
+
+
+<div
+    class="bnx-create-collection-modal"
+    data-bnx-edit-modal
+    hidden>
+
+    <div
+        class="bnx-modal-backdrop"
+        data-bnx-close-edit>
+    </div>
+
+    <div
+        class="bnx-create-collection-dialog"
+        role="dialog"
+        aria-modal="true">
+
+        <div class="bnx-modal-handle"></div>
+
+        <header>
+
+            <div>
+
+                <small>
+                    COLLECTION SETTINGS
+                </small>
+
+                <h2>
+                    Edit {{ collection.name }}
+                </h2>
+
+            </div>
+
+            <button
+                type="button"
+                class="bnx-modal-close"
+                data-bnx-close-edit>
+
+                ×
+
+            </button>
+
+        </header>
+
+
+        <form
+            method="post"
+            action="{% url 'toolkit:saved_collection_rename' collection.pk %}">
+
+            {% csrf_token %}
+
+            <label>
+                Collection name
+
+                <input
+                    type="text"
+                    name="name"
+                    value="{{ collection.name }}"
+                    maxlength="150"
+                    required>
+            </label>
+
+
+            <label>
+                Note
+
+                <input
+                    type="text"
+                    name="note"
+                    value="{{ collection.note }}"
+                    maxlength="500">
+            </label>
+
+
+            <div class="bnx-modal-actions">
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    data-bnx-close-edit>
+
+                    Cancel
+
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-button">
+
+                    Save changes
+
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <form
+            method="post"
+            action="{% url 'toolkit:saved_collection_delete' collection.pk %}"
+            class="bnx-delete-collection-form"
+            onsubmit="return confirm('Delete this collection? Saved services themselves will remain available under Unsorted.');">
+
+            {% csrf_token %}
+
+            <button type="submit">
+                Delete collection
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+(function () {
+
+    "use strict";
+
+    const modal =
+        document.querySelector(
+            "[data-bnx-edit-modal]"
+        );
+
+
+    const open =
+        document.querySelector(
+            "[data-bnx-edit-collection]"
+        );
+
+
+    if (!modal || !open) {
+        return;
+    }
+
+
+    function show() {
+
+        modal.hidden = false;
+
+        document.body.classList.add(
+            "bnx-modal-open"
+        );
+
+    }
+
+
+    function hide() {
+
+        modal.hidden = true;
+
+        document.body.classList.remove(
+            "bnx-modal-open"
+        );
+
+    }
+
+
+    open.addEventListener(
+        "click",
+        show
+    );
+
+
+    modal
+        .querySelectorAll(
+            "[data-bnx-close-edit]"
+        )
+        .forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    hide
+                );
+
+            }
+        );
+
+})();
+</script>
+
+{% endblock %}

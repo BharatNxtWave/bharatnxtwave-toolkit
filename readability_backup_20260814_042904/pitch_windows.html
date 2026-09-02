@@ -1,0 +1,887 @@
+{% extends "admin_base.html" %}
+{% load static %}
+
+{% block title %}
+Pitch Operations | BharatNXT Wave
+{% endblock %}
+
+
+{% block content %}
+
+<div class="pitch-ops-page">
+
+
+<!-- =====================================================
+     COMMAND HEADER
+====================================================== -->
+
+<header class="pitch-ops-header">
+
+    <div>
+
+        <div class="page-eyebrow">
+            TOOLKIT OPERATIONS
+        </div>
+
+        <h1>
+            Pitch Operations
+        </h1>
+
+        <p>
+            Live operational view of what BDEs can pitch,
+            what is becoming urgent and what needs attention.
+        </p>
+
+    </div>
+
+
+    <div class="pitch-ops-today">
+
+        <span>
+            TODAY
+        </span>
+
+        <strong>
+            {{ today|date:"d M Y" }}
+        </strong>
+
+    </div>
+
+</header>
+
+
+
+<!-- =====================================================
+     STATUS STRIP
+====================================================== -->
+
+<div class="pitch-ops-status-strip">
+
+    <a href="?state=active">
+
+        <strong>
+            {{ active_count }}
+        </strong>
+
+        <span>
+            Pitchable now
+        </span>
+
+    </a>
+
+
+    <a href="?state=closing">
+
+        <strong>
+            {{ closing_count }}
+        </strong>
+
+        <span>
+            Closing soon
+        </span>
+
+    </a>
+
+
+    <a href="?state=urgent">
+
+        <strong class="danger">
+            {{ urgent_count }}
+        </strong>
+
+        <span>
+            Urgent ≤ 7 days
+        </span>
+
+    </a>
+
+
+    <a href="?attention=missing">
+
+        <strong>
+            {{ missing_dates_count }}
+        </strong>
+
+        <span>
+            Missing end dates
+        </span>
+
+    </a>
+
+</div>
+
+
+
+<!-- =====================================================
+     OPERATIONS GRID
+====================================================== -->
+
+<div class="pitch-ops-command-grid">
+
+
+<!-- TIMELINE -->
+
+<section class="pitch-ops-timeline-panel">
+
+    <div class="pitch-ops-panel-heading">
+
+        <div>
+
+            <strong>
+                Pitch Window Timeline
+            </strong>
+
+            <span>
+                Today → {{ horizon_end|date:"d M Y" }}
+            </span>
+
+        </div>
+
+        <span class="pitch-ops-live">
+            ● LIVE DATABASE
+        </span>
+
+    </div>
+
+
+    <div class="pitch-ops-axis">
+
+        {% for marker in timeline_axis %}
+
+            <div
+                class="pitch-axis-marker"
+                data-left="{{ marker.pct }}">
+
+                <span>
+                    {{ marker.date|date:"d M" }}
+                </span>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <div class="pitch-ops-timeline-body">
+
+
+        {% for item in timeline_rows %}
+
+            <button
+                type="button"
+                class="pitch-timeline-row ops-row-open"
+
+                data-title="{{ item.service.title }}"
+                data-service-id="{{ item.service.service_id }}"
+                data-sector="{% if item.service.industries %}{{ item.service.industries|join:', ' }}{% else %}Not specified{% endif %}"
+                data-status="{{ item.service.pitch_state_label }}"
+
+                data-effective="{% if item.service.effective_from %}{{ item.service.effective_from|date:'d M Y' }}{% else %}Not specified{% endif %}"
+
+                data-pitch="{% if item.service.pitch_until %}{{ item.service.pitch_until|date:'d M Y' }}{% else %}No internal pitch-until date{% endif %}"
+
+                data-deadline="{% if item.service.application_deadline %}{{ item.service.application_deadline|date:'d M Y' }}{% else %}No application deadline{% endif %}"
+
+                data-days="{% if item.service.pitch_days_remaining != None %}{{ item.service.pitch_days_remaining }}{% else %}—{% endif %}"
+
+                data-updated="{{ item.service.updated_at|date:'d M Y, h:i A' }}"
+
+                data-verified="{% if item.service.last_verified_at %}{{ item.service.last_verified_at|date:'d M Y, h:i A' }}{% else %}Not verified yet{% endif %}"
+
+                data-edit-url="{% url 'toolkit:admin_service_edit' item.service.pk %}"
+
+                data-detail-url="{% url 'toolkit:service_detail' item.service.slug %}">
+
+
+                <div class="pitch-timeline-name">
+
+                    <strong>
+                        {{ item.service.title }}
+                    </strong>
+
+                    <span>
+                        {{ item.service.service_id }}
+                    </span>
+
+                </div>
+
+
+                <div class="pitch-timeline-track">
+
+                    <div
+                        class="pitch-timeline-bar {{ item.service.pitch_state_code|lower }} {% if item.open_ended %}open-ended{% endif %}"
+
+                        data-left="{{ item.left_pct }}"
+
+                        data-width="{{ item.width_pct }}">
+                    </div>
+
+                </div>
+
+
+                <div class="pitch-timeline-end">
+
+                    {% if item.service.pitch_days_remaining != None %}
+
+                        <strong>
+                            {{ item.service.pitch_days_remaining }}d
+                        </strong>
+
+                    {% else %}
+
+                        <strong>
+                            —
+                        </strong>
+
+                    {% endif %}
+
+
+                    <span>
+                        {{ item.service.pitch_state_label }}
+                    </span>
+
+                </div>
+
+            </button>
+
+
+        {% empty %}
+
+            <div class="pitch-ops-empty">
+                No current services available for the timeline.
+            </div>
+
+        {% endfor %}
+
+
+    </div>
+
+</section>
+
+
+
+<!-- ACTION QUEUE -->
+
+<aside class="pitch-ops-action-queue">
+
+    <div class="pitch-ops-panel-heading">
+
+        <div>
+
+            <strong>
+                Action Queue
+            </strong>
+
+            <span>
+                What needs attention
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <a
+        href="?state=urgent"
+        class="pitch-action-item urgent">
+
+        <div>
+
+            <span>
+                URGENT
+            </span>
+
+            <strong>
+                {{ urgent_count }}
+                scheme{{ urgent_count|pluralize }}
+            </strong>
+
+        </div>
+
+        <p>
+            Pitch windows ending within 7 days
+        </p>
+
+        <b>→</b>
+
+    </a>
+
+
+    <a
+        href="?attention=missing"
+        class="pitch-action-item">
+
+        <div>
+
+            <span>
+                NEEDS ATTENTION
+            </span>
+
+            <strong>
+                {{ missing_dates_count }}
+                missing date{{ missing_dates_count|pluralize }}
+            </strong>
+
+        </div>
+
+        <p>
+            No pitch-until or application deadline
+        </p>
+
+        <b>→</b>
+
+    </a>
+
+
+    <a
+        href="?state=upcoming"
+        class="pitch-action-item">
+
+        <div>
+
+            <span>
+                UPCOMING
+            </span>
+
+            <strong>
+                {{ upcoming_count }}
+                service{{ upcoming_count|pluralize }}
+            </strong>
+
+        </div>
+
+        <p>
+            Not yet effective for BDE pitching
+        </p>
+
+        <b>→</b>
+
+    </a>
+
+
+    <a
+        href="?attention=changed"
+        class="pitch-action-item">
+
+        <div>
+
+            <span>
+                RECENTLY CHANGED
+            </span>
+
+            <strong>
+                {{ recently_changed_count }}
+                update{{ recently_changed_count|pluralize }}
+            </strong>
+
+        </div>
+
+        <p>
+            Modified during the last 24 hours
+        </p>
+
+        <b>→</b>
+
+    </a>
+
+</aside>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     OPERATIONS TABLE
+====================================================== -->
+
+<section class="pitch-ledger">
+
+
+    <div class="pitch-ledger-toolbar">
+
+
+        <div class="pitch-ledger-tabs">
+
+            <a
+                href="?state=active"
+                class="{% if selected_state == 'active' and not attention %}active{% endif %}">
+                Active
+            </a>
+
+            <a
+                href="?state=closing"
+                class="{% if selected_state == 'closing' %}active{% endif %}">
+                Closing
+            </a>
+
+            <a
+                href="?state=upcoming"
+                class="{% if selected_state == 'upcoming' %}active{% endif %}">
+                Upcoming
+            </a>
+
+            <a
+                href="?state=closed"
+                class="{% if selected_state == 'closed' %}active{% endif %}">
+                Closed
+            </a>
+
+            <a
+                href="?state=all"
+                class="{% if selected_state == 'all' and not attention %}active{% endif %}">
+                All
+            </a>
+
+        </div>
+
+
+        <form method="get">
+
+            {% if selected_state %}
+                <input
+                    type="hidden"
+                    name="state"
+                    value="{{ selected_state }}">
+            {% endif %}
+
+            <input
+                type="search"
+                name="q"
+                value="{{ query }}"
+                placeholder="Search scheme, sector or ID...">
+
+        </form>
+
+    </div>
+
+
+    <div class="pitch-ledger-table-wrap">
+
+        <table class="pitch-ledger-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Scheme / Service</th>
+                    <th>Sector</th>
+                    <th>Pitch Window</th>
+                    <th>Left</th>
+                    <th>Status</th>
+                    <th>Updated</th>
+                    <th></th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for service in services %}
+
+                    <tr class="pitch-row-{{ service.pitch_state_code|lower }}">
+
+                        <td>
+
+                            <button
+                                type="button"
+                                class="pitch-ledger-title ops-row-open"
+
+                                data-title="{{ service.title }}"
+                                data-service-id="{{ service.service_id }}"
+
+                                data-sector="{% if service.industries %}{{ service.industries|join:', ' }}{% else %}Not specified{% endif %}"
+
+                                data-status="{{ service.pitch_state_label }}"
+
+                                data-effective="{% if service.effective_from %}{{ service.effective_from|date:'d M Y' }}{% else %}Not specified{% endif %}"
+
+                                data-pitch="{% if service.pitch_until %}{{ service.pitch_until|date:'d M Y' }}{% else %}No internal pitch-until date{% endif %}"
+
+                                data-deadline="{% if service.application_deadline %}{{ service.application_deadline|date:'d M Y' }}{% else %}No application deadline{% endif %}"
+
+                                data-days="{% if service.pitch_days_remaining != None %}{{ service.pitch_days_remaining }}{% else %}—{% endif %}"
+
+                                data-updated="{{ service.updated_at|date:'d M Y, h:i A' }}"
+
+                                data-verified="{% if service.last_verified_at %}{{ service.last_verified_at|date:'d M Y, h:i A' }}{% else %}Not verified yet{% endif %}"
+
+                                data-edit-url="{% url 'toolkit:admin_service_edit' service.pk %}"
+
+                                data-detail-url="{% url 'toolkit:service_detail' service.slug %}">
+
+                                <strong>
+                                    {{ service.title }}
+                                </strong>
+
+                                <span>
+                                    {{ service.service_id }}
+                                </span>
+
+                            </button>
+
+                        </td>
+
+
+                        <td>
+
+                            {% if service.industries %}
+
+                                {{ service.industries|join:", " }}
+
+                            {% else %}
+
+                                <span class="pitch-muted">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td class="pitch-window-cell">
+
+                            {% if service.effective_from %}
+
+                                {{ service.effective_from|date:"d M" }}
+
+                            {% else %}
+
+                                —
+
+                            {% endif %}
+
+                            <span>→</span>
+
+                            {% if service.pitch_until %}
+
+                                {{ service.pitch_until|date:"d M Y" }}
+
+                            {% elif service.application_deadline %}
+
+                                {{ service.application_deadline|date:"d M Y" }}
+
+                            {% else %}
+
+                                No fixed end
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if service.pitch_days_remaining != None %}
+
+                                <strong class="pitch-days pitch-days-{{ service.pitch_state_code|lower }}">
+
+                                    {{ service.pitch_days_remaining }}d
+
+                                </strong>
+
+                            {% else %}
+
+                                —
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="pitch-ledger-status {{ service.pitch_state_code|lower }}">
+
+                                {{ service.pitch_state_label }}
+
+                            </span>
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="pitch-updated">
+
+                                {{ service.updated_at|date:"d M" }}
+
+                                <small>
+                                    {{ service.updated_at|date:"h:i A" }}
+                                </small>
+
+                            </span>
+
+                        </td>
+
+
+                        <td>
+
+                            <button
+                                type="button"
+                                class="pitch-row-arrow ops-row-open"
+
+                                data-title="{{ service.title }}"
+                                data-service-id="{{ service.service_id }}"
+
+                                data-sector="{% if service.industries %}{{ service.industries|join:', ' }}{% else %}Not specified{% endif %}"
+
+                                data-status="{{ service.pitch_state_label }}"
+
+                                data-effective="{% if service.effective_from %}{{ service.effective_from|date:'d M Y' }}{% else %}Not specified{% endif %}"
+
+                                data-pitch="{% if service.pitch_until %}{{ service.pitch_until|date:'d M Y' }}{% else %}No internal pitch-until date{% endif %}"
+
+                                data-deadline="{% if service.application_deadline %}{{ service.application_deadline|date:'d M Y' }}{% else %}No application deadline{% endif %}"
+
+                                data-days="{% if service.pitch_days_remaining != None %}{{ service.pitch_days_remaining }}{% else %}—{% endif %}"
+
+                                data-updated="{{ service.updated_at|date:'d M Y, h:i A' }}"
+
+                                data-verified="{% if service.last_verified_at %}{{ service.last_verified_at|date:'d M Y, h:i A' }}{% else %}Not verified yet{% endif %}"
+
+                                data-edit-url="{% url 'toolkit:admin_service_edit' service.pk %}"
+
+                                data-detail-url="{% url 'toolkit:service_detail' service.slug %}">
+
+                                →
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+
+                {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="7"
+                            class="pitch-ops-empty">
+
+                            Nothing matches this operational view.
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     DETAIL DRAWER
+====================================================== -->
+
+<div
+    id="pitch-ops-overlay"
+    class="pitch-ops-overlay">
+</div>
+
+
+<aside
+    id="pitch-ops-drawer"
+    class="pitch-ops-drawer"
+    aria-hidden="true">
+
+    <div class="pitch-drawer-head">
+
+        <div>
+
+            <span id="drawer-service-id">
+                SERVICE
+            </span>
+
+            <h2 id="drawer-title">
+                Service
+            </h2>
+
+        </div>
+
+
+        <button
+            id="pitch-drawer-close"
+            type="button">
+
+            ×
+
+        </button>
+
+    </div>
+
+
+    <div class="pitch-drawer-status">
+
+        <span>
+            BDE STATUS
+        </span>
+
+        <strong id="drawer-status">
+            —
+        </strong>
+
+    </div>
+
+
+    <div class="pitch-drawer-section">
+
+        <span class="pitch-drawer-label">
+            PITCH WINDOW
+        </span>
+
+
+        <div class="pitch-drawer-window">
+
+            <div>
+
+                <span>Effective</span>
+
+                <strong id="drawer-effective">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="pitch-drawer-line">
+            </div>
+
+
+            <div>
+
+                <span>Pitch Until</span>
+
+                <strong id="drawer-pitch">
+                    —
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="pitch-drawer-days">
+
+            <strong id="drawer-days">
+                —
+            </strong>
+
+            <span>
+                days remaining
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="pitch-drawer-grid">
+
+        <div>
+
+            <span>
+                SECTOR
+            </span>
+
+            <strong id="drawer-sector">
+                —
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                APPLICATION DEADLINE
+            </span>
+
+            <strong id="drawer-deadline">
+                —
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                LAST UPDATED
+            </span>
+
+            <strong id="drawer-updated">
+                —
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                LAST VERIFIED
+            </span>
+
+            <strong id="drawer-verified">
+                —
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="pitch-drawer-note">
+
+        Source-level details will appear here once the
+        operational Google Sheet is connected.
+
+    </div>
+
+
+    <div class="pitch-drawer-actions">
+
+        <a
+            id="drawer-edit"
+            href="#"
+            class="secondary-button">
+
+            Edit Dates
+
+        </a>
+
+
+        <a
+            id="drawer-detail"
+            href="#"
+            class="primary-button">
+
+            Open Service →
+
+        </a>
+
+    </div>
+
+</aside>
+
+
+</div>
+
+
+<script src="{% static 'js/pitch_operations.js' %}"></script>
+
+{% endblock %}

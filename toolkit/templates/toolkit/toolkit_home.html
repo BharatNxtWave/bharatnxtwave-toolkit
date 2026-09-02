@@ -1,0 +1,708 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Business Toolkit | BharatNXT Wave{% endblock %}
+
+{% block content %}
+<div class="bde-page bde-search-page">
+
+    <header class="bde-page-hero">
+        <div>
+            <div class="bde-eyebrow">BUSINESS TOOLKIT</div>
+            <h1>Find the right service <span>without leaving the call.</span></h1>
+            <p>Search naturally by scheme, sector, funding type or client need. Suggestions appear while you type.</p>
+        </div>
+        <a href="{% url 'toolkit:service_library' %}"
+           class="bde-hero-link">
+            Browse complete Service Library →
+        </a>
+    </header>
+
+    
+    <section class="bde-primary-search-shell">
+
+        <form method="get"
+              action="{% url 'toolkit:home' %}"
+              class="bde-page-search bde-feedback-form"
+              data-search-context="toolkit"
+              data-feedback-message="Searching services…"
+              autocomplete="off"
+ data-bnx-search-v41="1">
+
+            <span class="bde-page-search-icon" aria-hidden="true">
+                ⌕
+            </span>
+
+            <input
+                type="search"
+                name="q"
+                value="{{ query }}"
+                placeholder="Search schemes, grants, loans, sectors or client needs..."
+                autocomplete="off"
+                aria-label="Search BharatNXT services">
+
+            <button
+    type="submit"
+    class="search-shortcut bnx-full-search-button-v41"
+    aria-label="See all search results">
+    See all results
+    <span aria-hidden="true">↵</span>
+</button>
+
+            <div class="bde-page-suggestions"
+                 hidden></div>
+
+        </form>
+
+<div
+    class="bnx-search-help-v41"
+    id="bnx-search-help-v41"
+    role="status"
+    aria-live="polite">
+
+    <span
+        class="bnx-search-help-icon-v41"
+        aria-hidden="true">
+        i
+    </span>
+
+    <span id="bnx-search-help-text-v41">
+        Suggestions appear instantly while you type.
+        Press Enter or click <strong>See all results</strong>
+        to view the complete list of matching services.
+    </span>
+
+</div>
+
+
+        <div class="bde-search-examples">
+            <span>QUICK SEARCHES</span>
+            <a href="?q=grant">Grants</a>
+            <a href="?q=women">Women</a>
+            <a href="?q=agriculture">Agriculture</a>
+            <a href="?q=technology">Technology</a>
+            <a href="?q=loan">Loans</a>
+        </div>
+
+    </section>
+
+
+    <details class="bde-filter-panel" {% if selected_sector or selected_category or selected_kind or selected_deadline %}open{% endif %} data-bnx-filters-always-open-v1="1">
+        <summary aria-expanded="true" aria-disabled="true" tabindex="-1">
+            <span>Filters</span>
+            <small>Sector, category, type and deadline</small>
+        </summary>
+
+        <form method="get"
+              class="bde-filter-grid bde-feedback-form"
+              data-feedback-message="Applying filters…">
+            {% if query %}
+                <input type="hidden" name="q" value="{{ query }}">
+            {% endif %}
+
+            <label>
+                <span>Sector</span>
+                <select name="sector">
+                    <option value="">All sectors</option>
+                    {% for item in sector_options %}
+                        <option value="{{ item.name }}"
+                                {% if selected_sector == item.name %}selected{% endif %}>
+                            {{ item.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </label>
+
+            <label>
+                <span>Category</span>
+                <select name="category">
+                    <option value="">All categories</option>
+                    {% for item in categories %}
+                        <option value="{{ item.pk }}"
+                                {% if selected_category == item.pk|stringformat:"s" %}selected{% endif %}>
+                            {{ item.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </label>
+
+            <label>
+                <span>Service type</span>
+                <select name="kind">
+                    <option value="">All types</option>
+                    {% for value, label in service_kinds %}
+                        <option value="{{ value }}"
+                                {% if selected_kind == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </label>
+
+            <label>
+                <span>Deadline</span>
+                <select name="deadline">
+                    <option value="">Any deadline</option>
+                    <option value="urgent" {% if selected_deadline == "urgent" %}selected{% endif %}>Within 7 days</option>
+                    <option value="closing" {% if selected_deadline == "closing" %}selected{% endif %}>Within 30 days</option>
+                    <option value="no_deadline" {% if selected_deadline == "no_deadline" %}selected{% endif %}>No fixed date</option>
+                </select>
+            </label>
+
+            <button type="submit" class="secondary-button">Apply filters</button>
+        </form>
+    </details>
+
+    <section class="bde-results-section">
+        <div class="bde-results-head">
+            <div>
+                <div class="bde-eyebrow">
+                    {% if query %}SEARCH RESULTS{% else %}ALL AVAILABLE SERVICES{% endif %}
+                </div>
+                <h2>
+                    {% if query %}
+                        {{ result_count }} result{{ result_count|pluralize }} for “{{ query }}”
+                    {% else %}
+                        {{ result_count }} services ready to browse
+                    {% endif %}
+                </h2>
+            </div>
+
+            <a href="{% url 'toolkit:service_library' %}"
+               class="secondary-button">
+                Open Service Library
+            </a>
+        </div>
+
+        <div class="bde-service-list">
+            {% for service in services %}
+                <article class="bde-service-row">
+                    <div class="bde-service-row-main">
+                        <div class="bde-service-row-topline">
+                            <span class="bde-service-code">{{ service.service_id }}</span>
+                            <span class="bde-pill">{{ service.get_service_kind_display }}</span>
+                            <span class="bde-pitch-state {{ service.pitch_state_code|lower }}">
+                                {{ service.pitch_state_label }}
+                            </span>
+                        </div>
+
+                        <a href="{% url 'toolkit:service_detail' service.slug %}"
+                           class="bde-service-row-title">
+                            {{ service.title }}
+                        </a>
+
+                        <div class="bde-service-row-path">
+                            {{ service.domain.name }} · {{ service.category.name }}
+                        </div>
+
+                        {% if service.bde_summary %}
+                            <p>{{ service.bde_summary|truncatechars:170 }}</p>
+                        {% elif service.overview %}
+                            <p>{{ service.overview|truncatechars:170 }}</p>
+                        {% elif service.benefits %}
+                            <p>{{ service.benefits|truncatechars:170 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="bde-service-row-facts">
+                        <div>
+                            <span>Deadline</span>
+                            <strong>{{ service.bde_deadline_label|truncatechars:42 }}</strong>
+                        </div>
+                        {% if service.funding_organisation %}
+                            <div>
+                                <span>Run by</span>
+                                <strong>{{ service.funding_organisation|truncatechars:48 }}</strong>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="bde-service-row-actions">
+                        <button type="button"
+                                class="secondary-button bde-quick-button"
+                                data-service-quick="{{ service.pk }}">
+                            Quick View
+                        </button>
+
+                        {% if service.primary_source %}
+                            <a href="{% url 'toolkit:service_source_open' service.pk service.primary_source.pk %}"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="bde-external-button">
+                                Open Scheme ↗
+                            </a>
+                        {% endif %}
+
+                        <a href="{% url 'toolkit:service_detail' service.slug %}"
+                           class="primary-button">
+                            Details
+                        </a>
+
+                        <form method="post"
+                              action="{% url 'toolkit:toggle_saved_service' service.pk %}"
+                              class="bde-ajax-save">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                            <button type="submit"
+                                    class="bde-save-icon {% if service.pk in saved_service_ids %}saved{% endif %}"
+                                    aria-label="Save service">
+                                {% if service.pk in saved_service_ids %}<span class="bn-bookmark-icon is-saved" aria-hidden="true"></span>{% else %}<span class="bn-bookmark-icon" aria-hidden="true"></span>{% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="bde-empty-state">
+                    <span>⌕</span>
+                    <h3>No matching service found</h3>
+                    <p>Try a broader term or remove a filter. The Toolkit only shows real published records.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+
+<!-- BNX_SEARCH_UX_V41 -->
+<style id="BNX_SEARCH_UX_V41">
+
+[data-bnx-search-v41="1"]
+.bnx-full-search-button-v41 {
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+
+    min-height: 42px !important;
+
+    padding:
+        0 16px !important;
+
+    border:
+        1px solid #1769ff !important;
+
+    border-radius:
+        11px !important;
+
+    background:
+        #1769ff !important;
+
+    color:
+        #ffffff !important;
+
+    font-size:
+        13px !important;
+
+    font-weight:
+        700 !important;
+
+    line-height:
+        1 !important;
+
+    white-space:
+        nowrap !important;
+
+    cursor:
+        pointer !important;
+
+    pointer-events:
+        auto !important;
+
+    box-shadow:
+        0 5px 16px
+        rgba(23, 105, 255, .18) !important;
+
+    transition:
+        background .15s ease,
+        border-color .15s ease,
+        box-shadow .15s ease,
+        transform .15s ease !important;
+}
+
+
+[data-bnx-search-v41="1"]
+.bnx-full-search-button-v41:hover {
+
+    background:
+        #0f5ce8 !important;
+
+    border-color:
+        #0f5ce8 !important;
+
+    box-shadow:
+        0 7px 20px
+        rgba(23, 105, 255, .23) !important;
+
+    transform:
+        translateY(-1px) !important;
+}
+
+
+[data-bnx-search-v41="1"]
+.bnx-full-search-button-v41:active {
+
+    transform:
+        translateY(0) !important;
+}
+
+
+[data-bnx-search-v41="1"]
+.bnx-full-search-button-v41:focus-visible {
+
+    outline:
+        3px solid
+        rgba(23, 105, 255, .22) !important;
+
+    outline-offset:
+        2px !important;
+}
+
+
+.bnx-search-help-v41 {
+
+    display:
+        flex;
+
+    align-items:
+        flex-start;
+
+    gap:
+        8px;
+
+    width:
+        fit-content;
+
+    max-width:
+        100%;
+
+    margin:
+        9px 0 0;
+
+    padding:
+        7px 10px;
+
+    border:
+        1px solid
+        rgba(23, 105, 255, .13);
+
+    border-radius:
+        9px;
+
+    background:
+        rgba(23, 105, 255, .04);
+
+    color:
+        #667085;
+
+    font-size:
+        12.5px;
+
+    font-weight:
+        500;
+
+    line-height:
+        1.4;
+}
+
+
+.bnx-search-help-v41 strong {
+
+    color:
+        #344054;
+
+    font-weight:
+        700;
+}
+
+
+.bnx-search-help-icon-v41 {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    flex:
+        0 0 16px;
+
+    width:
+        16px;
+
+    height:
+        16px;
+
+    margin-top:
+        1px;
+
+    border-radius:
+        50%;
+
+    background:
+        #eaf2ff;
+
+    color:
+        #1769ff;
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+}
+
+
+.bnx-search-help-v41.is-searching
+.bnx-search-help-icon-v41 {
+
+    animation:
+        bnxSearchPulseV41
+        .75s ease-in-out infinite;
+}
+
+
+@keyframes bnxSearchPulseV41 {
+
+    0%,
+    100% {
+        opacity: .4;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+}
+
+</style>
+
+
+<script id="BNX_SEARCH_UX_V41_SCRIPT">
+
+(function () {
+
+    "use strict";
+
+
+    const form =
+        document.querySelector(
+            '[data-bnx-search-v41="1"]'
+        );
+
+
+    if (!form) {
+        return;
+    }
+
+
+    const input =
+        form.querySelector(
+            'input[name="q"]'
+        );
+
+
+    const button =
+        form.querySelector(
+            ".bnx-full-search-button-v41"
+        );
+
+
+    const help =
+        document.getElementById(
+            "bnx-search-help-v41"
+        );
+
+
+    const helpText =
+        document.getElementById(
+            "bnx-search-help-text-v41"
+        );
+
+
+    if (
+        !input
+        ||
+        !help
+        ||
+        !helpText
+    ) {
+        return;
+    }
+
+
+    function defaultMessage() {
+
+        help.classList.remove(
+            "is-searching"
+        );
+
+
+        helpText.innerHTML =
+            'Suggestions appear instantly while you type. '
+            + 'Press Enter or click '
+            + '<strong>See all results</strong> '
+            + 'to view the complete list of matching services.';
+
+    }
+
+
+    function typingMessage() {
+
+        const query =
+            input.value.trim();
+
+
+        if (!query) {
+
+            defaultMessage();
+
+            return;
+
+        }
+
+
+        help.classList.remove(
+            "is-searching"
+        );
+
+
+        helpText.innerHTML =
+            'Showing instant suggestions for <strong></strong>. '
+            + 'Press Enter or click '
+            + '<strong>See all results</strong> '
+            + 'to view every matching service.';
+
+
+        const firstStrong =
+            helpText.querySelector(
+                "strong"
+            );
+
+
+        if (firstStrong) {
+
+            firstStrong.textContent =
+                "“" + query + "”";
+
+        }
+
+    }
+
+
+    input.addEventListener(
+        "input",
+        typingMessage
+    );
+
+
+    form.addEventListener(
+        "submit",
+        function () {
+
+            help.classList.add(
+                "is-searching"
+            );
+
+
+            helpText.textContent =
+                "Opening complete search results…";
+
+
+            if (button) {
+
+                button.disabled =
+                    true;
+
+                button.innerHTML =
+                    "Searching…";
+
+            }
+
+        }
+    );
+
+
+    typingMessage();
+
+})();
+
+</script>
+
+
+
+<!-- BNX_FILTERS_ALWAYS_OPEN_V1 -->
+<style id="BNX_FILTERS_ALWAYS_OPEN_V1_STYLE">
+
+details[data-bnx-filters-always-open-v1="1"]
+> summary {
+    cursor: default !important;
+}
+
+details[data-bnx-filters-always-open-v1="1"]
+> summary::marker {
+    display: none;
+}
+
+</style>
+
+<script id="BNX_FILTERS_ALWAYS_OPEN_V1_SCRIPT">
+
+(function () {
+
+    "use strict";
+
+    const filters =
+        document.querySelector(
+            'details[data-bnx-filters-always-open-v1="1"]'
+        );
+
+    if (!filters) {
+        return;
+    }
+
+    filters.open = true;
+
+
+    const summary =
+        filters.querySelector(
+            ":scope > summary"
+        );
+
+
+    if (summary) {
+
+        summary.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+
+                filters.open = true;
+
+            }
+        );
+
+    }
+
+
+    filters.addEventListener(
+        "toggle",
+        function () {
+
+            if (!filters.open) {
+
+                filters.open = true;
+
+            }
+
+        }
+    );
+
+})();
+
+</script>
+
+{% endblock %}

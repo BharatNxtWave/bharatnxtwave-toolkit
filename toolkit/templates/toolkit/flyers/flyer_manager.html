@@ -1,0 +1,116 @@
+{% extends "admin_base.html" %}
+{% load static %}
+
+{% block title %}Flyer Manager | BharatNXT Wave{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/service_flyers.css' %}">
+
+<div class="bnx-flyer-admin-page">
+
+    <header class="bnx-flyer-admin-header">
+        <div>
+            <span class="bnx-flyer-eyebrow">TOOLKIT CONTENT</span>
+            <h1>Flyer Manager</h1>
+            <p>
+                Find the exact scheme by name or Service ID, then upload or
+                replace its official flyer.
+            </p>
+        </div>
+
+        <div class="bnx-flyer-admin-stats" aria-label="Flyer coverage">
+            <div>
+                <span>Services</span>
+                <strong>{{ total_services }}</strong>
+            </div>
+            <div>
+                <span>With flyers</span>
+                <strong>{{ services_with_flyers }}</strong>
+            </div>
+        </div>
+    </header>
+
+    <form method="get" class="bnx-flyer-search" role="search">
+        <label for="flyer-manager-search">Scheme name or Service ID</label>
+        <div>
+            <input
+                id="flyer-manager-search"
+                type="search"
+                name="q"
+                value="{{ query }}"
+                placeholder="Example: IVP or BNXT-SVC-CDFC2C8B0B13"
+                autocomplete="off">
+            <button type="submit">Search schemes</button>
+        </div>
+    </form>
+
+    <section class="bnx-flyer-service-list" aria-label="Toolkit schemes">
+        <div class="bnx-flyer-list-head">
+            <span>Scheme</span>
+            <span>Current flyer</span>
+            <span>Action</span>
+        </div>
+
+        {% for service in page.object_list %}
+            {% with flyer=service.current_flyer_rows.0 %}
+                <article class="bnx-flyer-service-row">
+                    <div class="bnx-flyer-service-identity">
+                        <strong>{{ service.title }}</strong>
+                        <code>{{ service.service_id }}</code>
+                        <small>
+                            {{ service.domain.name }} · {{ service.category.name }}
+                        </small>
+                    </div>
+
+                    <div>
+                        {% if flyer %}
+                            <span class="bnx-flyer-status available">
+                                Version {{ flyer.version }} available
+                            </span>
+                            <small>{{ flyer.original_filename }}</small>
+                        {% else %}
+                            <span class="bnx-flyer-status missing">
+                                No flyer uploaded
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="bnx-flyer-row-action">
+                        <a href="{% url 'toolkit:flyer_upload' service.pk %}">
+                            {% if flyer %}Update flyer{% else %}Upload flyer{% endif %}
+                        </a>
+                    </div>
+                </article>
+            {% endwith %}
+        {% empty %}
+            <div class="bnx-flyer-empty">
+                <strong>No matching scheme found.</strong>
+                <span>Check the scheme name or permanent Service ID.</span>
+            </div>
+        {% endfor %}
+    </section>
+
+    {% if page.paginator.num_pages > 1 %}
+        <nav class="bnx-flyer-pagination" aria-label="Flyer Manager pages">
+            {% if page.has_previous %}
+                <a href="?q={{ query|urlencode }}&page={{ page.previous_page_number }}">
+                    Previous
+                </a>
+            {% endif %}
+
+            <span>
+                Page {{ page.number }} of {{ page.paginator.num_pages }}
+            </span>
+
+            {% if page.has_next %}
+                <a href="?q={{ query|urlencode }}&page={{ page.next_page_number }}">
+                    Next
+                </a>
+            {% endif %}
+        </nav>
+    {% endif %}
+
+</div>
+
+{% endblock %}

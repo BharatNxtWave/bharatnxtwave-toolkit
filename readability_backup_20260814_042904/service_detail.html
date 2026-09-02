@@ -1,0 +1,519 @@
+{% extends "base.html" %}
+
+{% block title %}{{ service.title }} | BharatNXT Wave{% endblock %}
+
+{% block content %}
+<!-- SERVICE_PITCH_WINDOW_STATUS -->
+
+<div class="service-pitch-banner {{ service.pitch_state_code|lower }}">
+
+    <div>
+
+        <span class="service-pitch-banner-label">
+            BDE PITCH STATUS
+        </span>
+
+        <strong>
+            {{ service.pitch_state_label }}
+        </strong>
+
+    </div>
+
+
+    <div class="service-pitch-banner-dates">
+
+        {% if service.effective_from %}
+
+            <span>
+                Effective:
+                <strong>
+                    {{ service.effective_from|date:"d M Y" }}
+                </strong>
+            </span>
+
+        {% endif %}
+
+
+        {% if service.pitch_until %}
+
+            <span>
+                Pitch Until:
+                <strong>
+                    {{ service.pitch_until|date:"d M Y" }}
+                </strong>
+            </span>
+
+        {% endif %}
+
+
+        {% if service.application_deadline %}
+
+            <span>
+                Application Deadline:
+                <strong>
+                    {{ service.application_deadline|date:"d M Y" }}
+                </strong>
+            </span>
+
+        {% endif %}
+
+
+        {% if service.pitch_days_remaining != None and service.is_pitchable_now %}
+
+            <span>
+                <strong>
+                    {{ service.pitch_days_remaining }}
+                    day{{ service.pitch_days_remaining|pluralize }}
+                    remaining
+                </strong>
+            </span>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<div class="service-detail-header">
+
+    <a
+        href="{% url 'toolkit:home' %}"
+        class="service-back-link">
+        ← Back to Business Toolkit
+    </a>
+
+
+    <div class="page-eyebrow">
+        {{ service.service_id }}
+    </div>
+
+    <div class="service-title-row">
+
+        <div>
+
+            <h1 class="page-title">
+                {{ service.title }}
+            </h1>
+
+            <div class="service-breadcrumb">
+                {{ service.domain.name }}
+                <span>›</span>
+                {{ service.category.name }}
+                <span>›</span>
+                {{ service.get_service_kind_display }}
+            </div>
+
+        </div>
+
+        <div class="service-header-actions">
+
+            <form
+                method="post"
+                action="{% url 'toolkit:toggle_saved_service' service.pk %}"
+                class="save-service-form">
+
+                {% csrf_token %}
+
+                <input
+                    type="hidden"
+                    name="next"
+                    value="{{ request.path }}">
+
+                <button
+                    type="submit"
+                    class="save-service-button {% if is_saved %}saved{% endif %}">
+
+                    {% if is_saved %}
+                        ★ Saved
+                    {% else %}
+                        ☆ Save
+                    {% endif %}
+
+                </button>
+
+            </form>
+
+            <span class="status-badge active">
+                {{ service.get_status_display }}
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+{% if service.bde_summary %}
+
+<div class="card service-call-card">
+
+    <div class="service-section-label">
+        QUICK CALL SUMMARY
+    </div>
+
+    <div class="service-call-summary">
+        {{ service.bde_summary|linebreaksbr }}
+    </div>
+
+</div>
+
+{% endif %}
+
+
+<div class="service-detail-grid">
+
+
+    <div class="service-main-column">
+
+
+        {% if service.overview %}
+
+        <section class="card service-section">
+
+            <div class="service-section-label">
+                OVERVIEW
+            </div>
+
+            <div class="service-copy">
+                {{ service.overview|linebreaks }}
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+        {% if service.benefits %}
+
+        <section class="card service-section">
+
+            <div class="service-section-label">
+                BENEFITS
+            </div>
+
+            <div class="service-copy">
+                {{ service.benefits|linebreaks }}
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+        {% if service.eligibility_summary or service.business_types or service.business_stages or service.industries or service.applicable_states or service.founder_categories %}
+
+        <section class="card service-section">
+
+            <div class="service-section-label">
+                ELIGIBILITY
+            </div>
+
+            {% if service.eligibility_summary %}
+                <div class="service-copy">
+                    {{ service.eligibility_summary|linebreaks }}
+                </div>
+            {% endif %}
+
+
+            <div class="service-info-grid">
+
+                {% if service.business_types %}
+                    <div class="service-info-item">
+                        <span>Business Types</span>
+                        <strong>{{ service.business_types|join:", " }}</strong>
+                    </div>
+                {% endif %}
+
+                {% if service.business_stages %}
+                    <div class="service-info-item">
+                        <span>Business Stages</span>
+                        <strong>{{ service.business_stages|join:", " }}</strong>
+                    </div>
+                {% endif %}
+
+                {% if service.industries %}
+                    <div class="service-info-item">
+                        <span>Industries</span>
+                        <strong>{{ service.industries|join:", " }}</strong>
+                    </div>
+                {% endif %}
+
+                {% if service.applicable_states %}
+                    <div class="service-info-item">
+                        <span>Applicable States</span>
+                        <strong>{{ service.applicable_states|join:", " }}</strong>
+                    </div>
+                {% endif %}
+
+                {% if service.founder_categories %}
+                    <div class="service-info-item">
+                        <span>Founder Categories</span>
+                        <strong>{{ service.founder_categories|join:", " }}</strong>
+                    </div>
+                {% endif %}
+
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+        {% if service.restrictions %}
+
+        <section class="card service-section">
+
+            <div class="service-section-label">
+                RESTRICTIONS
+            </div>
+
+            <div class="service-copy">
+                {{ service.restrictions|linebreaks }}
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+        {% if service.important_notes %}
+
+        <section class="card service-section">
+
+            <div class="service-section-label">
+                IMPORTANT NOTES
+            </div>
+
+            <div class="service-copy">
+                {{ service.important_notes|linebreaks }}
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+        {% if service.sales_pitch %}
+
+        <section class="card service-section">
+
+            <div class="service-section-label">
+                BDE SALES PITCH
+            </div>
+
+            <div class="service-copy">
+                {{ service.sales_pitch|linebreaks }}
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+        {% if service.internal_notes %}
+
+        <section class="card service-section">
+
+            <div class="service-section-label">
+                INTERNAL NOTES
+            </div>
+
+            <div class="service-copy">
+                {{ service.internal_notes|linebreaks }}
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+    </div>
+
+
+    <aside class="service-side-column">
+
+
+        <div class="card service-facts-card">
+
+            <div class="service-section-label">
+                QUICK FACTS
+            </div>
+
+
+            {% if service.estimated_processing_time %}
+
+            <div class="service-fact">
+                <span>Processing Time</span>
+                <strong>{{ service.estimated_processing_time }}</strong>
+            </div>
+
+            {% endif %}
+
+
+            {% if service.application_deadline %}
+
+            <div class="service-fact">
+                <span>Deadline</span>
+                <strong>{{ service.application_deadline|date:"d M Y" }}</strong>
+            </div>
+
+            {% endif %}
+
+
+            {% if service.government_fee != None %}
+
+            <div class="service-fact">
+                <span>Government Fee</span>
+                <strong>₹{{ service.government_fee }}</strong>
+            </div>
+
+            {% endif %}
+
+
+            {% if service.bharatnxt_fee != None %}
+
+            <div class="service-fact">
+                <span>BharatNXT Fee</span>
+                <strong>₹{{ service.bharatnxt_fee }}</strong>
+            </div>
+
+            {% endif %}
+
+
+            {% if service.funding_min != None or service.funding_max != None %}
+
+            <div class="service-fact">
+                <span>Funding Range</span>
+
+                <strong>
+                    {% if service.funding_min != None %}
+                        ₹{{ service.funding_min }}
+                    {% endif %}
+
+                    {% if service.funding_min != None and service.funding_max != None %}
+                        –
+                    {% endif %}
+
+                    {% if service.funding_max != None %}
+                        ₹{{ service.funding_max }}
+                    {% endif %}
+                </strong>
+            </div>
+
+            {% endif %}
+
+
+            {% if service.funding_type %}
+
+            <div class="service-fact">
+                <span>Funding Type</span>
+                <strong>{{ service.funding_type }}</strong>
+            </div>
+
+            {% endif %}
+
+
+            {% if service.tenure %}
+
+            <div class="service-fact">
+                <span>Tenure</span>
+                <strong>{{ service.tenure }}</strong>
+            </div>
+
+            {% endif %}
+
+
+            {% if service.collateral_required != None %}
+
+            <div class="service-fact">
+                <span>Collateral</span>
+
+                <strong>
+                    {% if service.collateral_required %}
+                        Required
+                    {% else %}
+                        Not Required
+                    {% endif %}
+                </strong>
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="card service-facts-card">
+
+            <div class="service-section-label">
+                DATA CONFIDENCE
+            </div>
+
+            <div class="service-fact">
+                <span>Version</span>
+                <strong>{{ service.version }}</strong>
+            </div>
+
+
+            <div class="service-fact">
+                <span>Last Updated</span>
+                <strong>{{ service.updated_at|date:"d M Y" }}</strong>
+            </div>
+
+
+            <div class="service-fact">
+                <span>Last Verified</span>
+
+                <strong>
+                    {% if service.last_verified_at %}
+                        {{ service.last_verified_at|date:"d M Y" }}
+                    {% else %}
+                        Not recorded
+                    {% endif %}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        {% if service.pricing_notes %}
+
+        <div class="card service-facts-card">
+
+            <div class="service-section-label">
+                PRICING NOTES
+            </div>
+
+            <div class="service-copy">
+                {{ service.pricing_notes|linebreaks }}
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        {% if service.escalation_notes %}
+
+        <div class="card service-facts-card">
+
+            <div class="service-section-label">
+                ESCALATION
+            </div>
+
+            <div class="service-copy">
+                {{ service.escalation_notes|linebreaks }}
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+    </aside>
+
+</div>
+
+{% endblock %}

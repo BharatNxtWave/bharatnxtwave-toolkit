@@ -1,0 +1,244 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Toolkit Management | BharatNXT Wave{% endblock %}
+
+{% block content %}
+
+<div class="page-eyebrow">
+    DATA MANAGEMENT
+</div>
+
+<h1 class="page-title">
+    Toolkit Management
+</h1>
+
+<p class="page-description">
+    Manage the service and scheme information available to BharatNXT Wave employees.
+</p>
+
+
+<div class="card activity-filter-card">
+
+    <form method="get" class="activity-filters">
+
+        <input
+            type="search"
+            name="q"
+            value="{{ query }}"
+            placeholder="Search service or scheme..."
+            class="activity-search"
+        >
+
+        <select
+            name="domain"
+            class="activity-select">
+
+            <option value="">
+                All domains
+            </option>
+
+            {% for domain in domains %}
+
+                <option
+                    value="{{ domain.slug }}"
+                    {% if selected_domain == domain.slug %}selected{% endif %}
+                >
+                    {{ domain.name }}
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+
+        <select
+            name="status"
+            class="activity-select">
+
+            <option value="">
+                All statuses
+            </option>
+
+            {% for value, label in status_choices %}
+
+                <option
+                    value="{{ value }}"
+                    {% if selected_status == value %}selected{% endif %}
+                >
+                    {{ label }}
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+
+        <button
+            type="submit"
+            class="primary-button">
+            Filter
+        </button>
+
+
+        {% if query or selected_domain or selected_status %}
+
+        <a
+            href="{% url 'toolkit:admin_service_list' %}"
+            class="secondary-button">
+            Clear
+        </a>
+
+        {% endif %}
+
+    </form>
+
+</div>
+
+
+<div class="card employee-table-card">
+
+    <div class="table-header">
+
+        <div>
+
+            <div class="table-title">
+                Services & Schemes
+            </div>
+
+            <div class="table-subtitle">
+                Draft, review, verify and maintain toolkit records
+            </div>
+
+        </div>
+
+
+        <a
+            href="{% url 'toolkit:admin_service_create' %}"
+            class="primary-button">
+            + Add Service
+        </a>
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table class="employee-table">
+
+            <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>Domain</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Verified</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for service in services %}
+
+                <tr>
+
+                    <td>
+
+                        <div class="employee-name">
+                            {{ service.title }}
+                        </div>
+
+                        <div class="employee-email">
+                            {{ service.service_id }}
+                        </div>
+
+                    </td>
+
+                    <td>
+                        {{ service.domain.name }}
+                    </td>
+
+                    <td>
+                        {{ service.get_service_kind_display }}
+                    </td>
+
+                    <td>
+                        <span class="status-badge {% if service.status == 'PUBLISHED' or service.status == 'APPROVED' %}active{% else %}inactive{% endif %}">
+                            {{ service.get_status_display }}
+                        </span>
+                    </td>
+
+                    <td>
+
+                        {% if service.last_verified_at %}
+
+                            <div class="employee-name">
+                                {{ service.last_verified_at|date:"d M Y" }}
+                            </div>
+
+                            <div class="employee-email">
+                                {% if service.verified_by %}
+                                    {{ service.verified_by.username }}
+                                {% endif %}
+                            </div>
+
+                        {% else %}
+
+                            <span class="muted-action">
+                                Not verified
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <div class="employee-actions">
+
+                            <a
+                                href="{% url 'toolkit:admin_service_edit' service.pk %}"
+                                class="table-action-button">
+                                Edit
+                            </a>
+
+                            <form
+                                method="post"
+                                action="{% url 'toolkit:admin_service_verify' service.pk %}"
+                                class="inline-action-form">
+
+                                {% csrf_token %}
+
+                                <button
+                                    type="submit"
+                                    class="table-action-button success-action">
+                                    Verify
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="6">
+                        No toolkit services found.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

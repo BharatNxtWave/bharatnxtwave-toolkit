@@ -1,0 +1,734 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Search Intelligence | BharatNXT Wave{% endblock %}
+
+{% block content %}
+
+<div class="page-eyebrow">
+    BDE SEARCH INTELLIGENCE
+</div>
+
+<div class="dashboard-title-row">
+
+    <div>
+
+        <h1 class="page-title">
+            Search Intelligence
+        </h1>
+
+        <p class="page-description">
+            Search the BharatNXT toolkit and analyse your real client-call research activity.
+        </p>
+
+    </div>
+
+    <a href="{% url 'toolkit:saved_services' %}"
+       class="secondary-button">
+        ★ {{ saved_count }} Saved
+    </a>
+
+</div>
+
+
+<!-- REAL SEARCH -->
+
+<section class="bde-dashboard-search">
+
+    <div class="bde-search-heading">
+        Search BharatNXT Wave Toolkit
+    </div>
+
+    <div class="bde-search-subheading">
+        Search schemes, funding, registrations, compliance, certifications and business services.
+    </div>
+
+    <form method="get"
+          action="{% url 'toolkit:home' %}">
+
+        <div class="toolkit-search-wrapper">
+
+            <input
+                id="toolkit-search-input"
+                class="toolkit-search-input bde-dashboard-search-input"
+                type="search"
+                name="q"
+                placeholder="Try: technology schemes, Startup India, MSME loan..."
+                autocomplete="off"
+            >
+
+            <div
+                id="toolkit-suggestions"
+                class="toolkit-suggestions"
+                hidden>
+            </div>
+
+        </div>
+
+    </form>
+
+</section>
+
+
+<!-- DATE ANALYTICS -->
+
+<div class="dashboard-date-layout">
+
+
+    <!-- CALENDAR -->
+
+    <section class="card analytics-calendar-card">
+
+        <div class="calendar-header">
+
+            <div>
+
+                <div class="table-title">
+                    Activity Calendar
+                </div>
+
+                <div class="table-subtitle">
+                    Select dates to analyse searches
+                </div>
+
+            </div>
+
+
+            <div class="calendar-month-controls">
+
+                <a href="?month={{ previous_month }}&start={{ selected_start|date:'Y-m-d' }}&end={{ selected_end|date:'Y-m-d' }}"
+                   class="calendar-arrow">
+                    ‹
+                </a>
+
+                <strong>
+                    {{ calendar_title }}
+                </strong>
+
+                <a href="?month={{ next_month }}&start={{ selected_start|date:'Y-m-d' }}&end={{ selected_end|date:'Y-m-d' }}"
+                   class="calendar-arrow">
+                    ›
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="calendar-presets">
+
+            <a href="?preset=today"
+               class="calendar-preset {% if preset == 'today' %}active{% endif %}">
+                Today
+            </a>
+
+            <a href="?preset=7d"
+               class="calendar-preset {% if preset == '7d' or not preset %}active{% endif %}">
+                Last 7 Days
+            </a>
+
+            <a href="?preset=30d"
+               class="calendar-preset {% if preset == '30d' %}active{% endif %}">
+                Last 30 Days
+            </a>
+
+        </div>
+
+
+        <form method="get"
+              id="calendar-range-form">
+
+            <input type="hidden"
+                   name="month"
+                   value="{{ calendar_month_value }}">
+
+            <input type="hidden"
+                   id="calendar-start"
+                   name="start"
+                   value="{{ selected_start|date:'Y-m-d' }}">
+
+            <input type="hidden"
+                   id="calendar-end"
+                   name="end"
+                   value="{{ selected_end|date:'Y-m-d' }}">
+
+
+            <div class="calendar-weekdays">
+
+                <span>MON</span>
+                <span>TUE</span>
+                <span>WED</span>
+                <span>THU</span>
+                <span>FRI</span>
+                <span>SAT</span>
+                <span>SUN</span>
+
+            </div>
+
+
+            <div class="analytics-calendar">
+
+                {% for week in calendar_weeks %}
+
+                    {% for day in week %}
+
+                        <button
+                            type="button"
+                            class="calendar-day
+                                {% if not day.in_month %}outside{% endif %}
+                                {% if day.is_today %}today{% endif %}
+                                {% if day.selected %}selected{% endif %}"
+                            data-date="{{ day.date_value }}">
+
+                            <span class="calendar-day-number">
+                                {{ day.day }}
+                            </span>
+
+                            {% if day.search_count %}
+
+                                <span class="calendar-search-count">
+                                    {{ day.search_count }} search{{ day.search_count|pluralize:"es" }}
+                                </span>
+
+                            {% endif %}
+
+                        </button>
+
+                    {% endfor %}
+
+                {% endfor %}
+
+            </div>
+
+
+            <div class="calendar-selection-footer">
+
+                <div>
+
+                    <span class="calendar-selection-label">
+                        SELECTED
+                    </span>
+
+                    <strong id="calendar-range-label">
+                        {{ selected_start|date:"d M Y" }}
+                        —
+                        {{ selected_end|date:"d M Y" }}
+                    </strong>
+
+                </div>
+
+                <button type="submit"
+                        class="primary-button">
+                    Apply Range
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- KPI PANEL -->
+
+    <section class="calendar-kpi-panel">
+
+        <div class="card date-range-summary">
+
+            <div class="stat-label">
+                SELECTED PERIOD
+            </div>
+
+            <div class="date-range-title">
+                {{ selected_start|date:"d M Y" }}
+                —
+                {{ selected_end|date:"d M Y" }}
+            </div>
+
+        </div>
+
+
+        <div class="calendar-mini-kpis">
+
+            <div class="card search-kpi-card">
+                <div class="stat-label">SEARCHES</div>
+                <div class="search-kpi-value">{{ search_count }}</div>
+            </div>
+
+            <div class="card search-kpi-card">
+                <div class="stat-label">SERVICES VIEWED</div>
+                <div class="search-kpi-value">{{ services_viewed }}</div>
+            </div>
+
+            <div class="card search-kpi-card">
+                <div class="stat-label">ZERO-RESULT SEARCHES</div>
+                <div class="search-kpi-value">{{ zero_result_count }}</div>
+            </div>
+
+            <div class="card search-kpi-card">
+                <div class="stat-label">FILTER ACTIONS</div>
+                <div class="search-kpi-value">{{ filter_count }}</div>
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<!-- INTERACTIVE SEARCH CHART -->
+
+<section class="card search-activity-card dashboard-chart-large">
+
+    <div class="dashboard-card-heading">
+
+        <div>
+
+            <div class="table-title">
+                Toolkit Activity
+            </div>
+
+            <div class="table-subtitle">
+                Searches and Client Service Finder activity — click an active day to drill down
+            </div>
+
+        </div>
+
+        <div class="live-data-badge">
+            ● REAL DATA
+        </div>
+
+    </div>
+
+
+    <div class="search-bar-chart">
+
+        {% for day in activity_chart %}
+
+            <a href="?start={{ day.date_value }}&end={{ day.date_value }}&month={{ day.date|date:'Y-m' }}"
+               class="search-bar-column"
+                 data-total="{{ day.total_count }}">
+
+                
+                <div class="activity-bar-values">
+
+                    <span class="activity-search-value">
+                        S {{ day.search_count }}
+                    </span>
+
+                    <span class="activity-matcher-value">
+                        M {{ day.matcher_count }}
+                    </span>
+
+                </div>
+
+
+                <div class="search-bar-track">
+
+                    <div class="activity-series-bars">
+
+                        <div
+                            class="search-bar-fill activity-search-bar"
+                            data-height="{{ day.search_height }}">
+                        </div>
+
+                        <div
+                            class="search-bar-fill activity-matcher-bar"
+                            data-height="{{ day.matcher_height }}">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="search-bar-day">
+                    {{ day.label }}
+                </div>
+
+
+                <div class="activity-total-label">
+
+                    {% if day.total_count %}
+
+                        {{ day.total_count }}
+                        action{{ day.total_count|pluralize }}
+
+                    {% else %}
+
+                        No activity
+
+                    {% endif %}
+
+                </div>
+
+
+            </a>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+
+<!-- QUERY + ACTIVITY -->
+
+<div class="search-dashboard-secondary-grid">
+
+
+    <section class="card dashboard-list-card">
+
+        <div class="dashboard-card-heading">
+
+            <div>
+
+                <div class="table-title">
+                    Top Searches
+                </div>
+
+                <div class="table-subtitle">
+                    Most-used queries in selected period
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="top-query-list">
+
+            {% for item in top_queries %}
+
+                <a href="{% url 'toolkit:home' %}?q={{ item.query|urlencode }}"
+                   class="top-query-item">
+
+                    <span class="top-query-name">
+                        {{ item.query }}
+                    </span>
+
+                    <span class="top-query-count">
+                        {{ item.total }}
+                    </span>
+
+                </a>
+
+            {% empty %}
+
+                <div class="dashboard-empty">
+                    No searches recorded for this period.
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+
+    <section class="card dashboard-list-card">
+
+        <div class="dashboard-card-heading">
+
+            <div>
+
+                <div class="table-title">
+                    Recent Searches
+                </div>
+
+                <div class="table-subtitle">
+                    Repeat a recent toolkit search
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-activity-list">
+
+            {% for item in recent_searches %}
+
+                <a href="{% url 'toolkit:home' %}?q={{ item.query|urlencode }}"
+                   class="dashboard-activity-item">
+
+                    <div>
+
+                        <div class="dashboard-activity-title">
+                            {{ item.query }}
+                        </div>
+
+                        <div class="dashboard-activity-time">
+                            {{ item.result_count }} results
+                            ·
+                            {{ item.created_at|date:"d M, h:i A" }}
+                        </div>
+
+                    </div>
+
+                    <span>→</span>
+
+                </a>
+
+            {% empty %}
+
+                <div class="dashboard-empty">
+                    No searches in this date range.
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<div class="search-dashboard-secondary-grid">
+
+
+    <section class="card dashboard-list-card">
+
+        <div class="dashboard-card-heading">
+
+            <div>
+
+                <div class="table-title">
+                    Recently Viewed Services
+                </div>
+
+                <div class="table-subtitle">
+                    Services opened during this period
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-activity-list">
+
+            {% for item in recent_views %}
+
+                {% if item.service %}
+
+                    <a href="{% url 'toolkit:service_detail' item.service.slug %}"
+                       class="dashboard-activity-item">
+
+                        <div>
+
+                            <div class="dashboard-activity-title">
+                                {{ item.service.title }}
+                            </div>
+
+                            <div class="dashboard-activity-time">
+                                {{ item.created_at|date:"d M Y, h:i A" }}
+                            </div>
+
+                        </div>
+
+                        <span>→</span>
+
+                    </a>
+
+                {% endif %}
+
+            {% empty %}
+
+                <div class="dashboard-empty">
+                    No services viewed during this period.
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+
+    <section class="card dashboard-summary-card">
+
+        <div class="dashboard-card-heading">
+
+            <div>
+
+                <div class="table-title">
+                    Toolkit Access
+                </div>
+
+                <div class="table-subtitle">
+                    Current personal workspace
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-summary-content">
+
+            <div class="summary-metric">
+                <span>Searchable Services</span>
+                <strong>{{ available_services }}</strong>
+            </div>
+
+            <div class="summary-metric">
+                <span>Saved Services</span>
+                <strong>{{ saved_count }}</strong>
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+
+<!-- =====================================================
+     SCHEMES / SERVICES CLOSING SOON
+====================================================== -->
+
+{% if closing_soon_services %}
+
+<section class="closing-soon-section">
+
+    <div class="domain-explorer-heading">
+
+        <div>
+
+            <div class="table-title">
+                Closing Soon
+            </div>
+
+            <div class="table-subtitle">
+                Active Toolkit services that BDEs should prioritise before their pitch window closes
+            </div>
+
+        </div>
+
+
+        <a
+            href="{% url 'toolkit:home' %}?deadline=closing"
+            class="secondary-button">
+
+            View All Closing Soon
+
+        </a>
+
+    </div>
+
+
+    <div class="closing-soon-grid">
+
+        {% for service in closing_soon_services %}
+
+            <a
+                href="{% url 'toolkit:service_detail' service.slug %}"
+                class="closing-soon-card">
+
+                <div>
+
+                    <div class="closing-soon-title">
+                        {{ service.title }}
+                    </div>
+
+                    <div class="closing-soon-meta">
+                        {{ service.domain.name }}
+                        •
+                        {{ service.get_service_kind_display }}
+                    </div>
+
+                </div>
+
+
+                <div class="closing-soon-days {% if service.pitch_days_remaining <= 7 %}urgent{% endif %}">
+
+                    <strong>
+                        {{ service.pitch_days_remaining }}
+                    </strong>
+
+                    <span>
+                        days left
+                    </span>
+
+                </div>
+
+            </a>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endif %}
+
+
+<!-- DOMAINS -->
+
+<section class="domain-explorer-section">
+
+    <div class="domain-explorer-heading">
+
+        <div>
+
+            <div class="table-title">
+                Explore by Service Domain
+            </div>
+
+            <div class="table-subtitle">
+                Browse actual BharatNXT toolkit coverage
+            </div>
+
+        </div>
+
+        <a href="{% url 'toolkit:home' %}"
+           class="secondary-button">
+            Complete Toolkit
+        </a>
+
+    </div>
+
+
+    <div class="domain-explorer-grid">
+
+        {% for domain in domains %}
+
+            <a href="{% url 'toolkit:home' %}?domain={{ domain.slug }}"
+               class="domain-explorer-card">
+
+                <div class="domain-explorer-name">
+                    {{ domain.name }}
+                </div>
+
+                <div class="domain-explorer-footer">
+
+                    <span>
+                        {{ domain.visible_service_count }}
+                        services
+                    </span>
+
+                    <span>→</span>
+
+                </div>
+
+            </a>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+
+<script src="{% static 'js/toolkit_search.js' %}"></script>
+<script src="{% static 'js/dashboard_calendar.js' %}"></script>
+<script src="{% static 'js/dashboard_live.js' %}"></script>
+
+
+<script src="{% static 'js/dashboard_search_drilldown.js' %}"></script>
+
+{% endblock %}

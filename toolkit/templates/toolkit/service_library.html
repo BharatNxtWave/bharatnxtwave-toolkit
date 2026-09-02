@@ -1,0 +1,527 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Service Library | BharatNXT Wave{% endblock %}
+
+{% block content %}
+
+<style id="BNX_LIBRARY_COUNT_ALIGNMENT_FINAL">
+
+/* =========================================================
+   SERVICE LIBRARY — PUBLISHED SERVICES COUNT
+   Optical centering only.
+   Card dimensions and page layout remain unchanged.
+========================================================= */
+
+.bnx-library-total-card {
+
+    box-sizing:
+        border-box !important;
+
+    display:
+        flex !important;
+
+    flex-direction:
+        column !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    text-align:
+        center !important;
+
+    gap:
+        8px !important;
+
+}
+
+
+/* NUMBER */
+
+.bnx-library-total-card strong {
+
+    display:
+        block !important;
+
+    width:
+        100% !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    text-align:
+        center !important;
+
+    align-self:
+        center !important;
+
+    line-height:
+        1 !important;
+
+}
+
+
+/* "published services" */
+
+.bnx-library-total-card span {
+
+    display:
+        block !important;
+
+    width:
+        100% !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    text-align:
+        center !important;
+
+    align-self:
+        center !important;
+
+    line-height:
+        1.35 !important;
+
+}
+
+
+/*
+Remove inherited horizontal offsets
+that caused the visual misalignment.
+*/
+
+.bnx-library-total-card > * {
+
+    margin-left:
+        auto !important;
+
+    margin-right:
+        auto !important;
+
+}
+
+</style>
+
+
+<div class="bde-page bde-library-page">
+
+    <header class="bde-page-hero bde-library-hero">
+        <div>
+            <div class="bde-eyebrow">SERVICE LIBRARY</div>
+            <h1>Every service. <span>Organised for a live call.</span></h1>
+            <p>Browse the complete BDE catalog by category, or search instantly without losing your place.</p>
+        </div>
+        <div class="bde-library-total bnx-library-total-card">
+            <strong>{{ total_service_count }}</strong>
+            <span>published services</span>
+        </div>
+    </header>
+
+    <section class="bde-library-toolbar" aria-label="Service Library tools">
+        
+        <form method="get"
+              action="{% url 'toolkit:service_library' %}"
+              class="bde-page-search bde-library-page-search bde-feedback-form"
+              data-search-context="library"
+              data-feedback-message="Searching Service Library…"
+              autocomplete="off">
+
+            {% if selected_category %}
+                <input type="hidden"
+                       name="category"
+                       value="{{ selected_category }}">
+            {% endif %}
+
+            {% if selected_kind %}
+                <input type="hidden"
+                       name="kind"
+                       value="{{ selected_kind }}">
+            {% endif %}
+
+            <span class="bde-page-search-icon"
+                  aria-hidden="true">
+                ⌕
+            </span>
+
+            <input
+                type="search"
+                name="q"
+                value="{{ query }}"
+                placeholder="Search all {{ total_service_count }} published services..."
+                autocomplete="off"
+                aria-label="Search Service Library">
+
+            <span class="bde-page-search-shortcut">
+                Press Enter
+            </span>
+
+            <div class="bde-page-suggestions"
+                 hidden></div>
+
+        </form>
+
+
+        <form method="get"
+              class="bde-library-filter-form bde-feedback-form"
+              data-feedback-message="Updating Service Library…">
+            {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+            {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
+
+            <label>
+                <span>Service type</span>
+                <select name="kind"
+                        class="bde-auto-submit"
+                        aria-label="Filter by service type">
+                    <option value="">All service types</option>
+                    {% for value, label in service_kinds %}
+                        <option value="{{ value }}"
+                                {% if selected_kind == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </label>
+
+            {% if query or selected_category or selected_kind %}
+                <a href="{% url 'toolkit:service_library' %}"
+                   class="bde-clear-library">
+                    Clear filters
+                </a>
+            {% endif %}
+        </form>
+    </section>
+
+    {% if query %}
+        <div class="bde-active-search-line" role="status">
+            <span>Search</span>
+            <strong>“{{ query }}”</strong>
+            <b>{{ result_count }} match{{ result_count|pluralize:"es" }}</b>
+        </div>
+    {% endif %}
+
+    <div class="bde-library-grid">
+
+        <aside class="bde-library-categories">
+            <div class="bde-library-pane-head">
+                <span>CATEGORIES</span>
+                <strong>Browse</strong>
+            </div>
+
+            <a href="{% url 'toolkit:service_library' %}{% if query or selected_kind %}?{% if query %}q={{ query|urlencode }}{% endif %}{% if query and selected_kind %}&{% endif %}{% if selected_kind %}kind={{ selected_kind|urlencode }}{% endif %}{% endif %}"
+               class="bde-category-link {% if not selected_category %}active{% endif %}">
+                <span>All Services</span>
+                <strong>{{ total_service_count }}</strong>
+            </a>
+
+            <div class="bde-category-scroll">
+                {% for item in categories %}
+                    {% if item.bde_count %}
+                        {% ifchanged item.domain.name %}
+                            <div class="bde-category-group-label">
+                                {{ item.domain.name }}
+                            </div>
+                        {% endifchanged %}
+
+                        <a href="?category={{ item.pk }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if selected_kind %}&kind={{ selected_kind|urlencode }}{% endif %}"
+                           class="bde-category-link {% if selected_category == item.pk|stringformat:'s' %}active{% endif %}">
+                            <span>{{ item.name }}</span>
+                            <strong>{{ item.bde_count }}</strong>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </aside>
+
+        <section class="bde-library-results">
+            <div class="bde-library-pane-head">
+                <span>SERVICES</span>
+                <strong>{{ result_count }} shown</strong>
+            </div>
+
+            <div class="bde-library-list">
+                {% for service in services %}
+                    <button type="button"
+                            class="bde-library-row {% if selected_service and selected_service.pk == service.pk %}active{% endif %}"
+                            data-service-quick="{{ service.pk }}"
+                            data-quick-mode="library">
+                        <div>
+                            <span class="bde-service-code">{{ service.service_id }}</span>
+                            <strong>{{ service.title }}</strong>
+                            <small>
+                                {{ service.get_service_kind_display }}
+                                ·
+                                {{ service.category.name }}
+                            </small>
+                        </div>
+
+                        <div class="bde-library-row-side">
+                            <span>{{ service.bde_deadline_label|truncatechars:24 }}</span>
+                            <i>›</i>
+                        </div>
+                    </button>
+                {% empty %}
+                    <div class="bde-empty-state compact">
+                        <h3>No services in this view</h3>
+                        <p>Remove a filter or search another phrase.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <aside id="bde-library-preview"
+               class="bde-library-preview">
+
+            {% if selected_service %}
+
+                <div class="bde-preview-kicker">
+                    CALL QUICK VIEW
+                </div>
+
+                <div class="bde-preview-code">
+                    {{ selected_service.service_id }}
+                </div>
+
+
+                <h2>
+                    {{ selected_service.title }}
+                </h2>
+
+
+                <div class="bde-preview-tags">
+
+                    <span>
+                        {{ selected_service.get_service_kind_display }}
+                    </span>
+
+                    <span>
+                        {{ selected_service.category.name }}
+                    </span>
+
+                </div>
+
+
+                <div class="bde-preview-fact-grid">
+
+                    <div>
+                        <span>Deadline</span>
+                        <strong>
+                            {{ selected_service.bde_deadline_label }}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>Pitch status</span>
+                        <strong>
+                            {{ selected_service.pitch_state_label }}
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                {% if selected_service.bde_summary or selected_service.overview %}
+
+                    <section class="bde-preview-section">
+
+                        <span>
+                            WHAT TO SAY FIRST
+                        </span>
+
+                        <p>
+
+                            {% if selected_service.bde_summary %}
+
+                                {{ selected_service.bde_summary|truncatechars:330 }}
+
+                            {% else %}
+
+                                {{ selected_service.overview|truncatechars:330 }}
+
+                            {% endif %}
+
+                        </p>
+
+                    </section>
+
+                {% endif %}
+
+
+                {% if selected_service.benefits %}
+
+                    <section class="bde-preview-section">
+
+                        <span>
+                            CLIENT BENEFIT
+                        </span>
+
+                        <p>
+                            {{ selected_service.benefits|truncatechars:260 }}
+                        </p>
+
+                    </section>
+
+                {% endif %}
+
+
+                {% if selected_service.eligibility_summary or selected_service.applicable_for_raw %}
+
+                    <section class="bde-preview-section">
+
+                        <span>
+                            WHO CAN APPLY
+                        </span>
+
+                        <p>
+
+                            {% if selected_service.eligibility_summary %}
+
+                                {{ selected_service.eligibility_summary|truncatechars:300 }}
+
+                            {% else %}
+
+                                {{ selected_service.applicable_for_raw|truncatechars:300 }}
+
+                            {% endif %}
+
+                        </p>
+
+                    </section>
+
+                {% endif %}
+
+
+                {% if selected_service.funding_type or selected_service.funding_min != None or selected_service.funding_max != None or selected_service.government_fee != None or selected_service.bharatnxt_fee != None %}
+
+                    <section class="bde-preview-section">
+
+                        <span>
+                            FUNDING / CHARGES
+                        </span>
+
+                        <p>
+
+                            {% if selected_service.funding_type %}
+
+                                {{ selected_service.funding_type }}
+
+                            {% endif %}
+
+
+                            {% if selected_service.funding_min != None or selected_service.funding_max != None %}
+
+                                {% if selected_service.funding_type %}
+                                    ·
+                                {% endif %}
+
+                                {% if selected_service.funding_min != None %}
+                                    ₹{{ selected_service.funding_min }}
+                                {% endif %}
+
+                                {% if selected_service.funding_min != None and selected_service.funding_max != None %}
+                                    –
+                                {% endif %}
+
+                                {% if selected_service.funding_max != None %}
+                                    ₹{{ selected_service.funding_max }}
+                                {% endif %}
+
+                            {% endif %}
+
+
+                            {% if selected_service.government_fee != None %}
+
+                                · Govt fee ₹{{ selected_service.government_fee }}
+
+                            {% endif %}
+
+
+                            {% if selected_service.bharatnxt_fee != None %}
+
+                                · BharatNXT ₹{{ selected_service.bharatnxt_fee }}
+
+                            {% endif %}
+
+                        </p>
+
+                    </section>
+
+                {% endif %}
+
+
+                {% if selected_service.important_notes %}
+
+                    <section class="bde-preview-section">
+
+                        <span>
+                            CHECK BEFORE PROMISING
+                        </span>
+
+                        <p>
+                            {{ selected_service.important_notes|truncatechars:220 }}
+                        </p>
+
+                    </section>
+
+                {% endif %}
+
+
+                <div class="bde-preview-actions">
+
+                    {% if selected_service.primary_source %}
+
+                        <a
+                            href="{% url 'toolkit:service_source_open' selected_service.pk selected_service.primary_source.pk %}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="bde-external-button">
+
+                            Scheme ↗
+
+                        </a>
+
+                    {% endif %}
+
+
+                    <a
+                        href="{% url 'toolkit:service_detail' selected_service.slug %}"
+                        class="primary-button">
+
+                        Open Call Workspace
+
+                    </a>
+
+                </div>
+
+
+            {% else %}
+
+                <div class="bde-preview-empty">
+
+                    <span>▦</span>
+
+                    <h3>
+                        Select a service
+                    </h3>
+
+                    <p>
+                        Its call summary, eligibility,
+                        benefit and key facts will appear here.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </aside>
+    </div>
+</div>
+{% endblock %}

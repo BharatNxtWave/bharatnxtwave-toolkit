@@ -1,0 +1,1157 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Client Service Checker | BharatNXT Wave{% endblock %}
+
+{% block content %}
+
+<div class="client-matcher-page">
+
+
+<!-- =====================================================
+     PAGE HEADER
+====================================================== -->
+
+<div class="page-eyebrow">
+    CLIENT SERVICE FINDER
+</div>
+
+<h1 class="page-title">
+    Find Services for a Client
+</h1>
+
+<p class="page-description matcher-v2-description">
+    Enter what the client is looking for and the company details you know. The Toolkit will show services worth discussing.
+</p>
+
+
+<div class="matcher-v2-guide">
+
+    <div>
+        <span>1</span>
+        <strong>Enter client requirement</strong>
+    </div>
+
+    <div>
+        <span>2</span>
+        <strong>Add company details</strong>
+    </div>
+
+    <div>
+        <span>3</span>
+        <strong>Review suitable services</strong>
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     CLIENT MATCH FORM
+====================================================== -->
+
+<section
+    class="card matcher-v2-card"
+    id="client-match-form">
+
+    <form
+        method="post"
+        autocomplete="off">
+
+        {% csrf_token %}
+
+
+        <!-- STEP 1 -->
+
+        <div class="matcher-v2-step">
+
+            <div class="matcher-v2-step-number">
+                1
+            </div>
+
+
+            <div class="matcher-v2-step-content">
+
+                <h2>
+                    What is the client looking for?
+                </h2>
+
+                <p>
+                    Type naturally. The client does not need to know the exact scheme or service name.
+                </p>
+
+
+                <div class="matcher-v2-main-search">
+                    {{ form.need_query }}
+                </div>
+
+
+                <div class="matcher-v2-examples">
+
+                    <span class="matcher-example-label">
+                        Examples
+                    </span>
+
+                    <span>Technology schemes</span>
+                    <span>Startup funding</span>
+                    <span>MSME loan</span>
+                    <span>Startup India</span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="matcher-v2-divider"></div>
+
+
+        <!-- STEP 2 -->
+
+        <div class="matcher-v2-step">
+
+            <div class="matcher-v2-step-number">
+                2
+            </div>
+
+
+            <div class="matcher-v2-step-content">
+
+                <h2>
+                    What do you know about the company?
+                </h2>
+
+                <p>
+                    Fill only what the client tells you. More information can improve eligibility checking.
+                </p>
+
+
+                <div class="matcher-v2-basic-grid">
+
+
+                    <div class="matcher-v2-field">
+
+                        <label>
+                            Industry / Sector
+                        </label>
+
+                        {{ form.industry }}
+
+                    </div>
+
+
+                    <div class="matcher-v2-field">
+
+                        <label>
+                            Business Stage
+                        </label>
+
+                        {{ form.business_stage }}
+
+                    </div>
+
+
+                    <div class="matcher-v2-field">
+
+                        <label>
+                            State
+                        </label>
+
+                        {{ form.state }}
+
+                    </div>
+
+
+                    <div class="matcher-v2-field">
+
+                        <label>
+                            Business Type
+                        </label>
+
+                        {{ form.business_type }}
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- OPTIONAL ELIGIBILITY -->
+
+                <details class="matcher-v2-advanced">
+
+                    <summary>
+
+                        <span>
+                            + Add more eligibility details
+                        </span>
+
+                        <small>
+                            Optional
+                        </small>
+
+                    </summary>
+
+
+                    <div class="matcher-v2-advanced-content">
+
+
+                        <div class="matcher-v2-field">
+
+                            <label>
+                                Founder Category
+                            </label>
+
+                            {{ form.founder_category }}
+
+                        </div>
+
+
+                        <div class="matcher-v2-field">
+
+                            <label>
+                                Business Age
+                            </label>
+
+
+                            <div class="matcher-v2-input-suffix">
+
+                                {{ form.business_age_years }}
+
+                                <span>
+                                    Years
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="matcher-v2-field">
+
+                            <label>
+                                Annual Turnover
+                            </label>
+
+
+                            <div class="matcher-v2-turnover">
+
+                                {{ form.turnover_amount }}
+
+                                {{ form.turnover_unit }}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="matcher-v2-service-types">
+
+                            <label>
+                                Limit results to service types
+                            </label>
+
+                            <div class="matcher-v2-kind-grid">
+                                {{ form.service_kinds }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </details>
+
+            </div>
+
+        </div>
+
+
+
+        {% if form.errors %}
+
+            <div class="matcher-v2-error">
+                Please check the information above and try again.
+            </div>
+
+        {% endif %}
+
+
+
+        <!-- ACTION -->
+
+        <div class="matcher-v2-action">
+
+            <div class="matcher-v2-privacy">
+
+                <span>◇</span>
+
+                <div>
+
+                    <strong>
+                        Client profile isn't saved
+                    </strong>
+
+                    <small>
+                        The supplied details are used only for this matching request.
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="primary-button matcher-v2-submit">
+
+                Find Matching Services →
+
+            </button>
+
+        </div>
+
+    </form>
+
+</section>
+
+
+
+{% if submitted %}
+
+
+<!-- =====================================================
+     RESULT CONTEXT
+====================================================== -->
+
+<section
+    class="matcher-result-context"
+    id="match-results">
+
+    <div>
+
+        <div class="page-eyebrow">
+            MATCH RESULTS
+        </div>
+
+
+        <h2>
+            Services worth discussing with the client
+        </h2>
+
+
+        <div class="matcher-context-query">
+
+            <span>
+                MATCHING FOR
+            </span>
+
+            <strong class="matcher-query-chip">
+
+                {% if form.need_query.value %}
+
+                    {{ form.need_query.value }}
+
+                {% else %}
+
+                    Client company profile
+
+                {% endif %}
+
+            </strong>
+
+        </div>
+
+
+        <div class="matcher-context-details">
+
+            {% if form.industry.value %}
+                <span>
+                    Industry: {{ form.industry.value }}
+                </span>
+            {% endif %}
+
+            {% if form.business_stage.value %}
+                <span>
+                    Stage: {{ form.business_stage.value }}
+                </span>
+            {% endif %}
+
+            {% if form.state.value %}
+                <span>
+                    State: {{ form.state.value }}
+                </span>
+            {% endif %}
+
+            {% if form.business_type.value %}
+                <span>
+                    Type: {{ form.business_type.value }}
+                </span>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <div class="matcher-result-actions">
+
+        <a
+            href="#client-match-form"
+            class="secondary-button">
+
+            Edit Client Details
+
+        </a>
+
+
+        <a
+            href="{% url 'toolkit:client_matcher' %}"
+            class="primary-button">
+
+            New Client Service Check
+
+        </a>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     NEXT ACTION
+====================================================== -->
+
+<div class="matcher-next-action">
+
+    {% if results.high_count %}
+
+        <div class="matcher-next-action-icon strong">
+            ✓
+        </div>
+
+        <div>
+
+            <strong>
+                {{ results.high_count }}
+                strong match{{ results.high_count|pluralize:"es" }}
+                found
+            </strong>
+
+            <span>
+                Start with these services during the client conversation.
+            </span>
+
+        </div>
+
+    {% elif results.possible_count %}
+
+        <div class="matcher-next-action-icon verify">
+            !
+        </div>
+
+        <div>
+
+            <strong>
+                {{ results.possible_count }}
+                service{{ results.possible_count|pluralize }}
+                need{{ results.possible_count|pluralize:"s," }}
+                verification
+            </strong>
+
+            <span>
+                Review the missing eligibility information before advising the client.
+            </span>
+
+        </div>
+
+    {% elif results.not_eligible_count %}
+
+        <div class="matcher-next-action-icon rejected">
+            ×
+        </div>
+
+        <div>
+
+            <strong>
+                No currently eligible service found
+            </strong>
+
+            <span>
+                Review the conflicting eligibility criteria below.
+            </span>
+
+        </div>
+
+    {% else %}
+
+        <div class="matcher-next-action-icon neutral">
+            ⌕
+        </div>
+
+        <div>
+
+            <strong>
+                No matching Toolkit service found
+            </strong>
+
+            <span>
+                Try a broader search or edit the client details.
+            </span>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =====================================================
+     RESULT SUMMARY
+====================================================== -->
+
+<div class="matcher-summary-grid">
+
+
+    <div class="card matcher-summary-card high">
+
+        <div class="stat-label">
+            STRONG MATCH
+        </div>
+
+        <div class="search-kpi-value">
+            {{ results.high_count }}
+        </div>
+
+        <div class="search-kpi-meta">
+            Eligibility can be supported by Toolkit data
+        </div>
+
+    </div>
+
+
+    <div class="card matcher-summary-card possible">
+
+        <div class="stat-label">
+            NEEDS VERIFICATION
+        </div>
+
+        <div class="search-kpi-value">
+            {{ results.possible_count }}
+        </div>
+
+        <div class="search-kpi-meta">
+            Relevant, but eligibility needs checking
+        </div>
+
+    </div>
+
+
+    <div class="card matcher-summary-card rejected">
+
+        <div class="stat-label">
+            DOESN'T FIT
+        </div>
+
+        <div class="search-kpi-value">
+            {{ results.not_eligible_count }}
+        </div>
+
+        <div class="search-kpi-meta">
+            Current Toolkit criteria conflict
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     RESULT TOOLS
+====================================================== -->
+
+{% if results.high_count or results.possible_count %}
+
+<div class="matcher-result-toolbar">
+
+    <div>
+
+        <strong>
+            Recommendations
+        </strong>
+
+        <span>
+            Ranked using actual Toolkit information
+        </span>
+
+    </div>
+
+
+    <label class="matcher-sort-control">
+
+        <span>
+            SORT
+        </span>
+
+        <select id="matcher-result-sort">
+
+            <option value="best">
+                Best Match
+            </option>
+
+            <option value="type">
+                Service Type
+            </option>
+
+            <option value="verified">
+                Recently Verified
+            </option>
+
+        </select>
+
+    </label>
+
+</div>
+
+{% endif %}
+
+
+<!-- =====================================================
+     STRONG MATCHES
+     EMPTY SECTIONS ARE NOT SHOWN
+====================================================== -->
+
+{% if results.high_count %}
+
+<section class="matcher-result-section">
+
+    <div class="matcher-result-heading">
+
+        <div>
+
+            <div class="matcher-result-title">
+                Strong Matches
+            </div>
+
+            <div class="table-subtitle">
+                Best services to discuss first
+            </div>
+
+        </div>
+
+
+        <span class="matcher-count-badge high">
+            {{ results.high_count }}
+        </span>
+
+    </div>
+
+
+    <div class="matcher-results-grid {% if results.high_count == 1 %}single-result{% endif %}">
+
+        {% for item in results.high %}
+
+            <article
+                class="card matcher-result-card high"
+                data-kind="{{ item.service.get_service_kind_display }}"
+                data-verified="{% if item.service.last_verified_at %}{{ item.service.last_verified_at|date:'YmdHis' }}{% else %}0{% endif %}">
+
+
+                <div class="matcher-card-header">
+
+                    <div>
+
+                        <div class="toolkit-service-id">
+                            {{ item.service.service_id }}
+                        </div>
+
+                        <a
+                            href="{% url 'toolkit:service_detail' item.service.slug %}"
+                            class="matcher-service-title">
+
+                            {{ item.service.title }}
+
+                        </a>
+
+                    </div>
+
+
+                    <span class="matcher-status high">
+                        STRONG MATCH
+                    </span>
+
+                </div>
+
+
+
+                <div class="matcher-service-meta">
+
+                    <span>
+                        {{ item.service.domain.name }}
+                    </span>
+
+                    <span>•</span>
+
+                    <span>
+                        {{ item.service.category.name }}
+                    </span>
+
+                    <span>•</span>
+
+                    <span>
+                        {{ item.service.get_service_kind_display }}
+                    </span>
+
+                </div>
+
+
+
+                {% if item.service.bde_summary %}
+
+                    <p class="matcher-summary-copy">
+                        {{ item.service.bde_summary }}
+                    </p>
+
+                {% endif %}
+
+
+
+                <div class="matcher-call-section">
+
+                    <div class="matcher-call-label">
+                        WHY WE'RE SHOWING THIS
+                    </div>
+
+
+                    {% if form.need_query.value %}
+
+                        <div class="matcher-reason positive">
+                            ✓ Relevant to your search: {{ form.need_query.value }}
+                        </div>
+
+                    {% endif %}
+
+
+                    {% for reason in item.matches %}
+
+                        <div class="matcher-reason positive">
+                            ✓ {{ reason.reason }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+
+                <div class="matcher-card-actions">
+
+
+                    <form
+                        method="post"
+                        action="{% url 'toolkit:toggle_saved_service' item.service.pk %}"
+                        class="matcher-save-form">
+
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="matcher-save-button {% if item.service.pk in saved_service_ids %}saved{% endif %}">
+
+                            {% if item.service.pk in saved_service_ids %}
+                                <span class="bn-bookmark-icon is-saved" aria-hidden="true"></span> Saved
+                            {% else %}
+                                <span class="bn-bookmark-icon" aria-hidden="true"></span> Save
+                            {% endif %}
+
+                        </button>
+
+                    </form>
+
+
+                    <button
+                        type="button"
+                        class="secondary-button bde-quick-button"
+                        data-service-quick="{{ item.service.pk }}">
+                        Quick View
+                    </button>
+
+                    <a
+                        href="{% url 'toolkit:service_detail' item.service.slug %}"
+                        class="primary-button matcher-open-service">
+
+                        Open Service Details →
+
+                    </a>
+
+                </div>
+
+            </article>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endif %}
+
+
+
+<!-- =====================================================
+     NEEDS VERIFICATION
+====================================================== -->
+
+{% if results.possible_count %}
+
+<section class="matcher-result-section">
+
+    <div class="matcher-result-heading">
+
+        <div>
+
+            <div class="matcher-result-title">
+                Needs Verification
+            </div>
+
+            <div class="table-subtitle">
+                Relevant services where some eligibility information still needs checking
+            </div>
+
+        </div>
+
+
+        <span class="matcher-count-badge possible">
+            {{ results.possible_count }}
+        </span>
+
+    </div>
+
+
+
+    <div class="matcher-results-grid {% if results.possible_count == 1 %}single-result{% endif %}">
+
+        {% for item in results.possible %}
+
+            <article
+                class="card matcher-result-card possible"
+                data-kind="{{ item.service.get_service_kind_display }}"
+                data-verified="{% if item.service.last_verified_at %}{{ item.service.last_verified_at|date:'YmdHis' }}{% else %}0{% endif %}">
+
+
+                <div class="matcher-card-header">
+
+                    <div>
+
+                        <div class="toolkit-service-id">
+                            {{ item.service.service_id }}
+                        </div>
+
+                        <a
+                            href="{% url 'toolkit:service_detail' item.service.slug %}"
+                            class="matcher-service-title">
+
+                            {{ item.service.title }}
+
+                        </a>
+
+                    </div>
+
+
+                    <span class="matcher-status possible">
+                        VERIFY
+                    </span>
+
+                </div>
+
+
+
+                <div class="matcher-service-meta">
+
+                    <span>
+                        {{ item.service.domain.name }}
+                    </span>
+
+                    <span>•</span>
+
+                    <span>
+                        {{ item.service.category.name }}
+                    </span>
+
+                    <span>•</span>
+
+                    <span>
+                        {{ item.service.get_service_kind_display }}
+                    </span>
+
+                </div>
+
+
+
+                {% if item.service.bde_summary %}
+
+                    <p class="matcher-summary-copy">
+                        {{ item.service.bde_summary }}
+                    </p>
+
+                {% endif %}
+
+
+
+                <div class="matcher-call-section">
+
+                    <div class="matcher-call-label">
+                        WHY WE'RE SHOWING THIS
+                    </div>
+
+
+                    {% if form.need_query.value %}
+
+                        <div class="matcher-reason positive">
+                            ✓ Relevant to your search: {{ form.need_query.value }}
+                        </div>
+
+                    {% endif %}
+
+
+                    {% for reason in item.matches %}
+
+                        <div class="matcher-reason positive">
+                            ✓ {{ reason.reason }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+
+                <div class="matcher-call-section verify">
+
+                    <div class="matcher-call-label">
+                        WHAT TO VERIFY
+                    </div>
+
+
+                    {% for reason in item.unknowns %}
+
+                        <div class="matcher-reason warning">
+                            ! {{ reason.reason }}
+                        </div>
+
+                    {% empty %}
+
+                        <div class="matcher-reason warning">
+                            ! Ask the client a few eligibility questions before recommending this service.
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+
+                <div class="matcher-card-actions">
+
+
+                    <form
+                        method="post"
+                        action="{% url 'toolkit:toggle_saved_service' item.service.pk %}"
+                        class="matcher-save-form">
+
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="matcher-save-button {% if item.service.pk in saved_service_ids %}saved{% endif %}">
+
+                            {% if item.service.pk in saved_service_ids %}
+                                <span class="bn-bookmark-icon is-saved" aria-hidden="true"></span> Saved
+                            {% else %}
+                                <span class="bn-bookmark-icon" aria-hidden="true"></span> Save
+                            {% endif %}
+
+                        </button>
+
+                    </form>
+
+
+                    <button
+                        type="button"
+                        class="secondary-button bde-quick-button"
+                        data-service-quick="{{ item.service.pk }}">
+                        Quick View
+                    </button>
+
+                    <a
+                        href="{% url 'toolkit:service_detail' item.service.slug %}"
+                        class="primary-button matcher-open-service">
+
+                        Check Eligibility & Details →
+
+                    </a>
+
+                </div>
+
+            </article>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endif %}
+
+
+
+<!-- =====================================================
+     DOESN'T FIT
+====================================================== -->
+
+{% if results.not_eligible_count %}
+
+<details class="matcher-rejected-section">
+
+    <summary>
+
+        <span>
+            Doesn't fit current eligibility
+        </span>
+
+        <strong>
+            {{ results.not_eligible_count }}
+        </strong>
+
+    </summary>
+
+
+    <div class="matcher-results-grid rejected">
+
+        {% for item in results.not_eligible %}
+
+            <article class="card matcher-result-card rejected">
+
+
+                <div class="matcher-card-header">
+
+                    <div>
+
+                        <div class="toolkit-service-id">
+                            {{ item.service.service_id }}
+                        </div>
+
+                        <a
+                            href="{% url 'toolkit:service_detail' item.service.slug %}"
+                            class="matcher-service-title">
+
+                            {{ item.service.title }}
+
+                        </a>
+
+                    </div>
+
+
+                    <span class="matcher-status rejected">
+                        DOESN'T FIT
+                    </span>
+
+                </div>
+
+
+
+                <div class="matcher-call-section verify">
+
+                    <div class="matcher-call-label">
+                        WHY IT DOESN'T FIT
+                    </div>
+
+
+                    {% for reason in item.mismatches %}
+
+                        <div class="matcher-reason negative">
+                            × {{ reason.reason }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+
+                <div class="matcher-card-actions">
+
+                    <button
+                        type="button"
+                        class="secondary-button bde-quick-button"
+                        data-service-quick="{{ item.service.pk }}">
+                        Quick View
+                    </button>
+
+                    <a
+                        href="{% url 'toolkit:service_detail' item.service.slug %}"
+                        class="secondary-button">
+
+                        Review Service
+
+                    </a>
+
+                </div>
+
+            </article>
+
+        {% endfor %}
+
+    </div>
+
+</details>
+
+{% endif %}
+
+
+
+<!-- =====================================================
+     NOTHING RELEVANT
+====================================================== -->
+
+{% if not results.high_count and not results.possible_count and not results.not_eligible_count %}
+
+<section class="card matcher-no-results">
+
+    <div class="matcher-no-results-icon">
+        ⌕
+    </div>
+
+    <h3>
+        No matching Toolkit service found
+    </h3>
+
+    <p>
+        Try a broader description or remove some company criteria. The system will not invent a scheme that does not exist in the Toolkit.
+    </p>
+
+    <a
+        href="#client-match-form"
+        class="secondary-button">
+
+        Edit Search
+
+    </a>
+
+</section>
+
+{% endif %}
+
+
+{% endif %}
+
+
+</div>
+
+
+<script src="{% static 'js/matcher_saved.js' %}"></script>
+<script src="{% static 'js/matcher_sort.js' %}"></script>
+
+{% endblock %}

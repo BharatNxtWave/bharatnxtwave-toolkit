@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Recent Services | BharatNXT Wave{% endblock %}
+
+{% block content %}
+<div class="bde-page">
+    <header class="bde-page-hero">
+        <div>
+            <div class="bde-eyebrow">RECENT</div>
+            <h1>Pick up where the call left off.</h1>
+            <p>Your most recently opened or previewed Toolkit services.</p>
+        </div>
+        <a href="{% url 'toolkit:service_library' %}" class="secondary-button">
+            Service Library
+        </a>
+    </header>
+
+    <div class="bde-service-list">
+        {% for service in services %}
+            <article class="bde-service-row">
+                <div class="bde-service-row-main">
+                    <div class="bde-service-row-topline">
+                        <span class="bde-service-code">{{ service.service_id }}</span>
+                        <span class="bde-pill">{{ service.get_service_kind_display }}</span>
+                    </div>
+
+                    <a href="{% url 'toolkit:service_detail' service.slug %}"
+                       class="bde-service-row-title">
+                        {{ service.title }}
+                    </a>
+
+                    <div class="bde-service-row-path">
+                        {{ service.domain.name }} · {{ service.category.name }}
+                    </div>
+
+                    {% if service.bde_summary %}
+                        <p>{{ service.bde_summary|truncatechars:180 }}</p>
+                    {% elif service.overview %}
+                        <p>{{ service.overview|truncatechars:180 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="bde-service-row-facts">
+                    <div>
+                        <span>Deadline</span>
+                        <strong>{{ service.bde_deadline_label|truncatechars:42 }}</strong>
+                    </div>
+                </div>
+
+                <div class="bde-service-row-actions">
+                    <button type="button"
+                            class="secondary-button bde-quick-button"
+                            data-service-quick="{{ service.pk }}">
+                        Quick View
+                    </button>
+
+                    {% if service.primary_source %}
+                        <a href="{% url 'toolkit:service_source_open' service.pk service.primary_source.pk %}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="bde-external-button">
+                            Open Scheme ↗
+                        </a>
+                    {% endif %}
+
+                    <a href="{% url 'toolkit:service_detail' service.slug %}"
+                       class="primary-button">
+                        Details
+                    </a>
+                </div>
+            </article>
+        {% empty %}
+            <div class="bde-empty-state">
+                <span>◷</span>
+                <h3>No recent services yet</h3>
+                <p>Open or preview a service and it will appear here automatically.</p>
+                <a href="{% url 'toolkit:service_library' %}"
+                   class="primary-button">
+                    Open Service Library
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,343 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}BharatNXT Wave Internal{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <!-- BRAND -->
+        <div class="brand">
+
+            <div class="brand-mark">
+                BN
+            </div>
+
+            <div class="brand-text">
+                <div class="brand-name">
+                    BharatNXT Wave
+                </div>
+
+                <div class="brand-subtitle">
+                    ADMIN CENTER
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- ADMIN CENTER NAVIGATION -->
+        <nav class="navigation">
+
+            <div class="nav-section-label">
+                ADMIN CENTER
+            </div>
+
+            <a href="{% url 'dashboard:admin_overview' %}"
+               class="nav-item {% if request.path == '/admin-center/' %}active{% endif %}">
+                <span class="nav-icon">⌂</span>
+                <span>Overview</span>
+            </a>
+
+            {% if request.user.is_superuser or request.user.role == "SUPER_ADMIN" or request.user.role == "IT_ADMIN" or request.user.role == "SECURITY_ADMIN" %}
+
+                <a href="{% url 'dashboard:bde_analytics' %}"
+                   class="nav-item {% if '/bde-analytics/' in request.path %}active{% endif %}">
+
+                    <span class="nav-icon">⌁</span>
+                    <span>BDE Analytics</span>
+
+                </a>
+
+            {% endif %}
+
+
+
+            {% if request.user.is_superuser or request.user.role == "SUPER_ADMIN" or request.user.role == "IT_ADMIN" %}
+
+            <a href="{% url 'accounts:employee_list' %}"
+               class="nav-item {% if '/employees/' in request.path %}active{% endif %}">
+                <span class="nav-icon">♙</span>
+                <span>Employees</span>
+            </a>
+
+            {% endif %}
+
+
+            {% if request.user.is_superuser or request.user.role == "SUPER_ADMIN" or request.user.role == "DATA_ADMIN" %}
+
+            <a href="{% url 'toolkit:admin_service_list' %}"
+               class="nav-item {% if '/admin-center/toolkit/' in request.path %}active{% endif %}">
+                <span class="nav-icon">◫</span>
+                <span>Toolkit Management</span>
+            </a>
+
+                {% if request.user.is_superuser or request.user.role == "SUPER_ADMIN" or request.user.role == "DATA_ADMIN" or request.user.role == "IT_ADMIN" %}
+
+                    <a
+                        href="{% url 'toolkit:pitch_windows' %}"
+                        class="nav-item {% if '/pitch-windows/' in request.path %}active{% endif %}">
+
+                        <span class="nav-icon">◷</span>
+                        <span>Pitch Windows</span>
+
+                    </a>
+
+                {% endif %}
+
+
+            <a href="{% url 'toolkit:import_center' %}"
+               class="nav-item {% if '/admin-center/import/' in request.path %}active{% endif %}">
+                <span class="nav-icon">⇧</span>
+                <span>Import Data</span>
+            </a>
+
+                <a
+                    href="{% url 'toolkit:import_history' %}"
+                    class="nav-item {% if '/import/history/' in request.path %}active{% endif %}">
+
+                    <span class="nav-icon">↻</span>
+                    <span>Source History</span>
+
+                </a>
+
+
+            {% endif %}
+
+
+            {% if request.user.is_superuser or request.user.role == "SUPER_ADMIN" or request.user.role == "IT_ADMIN" or request.user.role == "SECURITY_ADMIN" %}
+
+            <a href="{% url 'accounts:activity_logs' %}"
+               class="nav-item {% if '/activity-logs/' in request.path %}active{% endif %}">
+                <span class="nav-icon">◉</span>
+                <span>Activity Logs</span>
+            </a>
+
+            {% endif %}
+
+        </nav>
+
+
+        <!-- SIDEBAR BOTTOM -->
+        <div class="sidebar-bottom">
+
+            <div class="nav-section-label">
+                SYSTEM
+            </div>
+
+            {% if request.user.is_superuser %}
+
+            <a href="/admin/" class="nav-item">
+                <span class="nav-icon">⚙</span>
+                <span>Developer Admin</span>
+            </a>
+
+            {% endif %}
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN APPLICATION AREA -->
+    <main class="main-area">
+
+
+        <!-- TOP NAVIGATION BAR -->
+        <header class="topbar">
+
+
+            <!-- TOP RIGHT -->
+            <div class="topbar-actions">
+
+
+                <!-- SECURITY STATUS -->
+                <div class="security-status">
+
+                    <span class="security-dot"></span>
+
+                    Secure Session
+
+                </div>
+
+
+                <!-- NOTIFICATIONS -->
+                <button
+                    class="notification-button"
+                    type="button"
+                    aria-label="Notifications"
+                >
+                    ♢
+                </button>
+
+
+                <!-- USER PROFILE -->
+                <div class="user-profile">
+
+                    <div class="user-avatar">
+
+                        {{ request.user.username|slice:":1"|upper }}
+
+                    </div>
+
+
+                    <div class="user-info">
+
+                        <div class="user-name">
+
+                            {{ request.user.username }}
+
+                        </div>
+
+                        <div class="user-role">
+
+                            {{ request.user.get_role_display }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        
+            <form method="post"
+                  action="{% url 'accounts:logout' %}"
+                  class="topbar-logout-form">
+                {% csrf_token %}
+                <button type="submit"
+                        class="topbar-logout-button">
+                    Sign Out
+                </button>
+            </form>
+
+</header>
+
+
+        <!-- MAIN PAGE CONTENT -->
+        
+        <!-- =================================================
+             GLOBAL HUMAN FEEDBACK
+        ================================================== -->
+
+        {% if messages %}
+
+            <div
+                class="bn-feedback-stack"
+                aria-live="polite"
+                aria-atomic="true">
+
+                {% for message in messages %}
+
+                    <div
+                        class="bn-feedback-toast {{ message.tags|default:'info' }}"
+                        data-feedback-type="{{ message.tags|default:'info' }}"
+                        role="status">
+
+
+                        <div
+                            class="bn-feedback-icon"
+                            aria-hidden="true">
+
+                            {% if "success" in message.tags %}
+                                ✓
+                            {% elif "error" in message.tags %}
+                                !
+                            {% elif "warning" in message.tags %}
+                                !
+                            {% else %}
+                                i
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="bn-feedback-copy">
+
+                            {% if "success" in message.tags %}
+
+                                <strong>
+                                    Done
+                                </strong>
+
+                            {% elif "error" in message.tags %}
+
+                                <strong>
+                                    Something went wrong
+                                </strong>
+
+                            {% elif "warning" in message.tags %}
+
+                                <strong>
+                                    Please check
+                                </strong>
+
+                            {% else %}
+
+                                <strong>
+                                    Update
+                                </strong>
+
+                            {% endif %}
+
+
+                            <span>
+                                {{ message }}
+                            </span>
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            class="bn-feedback-close"
+                            aria-label="Dismiss notification">
+
+                            ×
+
+                        </button>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+
+<section class="content">
+
+            {% block content %}
+
+            {% endblock %}
+
+        </section>
+
+
+    </main>
+
+</div>
+
+    <script src="{% static 'js/session_location.js' %}"></script>
+
+
+    <script src="{% static 'js/ui_feedback.js' %}"></script>
+
+</body>
+
+</html>

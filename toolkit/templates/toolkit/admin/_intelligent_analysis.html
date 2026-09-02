@@ -1,0 +1,117 @@
+<section class="card" style="margin-top:24px;">
+
+    <div class="service-section-label">
+        INTELLIGENT EXTRACTION
+    </div>
+
+    <h2 style="margin:8px 0 6px;">
+        File Analysis
+    </h2>
+
+    <p style="margin-top:0;">
+        The uploaded source has been analysed before any
+        Service data is changed.
+    </p>
+
+    <div style="
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+        gap:12px;
+        margin:20px 0;
+    ">
+
+        <div class="card">
+            <div class="stat-label">SHEETS</div>
+            <strong>{{ analysis.sheet_count }}</strong>
+        </div>
+
+        <div class="card">
+            <div class="stat-label">SERVICE CANDIDATES</div>
+            <strong>{{ analysis.candidate_count }}</strong>
+        </div>
+
+        <div class="card">
+            <div class="stat-label">ENGINE</div>
+            <strong>{{ analysis.engine_version }}</strong>
+        </div>
+
+    </div>
+
+    <div style="
+        overflow-x:auto;
+        margin-top:18px;
+    ">
+
+        <table style="
+            width:100%;
+            border-collapse:collapse;
+        ">
+
+            <thead>
+                <tr>
+                    <th style="text-align:left;padding:10px;">
+                        Sheet
+                    </th>
+                    <th style="text-align:left;padding:10px;">
+                        Detected Type
+                    </th>
+                    <th style="text-align:left;padding:10px;">
+                        Rows
+                    </th>
+                    <th style="text-align:left;padding:10px;">
+                        Candidates
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for sheet in analysis.sheets %}
+
+                    <tr>
+                        <td style="padding:10px;">
+                            {{ sheet.name }}
+                        </td>
+
+                        <td style="padding:10px;">
+                            {{ sheet.kind }}
+                        </td>
+
+                        <td style="padding:10px;">
+                            {{ sheet.nonempty_rows }}
+                        </td>
+
+                        <td style="padding:10px;">
+                            {{ sheet.candidate_count }}
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <p style="margin-top:18px;opacity:.72;">
+        Business knowledge is retained for BDE access.
+        Technical import controls remain Admin / IT only.
+    </p>
+
+
+
+{% if current_batch %}
+
+    <div style="margin-top:20px;">
+
+        <a
+            href="{% url 'toolkit:import_extraction_review' current_batch.pk %}"
+            class="primary-button">
+            Review Extraction →
+        </a>
+
+    </div>
+
+{% endif %}
+</section>

@@ -1,0 +1,321 @@
+{% extends "admin_base.html" %}
+
+{% block title %}
+{% if page_mode == "create" %}Add Service{% else %}Edit Service{% endif %}
+| BharatNXT Wave
+{% endblock %}
+
+{% block content %}
+
+<div class="page-eyebrow">
+    TOOLKIT MANAGEMENT
+</div>
+
+<h1 class="page-title">
+    {% if page_mode == "create" %}
+        Add Service
+    {% else %}
+        Edit Service
+    {% endif %}
+</h1>
+
+<p class="page-description">
+    Maintain accurate information that BDEs can use during client conversations.
+</p>
+
+
+<form method="post">
+
+    {% csrf_token %}
+
+
+    {% if form.non_field_errors %}
+
+        <div class="auth-error">
+            {{ form.non_field_errors }}
+        </div>
+
+    {% endif %}
+
+
+    <div class="toolkit-admin-form">
+
+
+        <section class="card toolkit-form-section">
+
+            <div class="service-section-label">
+                SERVICE IDENTITY
+            </div>
+
+            <div class="admin-form-grid">
+
+                <div>
+                    {{ form.service_id.label_tag }}
+                    {{ form.service_id }}
+                    {{ form.service_id.errors }}
+                </div>
+
+                <div>
+                    {{ form.title.label_tag }}
+                    {{ form.title }}
+                    {{ form.title.errors }}
+                </div>
+
+                <div>
+                    {{ form.domain.label_tag }}
+                    {{ form.domain }}
+                    {{ form.domain.errors }}
+                </div>
+
+                <div>
+                    {{ form.category.label_tag }}
+                    {{ form.category }}
+                    {{ form.category.errors }}
+                </div>
+
+                <div>
+                    {{ form.service_kind.label_tag }}
+                    {{ form.service_kind }}
+                    {{ form.service_kind.errors }}
+                </div>
+
+                <div>
+                    {{ form.status.label_tag }}
+                    {{ form.status }}
+                    {{ form.status.errors }}
+                </div>
+
+                <div>
+                    {{ form.priority.label_tag }}
+                    {{ form.priority }}
+                    {{ form.priority.errors }}
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="card toolkit-form-section">
+
+            <div class="service-section-label">
+                BDE INFORMATION
+            </div>
+
+            {{ form.bde_summary.label_tag }}
+            {{ form.bde_summary }}
+            {{ form.bde_summary.errors }}
+
+            {{ form.overview.label_tag }}
+            {{ form.overview }}
+            {{ form.overview.errors }}
+
+            {{ form.benefits.label_tag }}
+            {{ form.benefits }}
+            {{ form.benefits.errors }}
+
+            {{ form.restrictions.label_tag }}
+            {{ form.restrictions }}
+            {{ form.restrictions.errors }}
+
+            {{ form.important_notes.label_tag }}
+            {{ form.important_notes }}
+            {{ form.important_notes.errors }}
+
+        </section>
+
+
+        <section class="card toolkit-form-section">
+
+            <div class="service-section-label">
+                ELIGIBILITY
+            </div>
+
+            {{ form.eligibility_summary.label_tag }}
+            {{ form.eligibility_summary }}
+            {{ form.eligibility_summary.errors }}
+
+            <div class="admin-form-grid">
+
+                <div>
+                    {{ form.business_types.label_tag }}
+                    {{ form.business_types }}
+                </div>
+
+                <div>
+                    {{ form.business_stages.label_tag }}
+                    {{ form.business_stages }}
+                </div>
+
+                <div>
+                    {{ form.industries.label_tag }}
+                    {{ form.industries }}
+                </div>
+
+                <div>
+                    {{ form.applicable_states.label_tag }}
+                    {{ form.applicable_states }}
+                </div>
+
+                <div>
+                    {{ form.founder_categories.label_tag }}
+                    {{ form.founder_categories }}
+                </div>
+
+                <div>
+                    {{ form.min_business_age_months.label_tag }}
+                    {{ form.min_business_age_months }}
+                </div>
+
+                <div>
+                    {{ form.max_business_age_months.label_tag }}
+                    {{ form.max_business_age_months }}
+                </div>
+
+                <div>
+                    {{ form.min_turnover.label_tag }}
+                    {{ form.min_turnover }}
+                </div>
+
+                <div>
+                    {{ form.max_turnover.label_tag }}
+                    {{ form.max_turnover }}
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="card toolkit-form-section">
+
+            <div class="service-section-label">
+                FUNDING & FINANCIAL DETAILS
+            </div>
+
+            <div class="admin-form-grid">
+
+                <div>
+                    {{ form.funding_min.label_tag }}
+                    {{ form.funding_min }}
+                </div>
+
+                <div>
+                    {{ form.funding_max.label_tag }}
+                    {{ form.funding_max }}
+                </div>
+
+                <div>
+                    {{ form.funding_type.label_tag }}
+                    {{ form.funding_type }}
+                </div>
+
+                <div>
+                    {{ form.interest_rate_min.label_tag }}
+                    {{ form.interest_rate_min }}
+                </div>
+
+                <div>
+                    {{ form.interest_rate_max.label_tag }}
+                    {{ form.interest_rate_max }}
+                </div>
+
+                <div>
+                    {{ form.collateral_required.label_tag }}
+                    {{ form.collateral_required }}
+                </div>
+
+                <div>
+                    {{ form.tenure.label_tag }}
+                    {{ form.tenure }}
+                </div>
+
+            </div>
+
+            {{ form.subsidy_details.label_tag }}
+            {{ form.subsidy_details }}
+
+        </section>
+
+
+        <section class="card toolkit-form-section">
+
+            <div class="service-section-label">
+                PRICING & TIMELINE
+            </div>
+
+            <div class="admin-form-grid">
+
+                <div>
+                    {{ form.government_fee.label_tag }}
+                    {{ form.government_fee }}
+                </div>
+
+                <div>
+                    {{ form.bharatnxt_fee.label_tag }}
+                    {{ form.bharatnxt_fee }}
+                </div>
+
+                <div>
+                    {{ form.estimated_processing_time.label_tag }}
+                    {{ form.estimated_processing_time }}
+                </div>
+
+                <div>
+                    {{ form.application_deadline.label_tag }}
+                    {{ form.application_deadline }}
+                </div>
+
+            </div>
+
+            {{ form.pricing_notes.label_tag }}
+            {{ form.pricing_notes }}
+
+        </section>
+
+
+        <section class="card toolkit-form-section">
+
+            <div class="service-section-label">
+                INTERNAL BDE SUPPORT
+            </div>
+
+            {{ form.sales_pitch.label_tag }}
+            {{ form.sales_pitch }}
+
+            {{ form.internal_notes.label_tag }}
+            {{ form.internal_notes }}
+
+            {{ form.escalation_notes.label_tag }}
+            {{ form.escalation_notes }}
+
+        </section>
+
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                class="primary-button">
+
+                {% if page_mode == "create" %}
+                    Create Service
+                {% else %}
+                    Save Changes
+                {% endif %}
+
+            </button>
+
+            <a
+                href="{% url 'toolkit:admin_service_list' %}"
+                class="secondary-button">
+                Cancel
+            </a>
+
+        </div>
+
+    </div>
+
+</form>
+
+{% endblock %}
