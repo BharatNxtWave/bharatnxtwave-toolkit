@@ -31,10 +31,43 @@ if [ -z "${BHARATNXT_DATA_ROOT:-}" ]; then
     exit 1
 fi
 
+# A free Render instance cannot have a persistent disk, so the mount point
+# does not exist. That is survivable for a throwaway test deployment but
+# never for real data, so it has to be asked for explicitly.
+EPHEMERAL="${BHARATNXT_ALLOW_EPHEMERAL_STORAGE:-false}"
+
 if [ ! -d "${BHARATNXT_DATA_ROOT}" ]; then
-    echo "FATAL: BHARATNXT_DATA_ROOT=${BHARATNXT_DATA_ROOT} does not exist." >&2
-    echo "       Check the disk mount path in render.yaml." >&2
-    exit 1
+
+    if [ "${EPHEMERAL}" != "true" ]; then
+        echo "FATAL: BHARATNXT_DATA_ROOT=${BHARATNXT_DATA_ROOT} does not exist." >&2
+        echo "       No persistent disk is mounted there." >&2
+        echo "" >&2
+        echo "       For a real deployment: mount a disk at that path." >&2
+        echo "       For a throwaway test deployment on a free instance:" >&2
+        echo "       set BHARATNXT_ALLOW_EPHEMERAL_STORAGE=true and accept" >&2
+        echo "       that uploaded files are deleted on every deploy." >&2
+        exit 1
+    fi
+
+    mkdir -p "${BHARATNXT_DATA_ROOT}"
+fi
+
+if [ "${EPHEMERAL}" = "true" ]; then
+    echo ""
+    echo "  ****************************************************************"
+    echo "  *  EPHEMERAL STORAGE - TEST DEPLOYMENT ONLY                    *"
+    echo "  *                                                              *"
+    echo "  *  No persistent disk is mounted. Every scheme flyer uploaded  *"
+    echo "  *  here is DELETED on the next deploy or restart, while its    *"
+    echo "  *  database row survives and then points at a missing file.    *"
+    echo "  *                                                              *"
+    echo "  *  Do not put real BharatNXT data in this instance.            *"
+    echo "  *                                                              *"
+    echo "  *  To fix: attach a persistent disk, point                     *"
+    echo "  *  BHARATNXT_DATA_ROOT at it, and remove                       *"
+    echo "  *  BHARATNXT_ALLOW_EPHEMERAL_STORAGE.                          *"
+    echo "  ****************************************************************"
+    echo ""
 fi
 
 if ! command -v pg_dump > /dev/null 2>&1; then

@@ -32,6 +32,78 @@ Neither of these is a blocker. They are simply things to say out loud.
 
 ---
 
+## 0b. Testing with the team on the free tier first
+
+Deploying free for the team to try, then upgrading when it becomes real, is a
+sensible order. Do it — with one thing understood.
+
+### The one rule
+
+**Do not put real BharatNXT data in the free instance.**
+
+Not because it is slow, but because a free instance cannot have a persistent
+disk. Every scheme flyer uploaded there is deleted on the next deploy or
+restart, **while its database row survives** — so the Admin Centre keeps
+listing a flyer whose file is gone. Nothing warns you; it surfaces when
+somebody opens it in front of a client.
+
+The app will not start on non-persistent storage unless you explicitly say so
+(`BHARATNXT_ALLOW_EPHEMERAL_STORAGE=true`), and it prints a banner in the boot
+log for as long as that flag is set. Treat the instance as a demo: throwaway
+schemes, throwaway flyers, throwaway users.
+
+### What the team will notice
+
+| | |
+|---|---|
+| **First load takes ~1 minute** | Free instances sleep after ~15 minutes idle. The next request wakes them. Warn the team, or it gets reported as a bug. |
+| **Uploads disappear after a deploy** | Expected. See above. |
+| **The database expires** | Render deletes free databases after their trial window, and everything in them. |
+
+There is no way to keep a free instance awake from inside the app: while it
+sleeps, no code of yours is running, so nothing can ping anything. An external
+pinger would work, but it does not fix the storage problem, which is the one
+that actually costs you.
+
+### Deploying it
+
+```bash
+cp deployment/render.free.yaml render.yaml
+git add render.yaml && git commit -m "Free test deployment"
+git push
+```
+
+Then follow sections 2 to 7 as written. Everything else is identical — same
+image, same code, same security model. Only the plan, the disk and the
+storage flag differ.
+
+> Section 7 (verifying imports) still matters. `pg_dump` runs from the same
+> image on either tier, so proving it there proves it for production.
+
+### Upgrading to paid
+
+When the team stops testing and starts depending on it:
+
+1. Restore the production blueprint:
+   ```bash
+   git checkout render.yaml
+   git commit -am "Move to production plan"
+   ```
+2. In the Render dashboard, change the instance type **Free → Starter**, then
+   add a disk named `bharatnxt-data` mounted at **`/var/data`**.
+3. Delete the `BHARATNXT_ALLOW_EPHEMERAL_STORAGE` environment variable.
+4. Move the database off the free plan **before it expires**.
+5. Redeploy, and confirm the boot log no longer prints the EPHEMERAL banner.
+
+`BHARATNXT_DATA_ROOT` is `/var/data` in both files, so the upgrade changes
+what backs that path, not the configuration around it.
+
+> **Migrating test data is not worth it.** The free database will not have the
+> flyer files that its rows refer to. Start the production instance clean and
+> re-import from the real workbooks.
+
+---
+
 ## 1. What Render actually runs
 
 Render builds the [`Dockerfile`](../Dockerfile), not its native Python runtime.

@@ -13,6 +13,9 @@
 #
 #   healthCheckPath: the office IP allow-list would otherwise reject
 #                    Render's health probe and fail every deploy.
+#
+# For a throwaway team-testing deployment on the free tier, use
+# deployment/render.free.yaml instead - see DEPLOY_RENDER.md section 0b.
 
 databases:
   - name: bharatnxt-db
