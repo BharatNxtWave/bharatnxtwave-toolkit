@@ -13,9 +13,10 @@ Safety:
 - reversible created/updated objects
 """
 
-import json
-import re
+import os
+import shutil
 import sqlite3
+import subprocess
 from collections import Counter
 from datetime import date, datetime
 from decimal import Decimal
@@ -456,35 +457,17 @@ def _decision(row):
 # DATABASE BACKUP
 # ============================================================
 
-def backup_database(
-    batch_id,
-):
-
-    db = settings.DATABASES[
-        "default"
-    ]
-
-    if (
-        db.get("ENGINE")
-        != "django.db.backends.sqlite3"
-    ):
-        raise FinalImportError(
-            "Automatic Final Import backup "
-            "currently requires SQLite."
-        )
-
-    source = Path(
-        db["NAME"]
-    )
-
-    if not source.exists():
-        raise FinalImportError(
-            f"SQLite database not found: "
-            f"{source}"
-        )
+def _backup_directory():
+    """Where pre-import snapshots are written."""
 
     directory = Path(
-        "confidential_source/audit"
+        getattr(
+            settings,
+            "BNW_IMPORT_BACKUP_ROOT",
+            Path(settings.BASE_DIR)
+            / "confidential_source"
+            / "audit",
+        )
     )
 
     directory.mkdir(
@@ -492,38 +475,107 @@ def backup_database(
         exist_ok=True,
     )
 
-    stamp = timezone.now().strftime(
-        "%Y%m%d_%H%M%S"
-    )
+    return directory
 
-    destination = (
-        directory
-        / (
-            f"before_final_import_"
-            f"batch{batch_id}_"
-            f"{stamp}.sqlite3"
-        )
-    )
 
-    source_connection = (
-        sqlite3.connect(
-            str(source)
-        )
-    )
+def _backup_sqlite(db, destination):
+    source = Path(db["NAME"])
 
-    destination_connection = (
-        sqlite3.connect(
-            str(destination)
+    if not source.exists():
+        raise FinalImportError(
+            f"SQLite database not found: {source}"
         )
-    )
+
+    source_connection = sqlite3.connect(str(source))
+    destination_connection = sqlite3.connect(str(destination))
 
     try:
-        source_connection.backup(
-            destination_connection
-        )
+        source_connection.backup(destination_connection)
     finally:
         destination_connection.close()
         source_connection.close()
+
+
+def _backup_postgresql(db, destination):
+    """Snapshot via pg_dump, matching deployment/backup_database.sh."""
+
+    if not shutil.which("pg_dump"):
+        raise FinalImportError(
+            "pg_dump was not found on PATH. It is required to take the "
+            "pre-import safety backup. Install the PostgreSQL client "
+            "tools on the application server."
+        )
+
+    command = [
+        "pg_dump",
+        "--format=custom",
+        "--no-owner",
+        "--no-privileges",
+        "--host", str(db.get("HOST") or "127.0.0.1"),
+        "--port", str(db.get("PORT") or "5432"),
+        "--username", str(db.get("USER") or ""),
+        "--file", str(destination),
+        str(db["NAME"]),
+    ]
+
+    environment = os.environ.copy()
+
+    # Passed by environment rather than on the command line, so it does not
+    # appear in the process list or in any error text below.
+    if db.get("PASSWORD"):
+        environment["PGPASSWORD"] = str(db["PASSWORD"])
+
+    try:
+        subprocess.run(
+            command,
+            env=environment,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+    except subprocess.CalledProcessError as exc:
+        raise FinalImportError(
+            "pg_dump failed while taking the pre-import backup: "
+            f"{(exc.stderr or '').strip()}"
+        ) from exc
+
+
+def backup_database(batch_id):
+    """Take a full database snapshot before an import is applied.
+
+    Both SQLite (development) and PostgreSQL (production) are supported.
+    This used to raise on any non-SQLite engine, which made apply_batch and
+    rollback_batch - the whole Final Import feature - unusable on the
+    production database.
+    """
+
+    db = settings.DATABASES["default"]
+    engine = db.get("ENGINE", "")
+
+    stamp = timezone.now().strftime("%Y%m%d_%H%M%S")
+    directory = _backup_directory()
+
+    if engine == "django.db.backends.sqlite3":
+        destination = directory / (
+            f"before_final_import_batch{batch_id}_{stamp}.sqlite3"
+        )
+
+        _backup_sqlite(db, destination)
+
+    elif engine == "django.db.backends.postgresql":
+        destination = directory / (
+            f"before_final_import_batch{batch_id}_{stamp}.dump"
+        )
+
+        _backup_postgresql(db, destination)
+
+    else:
+        raise FinalImportError(
+            f"Automatic Final Import backup does not support the "
+            f"database engine {engine!r}. Supported engines are SQLite "
+            f"and PostgreSQL."
+        )
 
     return str(destination)
 

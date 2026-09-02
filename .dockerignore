@@ -1,0 +1,43 @@
+# Keep the build context small and free of anything secret or machine-local.
+
+.git
+.gitignore
+
+# Local virtualenvs - the image installs its own dependencies
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Secrets must arrive as environment variables, never baked into the image
+.env
+.env.*
+!*.env.example
+
+# Local database and runtime state
+db.sqlite3
+*.sqlite3
+*.dump
+backups/
+logs/
+media/
+
+# Rebuilt inside the image by collectstatic
+staticfiles/
+
+# Uploaded scheme flyers live on the mounted disk, not in the image
+private_uploads/
+
+# Confidential BharatNXT source workbooks
+confidential_source/
+
+# Docs and self-hosted deployment templates are not needed at runtime
+*.md
+deployment/nginx.internal.example
+deployment/gunicorn.service.example
+deployment/backup-cron.example
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

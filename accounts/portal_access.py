@@ -1,5 +1,6 @@
 from urllib.parse import urlencode
 
+from django.conf import settings
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
@@ -19,6 +20,28 @@ ADMIN_PROTECTED_PREFIXES = (
     "/employees/",
     "/activity-logs/",
 )
+
+
+def admin_protected_prefixes():
+    """Protected prefixes, including Django's built-in admin.
+
+    The built-in admin gives direct model access, so it is gated by the same
+    role rules as the Admin Centre rather than by Django's `is_staff` flag
+    alone. Its path is configurable - see DJANGO_ADMIN_PATH in settings.
+    """
+
+    prefixes = list(ADMIN_PROTECTED_PREFIXES)
+
+    django_admin = getattr(
+        settings,
+        "DJANGO_ADMIN_PATH",
+        "",
+    )
+
+    if django_admin:
+        prefixes.append(f"/{django_admin.strip('/')}/")
+
+    return tuple(prefixes)
 
 
 def is_admin_user(user):
@@ -44,7 +67,7 @@ def is_bde_user(user):
 def is_admin_path(path):
     return any(
         (path or "").startswith(prefix)
-        for prefix in ADMIN_PROTECTED_PREFIXES
+        for prefix in admin_protected_prefixes()
     )
 
 

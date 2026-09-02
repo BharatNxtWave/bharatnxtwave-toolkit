@@ -30,7 +30,6 @@ from .models import (
 from .pitching import (
     VISIBLE_STATUSES,
     apply_pitch_state,
-    apply_pitch_states,
     available_sectors,
     closing_soon_queryset,
     pitchable_queryset,

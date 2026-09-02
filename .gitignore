@@ -26,3 +26,6 @@ backups/
 
 # Confidential BharatNXT source files
 confidential_source/
+
+# Runtime logs
+logs/

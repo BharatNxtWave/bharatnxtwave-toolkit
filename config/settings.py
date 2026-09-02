@@ -10,7 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+from urllib.parse import unquote, urlparse
+
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-rsje19v)%tk@*b-n93v&u=eu5-izbj($bdz7n0h138-s@kpstl'
+#
+# Development fallback only. Production reads BHARATNXT_SECRET_KEY from the
+# environment (see the production block below) and refuses to start without it.
+SECRET_KEY = os.environ.get(
+    "BHARATNXT_SECRET_KEY",
+    "django-insecure-development-only-key-never-use-in-production",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -46,6 +56,10 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "accounts.network_security.OfficeNetworkMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    # Serves collected static files directly from the app process. Needed on
+    # platforms with no separate web server in front (Render); harmless when
+    # nginx is serving /static/ itself, because nginx answers first.
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -126,6 +140,26 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
+# Destination for `manage.py collectstatic`. Nginx serves this directory
+# directly (see deployment/nginx.internal.example); on a managed platform
+# WhiteNoise serves it from inside the app process instead.
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Compressed + hashed filenames, so static assets can be cached hard and a
+# deploy busts the cache by itself. Every {% static %} reference in the
+# templates was verified to resolve, which is what this storage requires.
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": (
+            "whitenoise.storage."
+            "CompressedManifestStaticFilesStorage"
+        ),
+    },
+}
+
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
@@ -166,8 +200,6 @@ OFFICE_ALLOWED_NETWORKS = [
 # =========================================================
 # BHARATNXT PRODUCTION CONFIGURATION
 # =========================================================
-
-import os
 
 
 # ---------------------------------------------------------
@@ -211,6 +243,23 @@ if IS_PRODUCTION:
         ).split(",")
         if origin.strip()
     ]
+
+    # Render publishes the service's own hostname. Adding it automatically
+    # avoids the most common managed-platform deploy failure, where the app
+    # boots fine and then rejects every request with DisallowedHost.
+    _render_host = os.environ.get(
+        "RENDER_EXTERNAL_HOSTNAME",
+        "",
+    ).strip()
+
+    if _render_host:
+        if _render_host not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(_render_host)
+
+        _render_origin = f"https://{_render_host}"
+
+        if _render_origin not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(_render_origin)
 
     OFFICE_NETWORK_ENFORCED = True
 
@@ -280,12 +329,43 @@ if IS_PRODUCTION:
 # PostgreSQL credentials come entirely from environment.
 # ---------------------------------------------------------
 
-DATABASE_ENGINE = os.environ.get(
-    "BHARATNXT_DB_ENGINE",
-    "sqlite"
-).lower()
+# A single DATABASE_URL wins over the individual variables. Managed
+# platforms (Render, Heroku, Fly) inject their database this way.
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
+    "",
+).strip()
 
-if DATABASE_ENGINE == "postgresql":
+if DATABASE_URL:
+    _parsed = urlparse(DATABASE_URL)
+
+    if _parsed.scheme not in {"postgres", "postgresql"}:
+        raise ImproperlyConfigured(
+            f"DATABASE_URL must be a PostgreSQL URL, got "
+            f"scheme {_parsed.scheme!r}."
+        )
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": unquote(_parsed.path.lstrip("/")),
+            "USER": unquote(_parsed.username or ""),
+            "PASSWORD": unquote(_parsed.password or ""),
+            "HOST": _parsed.hostname or "127.0.0.1",
+            "PORT": str(_parsed.port or "5432"),
+            "CONN_MAX_AGE": 60,
+        }
+    }
+
+    DATABASE_ENGINE = "postgresql"
+
+else:
+    DATABASE_ENGINE = os.environ.get(
+        "BHARATNXT_DB_ENGINE",
+        "sqlite"
+    ).lower()
+
+if DATABASE_ENGINE == "postgresql" and not DATABASE_URL:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -305,8 +385,37 @@ if DATABASE_ENGINE == "postgresql":
     }
 
 
+# ---------------------------------------------------------
+# How the client IP is resolved
+#
+# "xrealip"   self-hosted nginx (default). X-Real-IP is
+#             honoured only from TRUSTED_PROXY_IPS below.
+#
+# "forwarded" managed platform such as Render, where
+#             REMOTE_ADDR is an internal platform address.
+#             The client comes from X-Forwarded-For,
+#             counting TRUSTED_PROXY_HOPS in from the right.
+#
+# This feeds the office-network allow-list, so getting it
+# wrong either locks everyone out or makes the allow-list
+# spoofable. See accounts/network_security.py.
+# ---------------------------------------------------------
+
+PROXY_MODE = os.environ.get(
+    "BHARATNXT_PROXY_MODE",
+    "xrealip",
+).strip().lower()
+
+TRUSTED_PROXY_HOPS = int(
+    os.environ.get(
+        "BHARATNXT_TRUSTED_PROXY_HOPS",
+        "1",
+    )
+)
+
+
 # Trusted reverse proxy addresses.
-# Only these hosts may provide X-Real-IP.
+# Only these hosts may provide X-Real-IP (xrealip mode).
 TRUSTED_PROXY_IPS = [
     "127.0.0.1",
     "::1",
@@ -321,3 +430,230 @@ if IS_PRODUCTION:
         ).split(",")
         if ip.strip()
     ]
+
+
+# ---------------------------------------------------------
+# Email
+#
+# This toolkit sends no email at all - there is no send_mail,
+# EmailMessage or mail_admins call anywhere in the codebase.
+#
+# Django's deploy check (mail.E001) rejects every non-SMTP
+# backend, so production uses the dummy backend and silences
+# that one check with the justification above.
+#
+# If email is ever added, switch BACKEND to the SMTP backend,
+# configure the host from the environment, and remove
+# "mail.E001" from SILENCED_SYSTEM_CHECKS.
+# ---------------------------------------------------------
+
+if IS_PRODUCTION:
+    MAILERS = {
+        "default": {
+            "BACKEND": "django.core.mail.backends.dummy.EmailBackend",
+        },
+    }
+
+    # security.W005 - HSTS includeSubDomains: the toolkit is served from a
+    #   bare internal IP address, which has no subdomains.
+    # security.W021 - HSTS preload: the browser preload list does not accept
+    #   IP addresses, only registrable domains.
+    # Both are genuinely not applicable to this deployment. Everything else
+    # is left un-silenced so a real new warning stands out.
+    SILENCED_SYSTEM_CHECKS = [
+        "mail.E001",
+        "security.W005",
+        "security.W021",
+    ]
+
+
+# ---------------------------------------------------------
+# Django's built-in admin
+#
+# The built-in admin gives direct model access, including the
+# User model, so it is not left on the guessable default path
+# in production. Set BHARATNXT_DJANGO_ADMIN_PATH to something
+# unguessable, or to an empty string to remove it entirely -
+# the custom Admin Centre covers day-to-day administration.
+#
+# The resolved path is also added to the Admin Centre's
+# protected prefixes (see accounts/portal_access.py) so the
+# same role rules apply to it.
+# ---------------------------------------------------------
+
+DJANGO_ADMIN_PATH = os.environ.get(
+    "BHARATNXT_DJANGO_ADMIN_PATH",
+    "admin/",
+).strip().strip("/")
+
+if DJANGO_ADMIN_PATH:
+    DJANGO_ADMIN_PATH = f"{DJANGO_ADMIN_PATH}/"
+
+
+# ---------------------------------------------------------
+# Login brute-force protection
+#
+# Failures are counted per username and per client IP by
+# accounts/login_throttle.py.
+#
+# The counters live in the cache, so production must use a
+# cache shared by every gunicorn worker - the default
+# per-process LocMemCache would multiply the effective limit
+# by the worker count. The database cache needs no extra
+# service; create its table once with:
+#
+#     manage.py createcachetable
+# ---------------------------------------------------------
+
+LOGIN_MAX_FAILED_ATTEMPTS = int(
+    os.environ.get(
+        "BHARATNXT_LOGIN_MAX_ATTEMPTS",
+        "5",
+    )
+)
+
+LOGIN_LOCKOUT_SECONDS = int(
+    os.environ.get(
+        "BHARATNXT_LOGIN_LOCKOUT_SECONDS",
+        str(15 * 60),
+    )
+)
+
+if IS_PRODUCTION:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+            "LOCATION": "bharatnxt_cache",
+        }
+    }
+
+
+# ---------------------------------------------------------
+# Platform health check
+#
+# The hosting platform polls this path from inside its own
+# network, so it is exempt from the office IP allow-list.
+# It returns a bare "ok" and nothing else.
+# ---------------------------------------------------------
+
+HEALTH_CHECK_PATH = os.environ.get(
+    "BHARATNXT_HEALTH_CHECK_PATH",
+    "/healthz/",
+)
+
+
+# ---------------------------------------------------------
+# Persistent data root
+#
+# Everything the app writes and must keep lives here:
+# scheme flyers, pre-import database snapshots, and logs.
+#
+# On a self-hosted server the project directory is durable,
+# so this can stay unset.
+#
+# On a managed platform the container filesystem is WIPED on
+# every deploy and restart. BHARATNXT_DATA_ROOT must point at
+# a mounted persistent disk there, or uploaded scheme flyers
+# are permanently lost on the next deploy - silently, because
+# only the files disappear while their database rows remain.
+# ---------------------------------------------------------
+
+DATA_ROOT = os.environ.get(
+    "BHARATNXT_DATA_ROOT",
+    "",
+).strip()
+
+if DATA_ROOT:
+    _data_root = Path(DATA_ROOT)
+
+    BNW_PRIVATE_UPLOAD_ROOT = _data_root / "private_uploads"
+    BNW_IMPORT_BACKUP_ROOT = _data_root / "audit"
+    DEFAULT_LOG_DIR = _data_root / "logs"
+
+else:
+    BNW_PRIVATE_UPLOAD_ROOT = BASE_DIR / "private_uploads"
+    BNW_IMPORT_BACKUP_ROOT = (
+        BASE_DIR / "confidential_source" / "audit"
+    )
+    DEFAULT_LOG_DIR = BASE_DIR / "logs"
+
+
+# ---------------------------------------------------------
+# Logging
+#
+# With DEBUG = False an unhandled exception renders a blank
+# 500 page and, without this block, vanishes silently.
+#
+# Everything goes to stdout (captured by journald via the
+# gunicorn unit) and to a rotating file for grepping on the
+# server.
+# ---------------------------------------------------------
+
+LOG_DIR = Path(
+    os.environ.get(
+        "BHARATNXT_LOG_DIR",
+        DEFAULT_LOG_DIR,
+    )
+)
+
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+LOG_LEVEL = os.environ.get(
+    "BHARATNXT_LOG_LEVEL",
+    "INFO" if IS_PRODUCTION else "DEBUG",
+).upper()
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    "formatters": {
+        "verbose": {
+            "format": (
+                "{asctime} {levelname} {name} "
+                "{process:d} {message}"
+            ),
+            "style": "{",
+        },
+    },
+
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": str(LOG_DIR / "bharatnxt.log"),
+            "maxBytes": 10 * 1024 * 1024,
+            "backupCount": 10,
+            "encoding": "utf-8",
+            "formatter": "verbose",
+        },
+    },
+
+    "root": {
+        "handlers": ["console", "file"],
+        "level": LOG_LEVEL,
+    },
+
+    "loggers": {
+        # Unhandled view exceptions and 4xx/5xx responses.
+        "django.request": {
+            "handlers": ["console", "file"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        # Blocked-network hits, failed logins, import failures.
+        "accounts": {
+            "handlers": ["console", "file"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "toolkit": {
+            "handlers": ["console", "file"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+    },
+}

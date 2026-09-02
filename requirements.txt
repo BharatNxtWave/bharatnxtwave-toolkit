@@ -1,0 +1,19 @@
+# BharatNXT Wave - development / test dependencies
+#
+# Exact pins so every machine and every deploy resolves to the same
+# versions. Regenerate with:  pip freeze > requirements.txt
+#
+# Production additionally needs gunicorn + psycopg:
+#   pip install -r deployment/requirements-production.txt
+
+Django==6.1
+asgiref==3.12.1
+sqlparse==0.6.0
+tzdata==2026.3
+
+# .xlsx import/export
+openpyxl==3.1.5
+et_xmlfile==2.0.0
+
+# Serves static files from the app process (managed platforms)
+whitenoise==6.12.0

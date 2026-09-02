@@ -1,0 +1,111 @@
+# BharatNXT Wave - Render Blueprint
+#
+# Create the whole stack from this file: Render Dashboard -> New -> Blueprint,
+# point it at this repository. See deployment/DEPLOY_RENDER.md for the full
+# walkthrough and for the values you must fill in yourself.
+#
+# Two things here are NOT optional:
+#
+#   disk:            Render wipes the container filesystem on every deploy.
+#                    Scheme flyers live on this disk. Without it they are
+#                    lost on the next deploy, silently - the files vanish
+#                    while their database rows remain.
+#
+#   healthCheckPath: the office IP allow-list would otherwise reject
+#                    Render's health probe and fail every deploy.
+
+databases:
+  - name: bharatnxt-db
+    databaseName: bharatnxt_toolkit
+    user: bharatnxt_app
+    # Must match the web service region, or every query crosses the internet.
+    region: singapore
+    plan: basic-256mb
+    postgresMajorVersion: "16"
+    ipAllowList: []          # Reachable only from inside Render.
+
+services:
+  - type: web
+    name: bharatnxt-toolkit
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: singapore
+    # A persistent disk requires a paid instance type; free will not work.
+    plan: starter
+    healthCheckPath: /healthz/
+
+    disk:
+      name: bharatnxt-data
+      mountPath: /var/data
+      sizeGB: 10
+
+    envVars:
+      # -- the master switch ------------------------------------------------
+      # Turns off DEBUG and turns on HTTPS enforcement, secure cookies and
+      # the office IP allow-list. The container refuses to start without it.
+      - key: BHARATNXT_ENVIRONMENT
+        value: production
+
+      # -- secrets ----------------------------------------------------------
+      # Generated once by Render and then held; never in the repository.
+      - key: BHARATNXT_SECRET_KEY
+        generateValue: true
+
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bharatnxt-db
+          property: connectionString
+
+      # -- persistent storage -----------------------------------------------
+      # Must equal the disk mountPath above.
+      - key: BHARATNXT_DATA_ROOT
+        value: /var/data
+
+      # -- how the client IP is resolved ------------------------------------
+      # On Render REMOTE_ADDR is an internal address, so the client comes
+      # from X-Forwarded-For instead. Verify the hop count against a real
+      # request before trusting the allow-list - DEPLOY_RENDER.md step 6
+      # explains how.
+      - key: BHARATNXT_PROXY_MODE
+        value: forwarded
+
+      - key: BHARATNXT_TRUSTED_PROXY_HOPS
+        value: "1"
+
+      # -- fill these in yourself -------------------------------------------
+      # sync: false means Render prompts for the value and keeps it out of
+      # this file.
+
+      # The office's PUBLIC egress IP in CIDR form, e.g. 203.0.113.5/32.
+      # NOT the office LAN range - Render never sees LAN addresses.
+      # Get it from the office network with: curl https://ifconfig.me
+      - key: BHARATNXT_OFFICE_NETWORKS
+        sync: false
+
+      # An unguessable path for Django's built-in admin, or an empty string
+      # to remove it. It grants direct model access, so do not leave /admin/.
+      - key: BHARATNXT_DJANGO_ADMIN_PATH
+        sync: false
+
+      # Optional. The service's own .onrender.com hostname is added
+      # automatically; set these only when using a custom domain.
+      - key: BHARATNXT_ALLOWED_HOSTS
+        sync: false
+
+      - key: BHARATNXT_CSRF_TRUSTED_ORIGINS
+        sync: false
+
+      # -- tunable ----------------------------------------------------------
+      - key: BHARATNXT_LOGIN_MAX_ATTEMPTS
+        value: "5"
+
+      - key: BHARATNXT_LOGIN_LOCKOUT_SECONDS
+        value: "900"
+
+      - key: BHARATNXT_LOG_LEVEL
+        value: INFO
+
+      # gunicorn workers. Raise only with the instance size - each worker
+      # holds its own database connections.
+      - key: WEB_CONCURRENCY
+        value: "3"

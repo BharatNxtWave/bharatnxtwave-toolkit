@@ -22,7 +22,6 @@ import hashlib
 import re
 
 from collections import Counter
-from decimal import Decimal
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
